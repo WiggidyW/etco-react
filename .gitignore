@@ -41,4 +41,5 @@ src/proto/staticdata/shop_locations.ts
 
 # etc
 package-lock.json
+package-lock.json
 .env
