@@ -1,46 +1,139 @@
 "use client";
 
-import { useRef, useEffect, RefObject, ReactElement } from "react";
-import { Dims, Rect } from "./dims";
+import {
+  useRef,
+  useEffect,
+  RefObject,
+  ReactElement,
+  ReactNode,
+  PropsWithChildren,
+} from "react";
+import classNames from "classnames";
+// import { useRouter } from "next/navigation";
 
-const DEFAULT_DIMS_TRANSFORM = (dims: Dims): Dims => ({
-  height: dims.height / 2,
-  width: dims.width / 2,
-});
+export type PopupStyle = "default" | "success" | "failure";
+
+export type DigitStr =
+  | "0"
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9";
+export type DoubleDigitStr = `${DigitStr}${DigitStr}`;
+export type ZeroToHundredStr = DigitStr | `${DigitStr}${DigitStr}` | "100";
 
 export interface PopupProps {
-  title: string;
-  message: string;
-  contentRect: Rect;
+  childrenClassName?: string;
+  footerClassName?: string;
   onClickOutside?: () => void;
-  dimsTransform?: (contentDims: Dims) => Dims;
+  popupStyle?: PopupStyle;
+  percentage?: ZeroToHundredStr;
+  footer?: ReactNode;
 }
-
 export const Popup = ({
-  title,
-  message,
-  contentRect,
+  popupStyle = "default",
   onClickOutside,
-  dimsTransform = DEFAULT_DIMS_TRANSFORM,
-}: PopupProps): ReactElement => {
+  percentage = "50",
+  childrenClassName,
+  children,
+  footerClassName,
+  footer,
+}: PopupProps & PropsWithChildren): ReactElement => {
   const popupRef = useOnClickOutside<HTMLDivElement>(onClickOutside);
-
   return (
     <div
-      className="fixed flex items-center justify-center bg-black bg-opacity-50 z-20"
-      style={contentRect}
+      className={classNames(
+        "absolute",
+        "inset-0",
+        "flex",
+        "items-center",
+        "justify-center",
+        "bg-black",
+        "bg-opacity-70",
+        "z-40"
+      )}
     >
       <div
-        className="bg-white rounded-md p-4"
-        style={dimsTransform(contentRect)}
+        className={classNames("flex", "flex-col", "border", {
+          "bg-primary-base": popupStyle === "default",
+          "border-primary-border": popupStyle === "default",
+          "text-primary-text": popupStyle === "default",
+
+          "bg-success-base": popupStyle === "success",
+          "border-success-border": popupStyle === "success",
+          "text-success-text": popupStyle === "success",
+
+          "bg-failure-base": popupStyle === "failure",
+          "border-failure-border": popupStyle === "failure",
+          "text-failure-text": popupStyle === "failure",
+        })}
+        style={{
+          maxWidth: `${percentage}vw`,
+          maxHeight: `${percentage}vh`,
+          width: `${percentage}%`,
+          height: `${percentage}%`,
+        }}
         ref={popupRef}
       >
-        <div className="font-bold text-xl mb-2">{title}</div>
-        <div className="text-base">{message}</div>
+        <div className={classNames("flex-grow", "p-2", childrenClassName)}>
+          {children}
+        </div>
+        {footer && (
+          <div
+            className={classNames(
+              "border-t",
+              "p-1",
+              {
+                "border-primary-border": popupStyle === "default",
+                "border-success-border": popupStyle === "success",
+                "border-failure-border": popupStyle === "failure",
+              },
+              footerClassName
+            )}
+          >
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );
 };
+
+export interface MessagePopupProps extends PopupProps {
+  title: string;
+  message: string;
+}
+export const MessagePopup = ({
+  message,
+  title,
+  ...props
+}: MessagePopupProps): ReactElement => (
+  <Popup {...props}>
+    <div className="font-bold text-xl mb-2">{title}</div>
+    <div className="text-base">{message}</div>
+  </Popup>
+);
+
+// export interface MessagePopupWithRedirectProps
+//   extends Omit<MessagePopupProps, "onClickOutside"> {
+//   href: string;
+// }
+
+// export const MessagePopupWithRedirect = ({
+//   href,
+//   ...MessagePopupProps
+// }: MessagePopupWithRedirectProps): ReactElement => {
+//   const router = useRouter();
+//   const onClickOutside = () => router.push(href);
+//   return (
+//     <MessagePopup {...MessagePopupProps} onClickOutside={onClickOutside} />
+//   );
+// };
 
 const useOnClickOutside = <T extends HTMLElement>(
   onClickOutside?: () => void

@@ -1,102 +1,96 @@
-import { ErrorResponse } from "@/proto/etco";
-import { RpcError, RpcStatus } from "@protobuf-ts/runtime-rpc";
+export const unknownToError = (e: unknown): Error => {
+  if (e instanceof Error) return e;
+  if (e instanceof ParsedJSONError) return e.toErrorMinified();
 
-export enum EtcoErrorKind {
-  UnknownError = 0,
-  StorageError = 1,
-  RPCError = 2, // transport error / bad status code (protobuf-ts combines these)
-  ProtoError = 3, // server returned an error in the response + status ok
-  AuthFailure = 4,
-  ValidationError = 5,
-  ClientConstructionError = 6,
-}
+  let message: string;
+  try {
+    message = JSON.stringify(e);
+  } catch {
+    message = "Unknown";
+  }
 
-const EtcoErrorKindToString = (kind: EtcoErrorKind): string => {
-  switch (kind) {
-    case EtcoErrorKind.UnknownError:
-      return "UnknownError";
-    case EtcoErrorKind.StorageError:
-      return "StorageError";
-    case EtcoErrorKind.RPCError:
-      return "RPCError";
-    case EtcoErrorKind.ProtoError:
-      return "ProtoError";
-    case EtcoErrorKind.AuthFailure:
-      return "AuthFailure";
-    case EtcoErrorKind.ValidationError:
-      return "ValidationError";
-    case EtcoErrorKind.ClientConstructionError:
-      return "ClientConstructionError";
-    // default:
-    //   return "UnknownError";
+  return new Error(message, { cause: e });
+};
+
+export const unknownToParsedJSONError = (e: unknown): ParsedJSONError => {
+  if (e instanceof ParsedJSONError) {
+    // return it as-is
+    return e;
+  } else if (e instanceof Error) {
+    // check if the message is an embedded ParsedJSONErrorMessage
+    const parsedMessage = toParsedJSONErrorMessage(e.message);
+    if (parsedMessage !== null) {
+      return new ParsedJSONError(parsedMessage);
+    } else {
+      return new ParsedJSONError({ kind: [], message: e.message }, e);
+    }
+  } else {
+    let message: string;
+    try {
+      message = JSON.stringify(e);
+    } catch {
+      message = "Unknown";
+    }
+    return new ParsedJSONError({ kind: [], message }, e);
   }
 };
 
-export interface IEtcoError {
-  kind: EtcoErrorKind;
-  error: any | Error | ErrorResponse | RpcError | RpcStatus | null | string;
-}
+const toParsedJSONErrorMessage = (
+  errorMessage: string
+): ParsedJSONErrorMessage | null => {
+  try {
+    const obj: unknown | { [key: string]: unknown } = JSON.parse(errorMessage);
+    if (
+      typeof obj === "object" &&
+      obj !== null &&
+      typeof (obj as { [key: string]: unknown }).message === "string" &&
+      Array.isArray((obj as { [key: string]: unknown }).kind)
+    ) {
+      return obj as ParsedJSONErrorMessage;
+    }
+  } catch {}
+  return null;
+};
 
-export class EtcoError {
-  readonly kind: EtcoErrorKind;
-  readonly error: any | ErrorResponse | RpcError | RpcStatus | null | string;
+export class ParsedJSONError {
+  readonly name: string = "ParsedJSONError";
+  message: ParsedJSONErrorMessage;
+  cause?: unknown;
 
-  private constructor(
-    kind: EtcoErrorKind,
-    error: any | Error | ErrorResponse | RpcError | RpcStatus | null | string
-  ) {
-    this.kind = kind;
-    this.error = error;
+  constructor(message: ParsedJSONErrorMessage, cause?: unknown) {
+    this.message = message;
+    this.cause = cause;
   }
 
-  static newUnknownError(err: any): EtcoError {
-    return new EtcoError(EtcoErrorKind.UnknownError, err);
+  private toError(spacing: number): Error {
+    return new Error(JSON.stringify(this.message, null, spacing), {
+      cause: this.cause,
+    });
   }
 
-  static newClientConstructionError(err: Error): EtcoError {
-    return new EtcoError(EtcoErrorKind.ClientConstructionError, err);
+  toErrorMinified(): Error {
+    return this.toError(0);
   }
 
-  static newStorageError(err: Error): EtcoError {
-    return new EtcoError(EtcoErrorKind.StorageError, err);
-  }
-
-  static newProtoError(err: ErrorResponse): EtcoError {
-    return new EtcoError(EtcoErrorKind.ProtoError, err);
-  }
-
-  static newRPCError(err: RpcError): EtcoError {
-    return new EtcoError(EtcoErrorKind.RPCError, err);
-  }
-
-  static newAuthFailure(): EtcoError {
-    return new EtcoError(EtcoErrorKind.AuthFailure, null);
-  }
-
-  static newValidationError(err: Error): EtcoError {
-    return new EtcoError(EtcoErrorKind.ValidationError, err);
-  }
-
-  public get message(): string {
-    return this.toString();
-  }
-
-  public get cause():
-    | any
-    | Error
-    | ErrorResponse
-    | RpcError
-    | RpcStatus
-    | null
-    | string {
-    return this.error;
-  }
-
-  toString(): string {
-    return `EtcoError: ${EtcoErrorKindToString(this.kind)}: ${JSON.stringify(
-      this.error,
-      null,
-      2
-    )}`;
+  toErrorPretty(): Error {
+    return this.toError(2);
   }
 }
+
+export interface ParsedJSONErrorMessage {
+  kind: string[];
+  message: string;
+  [key: string]: unknown;
+}
+
+// export const newParsedJSONErrorMessage = (
+//   name?: string,
+//   kind?: string,
+//   message?: string,
+//   args?: { [key: string]: unknown }
+// ): ParsedJSONErrorMessage => ({
+//   name: name ?? "Unknown",
+//   kind: kind ?? "Unknown",
+//   message: message ?? "Unknown",
+//   ...args,
+// });

@@ -1,25 +1,60 @@
-"use client";
+import { ShopAppraisalContainer } from "@/components/Appraisal/ShopAppraisalContainer";
+import { PurchaseContainerLoader } from "@/components/Purchase/Loader";
+import { serverCookiesGetCurrentCharacter } from "@/cookies/server";
+import { getLocations } from "@/components/Appraisal/Options";
+import { isLocationIdStringValid } from "@/utils/locationId";
+import { LoggedInMain, Main } from "@/components/Main";
+import { redirect } from "next/navigation";
+import { ReactElement, Suspense } from "react";
+import {
+  ErrorBoundaryRefresh,
+  ErrorBoundaryTryAgain,
+} from "@/components/ErrorBoundary";
+import { Loading } from "@/components/Loading";
 
-import { TestInventory } from "@/components/Item/Purchase/Inventory";
-import { useCurrentCharacter } from "@/components/Login/hooks";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+const PATH = "/shop";
 
-export const Test = (): React.ReactElement => {
-  const router = useRouter();
-  const { character } = useCurrentCharacter("characters-purchase");
+export default function Page({
+  searchParams: { locationId },
+}: {
+  searchParams: { locationId?: string | string[] };
+}): ReactElement {
+  const character = serverCookiesGetCurrentCharacter()?.toObject();
+  if (!isLocationIdParamValid(locationId)) {
+    return redirect(PATH);
+  } else if (locationId) {
+    return (
+      <LoggedInMain path={`${PATH}`} character={character}>
+        {character && (
+          <Suspense fallback={<Loading scale="25%" />}>
+            <ErrorBoundaryRefresh>
+              <PurchaseContainerLoader
+                character={character!}
+                locationId={Number(locationId)}
+                options={getLocations()}
+                basePath={PATH}
+              />
+            </ErrorBoundaryRefresh>
+          </Suspense>
+        )}
+      </LoggedInMain>
+    );
+  } /* if (!locationId) */ else {
+    return (
+      <Main path={PATH} character={character}>
+        <ErrorBoundaryTryAgain>
+          <ShopAppraisalContainer
+            basePath={`${PATH}`}
+            options={getLocations()}
+          />
+        </ErrorBoundaryTryAgain>
+      </Main>
+    );
+  }
+}
 
-  // useEffect(() => {
-  //   if (currentCharacter === null) router.push("/purchase/login");
-  // }, [currentCharacter]);
-
-  return (
-    <main>
-      <h1>{character?.name}</h1>
-      <a href="/purchase/login">Login</a>
-      <TestInventory />
-    </main>
-  );
+const isLocationIdParamValid = (locationId?: string | string[]): boolean => {
+  if (locationId === undefined) return true;
+  if (typeof locationId !== "string") return false;
+  return isLocationIdStringValid(locationId);
 };
-
-export default Test;

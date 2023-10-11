@@ -10,13 +10,14 @@ export type SDETypes = SDEType[];
 export type GroupNames = string[];
 export type CategoryNames = string[];
 export type MarketGroupNames = string[];
+export type LocationFlags = string[];
 
-// BuybackSystems
-export interface BuybackSystem {
+// BuybackSystems + SDESystems
+export interface System {
   systemName: string;
   regionId: number;
 }
-export type BuybackSystems = { [systemId: number]: BuybackSystem };
+export type Systems = { [systemId: number]: System };
 
 // ShopLocations
 export interface ShopLocation {
@@ -29,5 +30,5 @@ export interface ShopLocation {
 export type ShopLocations = { [locationId: number]: ShopLocation };
 export type SystemNames = { [systemId: number]: string };
 
-// BuybackSystems + ShopLocations
+// BuybackSystems + SDESystems + ShopLocations
 export type RegionNames = { [regionId: number]: string };

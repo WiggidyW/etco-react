@@ -1,30 +1,26 @@
 import { ReactElement } from "react";
-import { Dims } from "./dims";
-
-const DEFAULT_SIZE_TRANSFORM = (dims: Dims): number => {
-  const size = Math.min(dims.width, dims.height);
-  return size / 4;
-};
+import classNames from "classnames";
+import { CenteredSquareBox } from "./CenteredSquareBox";
+import { Scale } from "./todo";
 
 export interface LoadingProps {
-  parentDims: Dims;
-  sizeTransform?: (contentDims: Dims) => number;
+  scale?: Scale;
 }
 
-export const Loading = ({
-  parentDims,
-  sizeTransform = DEFAULT_SIZE_TRANSFORM,
-}: LoadingProps): ReactElement => {
-  const size = sizeTransform(parentDims);
-  return (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <div
-        className="ease-linear rounded-full border-8 border-gray-200 border-t-blue-500 animate-spin"
-        style={{
-          height: size,
-          width: size,
-        }}
-      />
-    </div>
-  );
-};
+export const Loading = ({ scale = "100%" }: LoadingProps): ReactElement => (
+  <CenteredSquareBox scale={scale} minSize={"4px"}>
+    <div
+      className={classNames(
+        // "aspect-[1/1]",
+        "h-full",
+        "w-full",
+        "ease-linear",
+        "rounded-full",
+        "border-2",
+        "border-gray-200",
+        "border-t-blue-500",
+        "animate-spin"
+      )}
+    />
+  </CenteredSquareBox>
+);

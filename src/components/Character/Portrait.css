@@ -1,0 +1,73 @@
+img.portrait.size-2xs {
+  @apply w-4 h-4;
+}
+img.portrait.size-xs {
+  @apply w-6 h-6;
+}
+img.portrait.size-sm {
+  @apply w-8 h-8;
+}
+img.portrait.size-md {
+  @apply w-12 h-12;
+}
+img.portrait.size-lg {
+  @apply w-16 h-16;
+}
+img.portrait.size-xl {
+  @apply w-24 h-24;
+}
+img.portrait.size-2xl {
+  @apply w-32 h-32;
+}
+img.portrait.size-3xl {
+  @apply w-48 h-48;
+}
+img.portrait.size-4xl {
+  @apply w-64 h-64;
+}
+img.portrait.size-5xl {
+  @apply w-96 h-96;
+}
+img.portrait.size-6xl {
+  @apply w-[32rem] h-[32rem];
+}
+img.portrait.size-auto {
+  @apply w-full h-full;
+}
+img.portrait.size-auto-sm {
+  max-width: calc(10% + 1rem);
+  max-height: calc(10% + 1rem);
+  min-width: 10%;
+  min-height: 10%;
+}
+
+.name-bar.size-xs {
+  @apply w-8 text-sm;
+}
+.name-bar.size-sm {
+  @apply w-12 text-sm;
+}
+.name-bar.size-md {
+  @apply w-16 text-sm;
+}
+.name-bar.size-lg {
+  @apply w-24 text-sm;
+}
+.name-bar.size-xl {
+  @apply w-32 text-sm;
+}
+.name-bar.size-2xl {
+  @apply w-48 text-base;
+}
+.name-bar.size-3xl {
+  @apply w-64 text-base;
+}
+.name-bar.size-4xl {
+  @apply w-96 text-base;
+}
+.name-bar.size-5xl {
+  @apply w-[32rem] text-base;
+}
+.name-bar.size-auto {
+  @apply w-full text-base;
+}

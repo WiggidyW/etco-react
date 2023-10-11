@@ -1,0 +1,166 @@
+/* Welcome to the Realm of Insanity. If you're confused, don't ask me, because I am too. */
+
+.ant-table-content > table {
+  /* @apply pr-4; */
+}
+
+.ant-table-wrapper,
+.ant-table-wrapper * {
+  font-family: inherit !important;
+}
+
+th.text-xs,
+th.text-sm {
+  font-size: inherit !important;
+}
+
+table > tbody.ant-table-tbody > tr.ant-table-placeholder,
+table
+  > tbody.ant-table-tbody
+  > tr.ant-table-placeholder:hover
+  > td.ant-table-cell,
+table > tbody.ant-table-tbody > tr.ant-table-placeholder > td.ant-table-cell {
+  @apply bg-primary-base text-primary-text border-primary-border !important;
+}
+
+.ant-table-column-sorter {
+  @apply text-primary-text !important;
+}
+
+.ant-pagination-item-ellipsis {
+  @apply text-primary-text !important;
+}
+
+ul.ant-pagination.ant-table-pagination > li > button.ant-pagination-item-link {
+  @apply text-primary-text;
+}
+
+ul.ant-pagination.ant-table-pagination > li.ant-pagination-item > a {
+  @apply text-primary-text;
+}
+
+.ant-table-wrapper
+  .ant-table-thead
+  > tr
+  > th:not(:last-child):not(.ant-table-selection-column):not(
+    .ant-table-row-expand-icon-cell
+  ):not([colspan])::before,
+.ant-table-wrapper
+  .ant-table-thead
+  > tr
+  > td:not(:last-child):not(.ant-table-selection-column):not(
+    .ant-table-row-expand-icon-cell
+  ):not([colspan])::before {
+  @apply hidden;
+}
+
+table
+  > tbody.ant-table-tbody
+  > tr.ant-table-placeholder
+  > td.ant-table-cell
+  .ant-empty-description {
+  @apply text-white;
+}
+
+ul.ant-pagination.ant-table-pagination
+  > li.ant-pagination-options
+  > div.ant-select.ant-pagination-options-size-changer
+  > div.ant-select-selector {
+  @apply cursor-pointer select-none text-primary-text bg-primary-base border-primary-border;
+}
+
+ul.ant-pagination.ant-table-pagination
+  > li.ant-pagination-options
+  > div.ant-select.ant-pagination-options-size-changer
+  > div.ant-select-dropdown {
+  @apply bg-primary-base text-primary-text;
+}
+
+ul.ant-pagination.ant-table-pagination
+  > li.ant-pagination-options
+  > div.ant-select.ant-pagination-options-size-changer
+  > div.ant-select-dropdown
+  > div
+  > div.rc-virtual-list
+  > div.rc-virtual-list-holder
+  > div
+  > div.rc-virtual-list-holder-inner
+  > div.ant-select-item {
+  @apply bg-primary-base text-primary-text;
+}
+
+ul.ant-pagination.ant-table-pagination {
+  @apply text-primary-text border-primary-border;
+}
+
+ul.ant-pagination.ant-table-pagination > li.ant-pagination-item {
+  @apply border-primary-border bg-primary-base;
+}
+
+ul.ant-pagination.ant-table-pagination
+  > li.ant-pagination-item.ant-pagination-item-active
+  > a {
+  @apply text-blue-500;
+}
+
+thead.ant-table-thead {
+  @apply bg-primary-base text-primary-text !important;
+}
+
+thead.ant-table-thead > tr > th.ant-table-cell {
+  @apply bg-transparent border-primary-border text-primary-text p-2 whitespace-nowrap align-text-top !important;
+}
+
+thead.ant-table-thead > tr > th.ant-table-cell > div.ant-table-filter-column {
+  @apply flex-col;
+}
+
+thead.ant-table-thead
+  > tr
+  > th.ant-table-cell
+  > div.ant-table-filter-column
+  > .ant-dropdown-trigger {
+  @apply m-0 p-0 pt-1 cursor-auto;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row > td.ant-table-cell {
+  @apply bg-transparent border-primary-border text-primary-text p-2 !important;
+}
+
+tbody.ant-table-tbody
+  > tr.ant-table-row
+  > td.ant-table-cell.ant-table-column-has-sorters::before {
+  content: "";
+}
+
+tbody.ant-table-tbody > tr.ant-table-row {
+  @apply filter brightness-100 transition-filter ease-linear;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row.ant-table-row-selected {
+  @apply filter brightness-125 transition-filter ease-linear;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row.cfg-unmodified-row {
+  @apply bg-secondary-base;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row.cfg-unmodified-row:hover {
+  @apply bg-secondary-active transition-colors duration-100 ease-linear;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row.cfg-modified-row {
+  @apply bg-success-base;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row.cfg-modified-row:hover {
+  @apply bg-success-active transition-colors duration-100 ease-linear;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row.cfg-deleted-row {
+  @apply bg-failure-base;
+}
+
+tbody.ant-table-tbody > tr.ant-table-row.cfg-deleted-row:hover {
+  @apply bg-failure-active transition-colors duration-100 ease-linear;
+}

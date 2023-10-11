@@ -3,20 +3,84 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  font-weight: 300;
+  font-rendering: optimizeLegibility;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.etco-theme-dark {
+  --color-light-blue-base: hsl(207, 60%, 52%);
+  --color-light-blue-active: hsl(207, 90%, 78%);
+  --color-light-blue-faded: hsl(207, 30%, 30%);
+
+  --color-light-red-base: hsl(0, 60%, 60%);
+  --color-light-red-active: hsl(0, 90%, 78%);
+  --color-light-red-faded: hsl(0, 45%, 78%);
+
+  --color-light-green-base: hsl(120, 60%, 52%);
+  --color-light-green-active: hsl(120, 90%, 78%);
+  --color-light-green-faded: hsl(120, 45%, 78%);
+
+  --color-background-base: hsl(213, 16%, 12%);
+  --color-background-active: hsl(213, 24%, 18%);
+  --color-background-faded: hsl(213, 8%, 18%);
+  --color-background-text: rgb(200, 203, 210);
+  --color-background-border: rgb(131, 122, 108);
+
+  --color-bookend-base: hsl(200, 7%, 9%);
+  --color-bookend-active: hsl(200, 14%, 18%);
+  --color-bookend-faded: hsl(200, 4%, 18%);
+  --color-bookend-text: rgb(200, 203, 210);
+  --color-bookend-border: rgb(131, 122, 108);
+
+  --color-primary-base: hsl(200, 7%, 9%);
+  --color-primary-tweak: hsl(90, 8%, 16%);
+  --color-primary-active: hsl(200, 14%, 18%);
+  --color-primary-faded: hsl(200, 4%, 18%);
+  --color-primary-text: rgb(200, 203, 210);
+  --color-primary-border: rgb(131, 122, 108);
+
+  --color-secondary-base: hsl(213, 8%, 18%);
+  --color-secondary-active: hsl(213, 12%, 27%);
+  --color-secondary-faded: hsl(213, 4%, 27%);
+  --color-secondary-text: rgb(200, 203, 210);
+  --color-secondary-border: rgb(131, 122, 108);
+  --color-secondary-border: rgb(35, 58, 70);
+
+  --color-success-dark: hsl(120, 9%, 16%);
+  --color-success-base: hsl(120, 13%, 23%);
+  --color-success-active: hsl(120, 32%, 23%);
+  --color-success-faded: hsl(120, 8%, 23%);
+  --color-success-text: rgb(200, 203, 210);
+  --color-success-border: rgb(131, 122, 108);
+
+  --color-failure-dark: hsl(0, 9%, 16%);
+  --color-failure-base: hsl(0, 13%, 23%);
+  --color-failure-active: hsl(0, 32%, 23%);
+  --color-failure-faded: hsl(0, 8%, 23%);
+  --color-failure-text: rgb(200, 203, 210);
+  --color-failure-border: rgb(131, 122, 108);
 }
 
-body {
+input[type="number"] {
+}
+
+input,
+select,
+textarea {
+  @apply bg-primary-faded text-primary-text border-primary-border;
+}
+
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  @apply bg-primary-faded text-primary-text;
+}
+
+/* body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -24,4 +88,4 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-}
+} */

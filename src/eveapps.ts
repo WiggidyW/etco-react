@@ -1,72 +1,63 @@
+import { EnvStore } from "./env";
+
 export interface EveApp {
+  kind: EveAppKind;
   clientId: string;
+  clientSecret: string;
   redirectUrl: string;
   scopes: string[];
   charactersKey: string;
-  currentCharacterKey: string;
-  tokenPrefix: string;
+  canBeAdmin: boolean;
 }
 
-export enum EveAppKind {
-  Auth = 0,
-  Markets = 1,
-  StructureInfo = 2,
-  Corporation = 3,
-}
+export type EveAppKind = "Auth" | "Markets" | "StructureInfo" | "Corporation";
 
-export type AdminEveAppKind =
-  | EveAppKind.Corporation
-  | EveAppKind.Markets
-  | EveAppKind.StructureInfo;
+export const EveAppKinds: ["Auth", "Markets", "StructureInfo", "Corporation"] =
+  ["Auth", "Markets", "StructureInfo", "Corporation"];
 
-export const UserEveAppKind = EveAppKind.Auth;
-
-export const getEveApp = (kind: EveAppKind): EveApp => {
-  const eveApp = EVE_APPS[kind];
-  if (eveApp.clientId === "") throw new Error(`no client id for ${kind}`);
-  if (eveApp.redirectUrl === "") throw new Error(`no redirect url for ${kind}`);
-  return eveApp;
-};
+export const CurrentCharacterEveAppKind: EveAppKind = "Auth";
 
 const redirectUrl = (callback: string): string =>
-  process.env.NEXT_PUBLIC_BASE_URL
-    ? `${process.env.NEXT_PUBLIC_BASE_URL}/${callback}`
-    : "";
+  `${EnvStore.getPublic("BASE_URL")!}/${callback}`;
 
-const EVE_APPS: { [key in EveAppKind]: EveApp } = {
-  [EveAppKind.Auth]: {
-    clientId: process.env.NEXT_PUBLIC_EVE_AUTH_CLIENT_ID ?? "",
+export const EveApps: { [key in EveAppKind]: EveApp } = {
+  Auth: {
+    kind: "Auth",
+    clientId: EnvStore.getPrivate("EVE_AUTH_CLIENT_ID")!,
+    clientSecret: EnvStore.getPrivate("EVE_AUTH_CLIENT_SECRET")!,
     redirectUrl: redirectUrl("eveauthcallback-auth"),
-    scopes: [] as string[],
+    scopes: [],
     charactersKey: "characters",
-    currentCharacterKey: "current_character",
-    tokenPrefix: "token",
+    canBeAdmin: true,
   },
-  [EveAppKind.Markets]: {
-    clientId: process.env.NEXT_PUBLIC_EVE_MARKETS_CLIENT_ID ?? "",
+  Markets: {
+    kind: "Markets",
+    clientId: EnvStore.getPrivate("EVE_MARKETS_CLIENT_ID")!,
+    clientSecret: EnvStore.getPrivate("EVE_MARKETS_CLIENT_SECRET")!,
     redirectUrl: redirectUrl("eveauthcallback-markets"),
     scopes: ["esi-markets.structure_markets.v1"],
     charactersKey: "markets_characters",
-    currentCharacterKey: "markets_current_character",
-    tokenPrefix: "markets_token",
+    canBeAdmin: false,
   },
-  [EveAppKind.StructureInfo]: {
-    clientId: process.env.NEXT_PUBLIC_EVE_STRUCTURE_INFO_CLIENT_ID ?? "",
+  StructureInfo: {
+    kind: "StructureInfo",
+    clientId: EnvStore.getPrivate("EVE_STRUCTURE_INFO_CLIENT_ID")!,
+    clientSecret: EnvStore.getPrivate("EVE_STRUCTURE_INFO_CLIENT_SECRET")!,
     redirectUrl: redirectUrl("eveauthcallback-structureinfo"),
     scopes: ["esi-universe.read_structures.v1"],
     charactersKey: "structureinfo_characters",
-    currentCharacterKey: "structureinfo_current_character",
-    tokenPrefix: "structureinfo_token",
+    canBeAdmin: false,
   },
-  [EveAppKind.Corporation]: {
-    clientId: process.env.NEXT_PUBLIC_EVE_CORPORATION_CLIENT_ID ?? "",
+  Corporation: {
+    kind: "Corporation",
+    clientId: EnvStore.getPrivate("EVE_CORPORATION_CLIENT_ID")!,
+    clientSecret: EnvStore.getPrivate("EVE_CORPORATION_CLIENT_SECRET")!,
     redirectUrl: redirectUrl("eveauthcallback-corporation"),
     scopes: [
       "esi-assets.read_corporation_assets.v1",
       "esi-contracts.read_corporation_contracts.v1",
     ],
     charactersKey: "corporation_characters",
-    currentCharacterKey: "corporation_current_character",
-    tokenPrefix: "corporation_token",
+    canBeAdmin: false,
   },
 };

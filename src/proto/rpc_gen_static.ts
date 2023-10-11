@@ -1,11 +1,13 @@
 import * as pb from "./etco";
 import * as pbClient from "./etco.client";
-import { RPCResponse, RPCMethod, RPCRequest } from "./custom_interfaces";
-import { dispatchAnonymousRPC } from "./dispatch";
+import { RPCResponse, RPCMethod, RPCRequest } from "./interfaces";
 import * as sdt from "./staticdata/types";
 import fs from "fs";
+import { asIs, dispatch } from "@/server-actions/grpc/grpc";
+import { ThrowKind } from "@/server-actions/throw";
 
 const SDE_TYPES_FILENAME: string = "sde_types.ts";
+const SDE_SYSTEMS_FILENAME: string = "sde_systems.ts";
 const BUYBACK_SYSTEMS_FILENAME: string = "buyback_systems.ts";
 const SHOP_LOCATIONS_FILENAME: string = "shop_locations.ts";
 
@@ -13,6 +15,7 @@ export const generateStaticData = async (dirPath: string): Promise<void> => {
   await Promise.all([
     getTransformWriteNamedSDETypeData(dirPath + "/" + SDE_TYPES_FILENAME),
     getTransformWriteBuybackSystems(dirPath + "/" + BUYBACK_SYSTEMS_FILENAME),
+    getTransformWriteSDESystems(dirPath + "/" + SDE_SYSTEMS_FILENAME),
     getTransformWriteShopLocations(dirPath + "/" + SHOP_LOCATIONS_FILENAME),
   ]);
 };
@@ -36,8 +39,14 @@ const getTransformWriteBuybackSystems = async (
   filePath: string
 ): Promise<void> => {
   const rep = await getBuybackSystems();
-  const { buybackSystems, regionNames } = transformBuybackSystems(rep);
-  return writeBuybackSystems(filePath, buybackSystems, regionNames);
+  const { systems, regionNames } = transformSystems(rep);
+  return writeBuybackSystems(filePath, systems, regionNames);
+};
+
+const getTransformWriteSDESystems = async (filePath: string): Promise<void> => {
+  const rep = await getSDESystems();
+  const { systems, regionNames } = transformSystems(rep);
+  return writeSDESystems(filePath, systems, regionNames);
 };
 
 const getTransformWriteShopLocations = async (
@@ -52,24 +61,7 @@ const getTransformWriteShopLocations = async (
 const getRPCResponse = async <RQ extends RPCRequest, RP extends RPCResponse>(
   method: RPCMethod<RQ, RP>,
   request: RQ
-): Promise<RP> => {
-  // setting it like this is a bit hacky, but it works
-  let response: RP | null = null;
-
-  await dispatchAnonymousRPC(
-    method,
-    request,
-    (rep) => {
-      response = rep;
-    },
-    (err) => {
-      throw err;
-    }
-  );
-
-  if (response === null) throw new Error("response is null");
-  return response;
-};
+): Promise<RP> => dispatch(method, request, asIs, ThrowKind.Pretty);
 
 const getNamedSDETypeData = async (): Promise<pb.NamedSDETypeDataResponse> =>
   getRPCResponse(pbClient.EveTradingCoClient.prototype.namedSDETypeData, {});
@@ -78,6 +70,15 @@ const getBuybackSystems = async (): Promise<pb.BuybackSystemsResponse> =>
   getRPCResponse(pbClient.EveTradingCoClient.prototype.buybackSystems, {
     includeLocationNaming: {
       includeLocationName: false,
+      includeSystemName: true,
+      includeRegionName: true,
+    },
+  });
+
+const getSDESystems = async (): Promise<pb.SDESystemsResponse> =>
+  getRPCResponse(pbClient.EveTradingCoClient.prototype.sDESystems, {
+    includeLocationNaming: {
+      includeLocationName: true,
       includeSystemName: true,
       includeRegionName: true,
     },
@@ -129,17 +130,17 @@ const transformNamedSDETypeData = (
   };
 };
 
-const transformBuybackSystems = (
-  rep: pb.BuybackSystemsResponse
+const transformSystems = (
+  rep: pb.BuybackSystemsResponse | pb.SDESystemsResponse
 ): {
-  buybackSystems: sdt.BuybackSystems;
+  systems: sdt.Systems;
   regionNames: sdt.RegionNames;
 } => {
   if (rep.locationNamingMaps === undefined) {
     throw new Error("locationNamingMaps is undefined");
   }
 
-  const buybackSystems: sdt.BuybackSystems = {};
+  const systems: sdt.Systems = {};
 
   for (const system of rep.systems) {
     try {
@@ -147,7 +148,7 @@ const transformBuybackSystems = (
       if (systemName === "") {
         throw new Error(`systemId ${system.systemId} has empty systemName`);
       }
-      buybackSystems[system.systemId] = {
+      systems[system.systemId] = {
         systemName: systemName,
         regionId: system.regionId,
       };
@@ -161,10 +162,7 @@ const transformBuybackSystems = (
     }
   }
 
-  return {
-    buybackSystems: buybackSystems,
-    regionNames: rep.locationNamingMaps.regionNames,
-  };
+  return { systems, regionNames: rep.locationNamingMaps.regionNames };
 };
 
 const transformShopLocations = (
@@ -190,15 +188,12 @@ const transformShopLocations = (
       );
     }
     let locationName: string;
-    if (location.locationInfo.forbiddenStructure) {
-      locationName = "";
-    } else
-      try {
-        locationName =
-          rep.locationNamingMaps.locationNames[location.locationId.toString()];
-      } catch (err) {
-        throw new Error(`locationId ${location.locationId} not found in names`);
-      }
+    try {
+      locationName =
+        rep.locationNamingMaps.locationNames[location.locationId.toString()];
+    } catch (err) {
+      throw new Error(`locationId ${location.locationId} not found in names`);
+    }
     shopLocations[Number(location.locationId)] = {
       locationName: locationName,
       ...location.locationInfo,
@@ -261,15 +256,43 @@ const writeNamedSDETypeData = async (
 
 const writeBuybackSystems = async (
   filePath: string,
-  buybackSystems: sdt.BuybackSystems,
+  systems: sdt.Systems,
   regionNames: sdt.RegionNames
+): Promise<void> =>
+  writeSystems(
+    filePath,
+    systems,
+    regionNames,
+    "BUYBACK_SYSTEMS",
+    "BUYBACK_REGION_NAMES"
+  );
+
+const writeSDESystems = async (
+  filePath: string,
+  systems: sdt.Systems,
+  regionNames: sdt.RegionNames
+): Promise<void> =>
+  writeSystems(
+    filePath,
+    systems,
+    regionNames,
+    "SDE_SYSTEMS",
+    "SDE_REGION_NAMES"
+  );
+
+const writeSystems = async (
+  filePath: string,
+  systems: sdt.Systems,
+  regionNames: sdt.RegionNames,
+  systemsConstName: string,
+  regionsConstName: string
 ): Promise<void> => {
   let fileContent: string = "";
   fileContent += `import * as sdt from "./types";\n`;
-  fileContent += `export const BUYBACK_SYSTEMS: sdt.BuybackSystems = ${JSON.stringify(
-    buybackSystems
+  fileContent += `export const ${systemsConstName}: sdt.Systems = ${stringifyWithNumberKeys(
+    systems
   )};\n`;
-  fileContent += `export const REGION_NAMES: sdt.RegionNames = ${JSON.stringify(
+  fileContent += `export const ${regionsConstName}: sdt.RegionNames = ${stringifyWithNumberKeys(
     regionNames
   )};\n`;
   return writeFile(filePath, fileContent);
@@ -283,14 +306,23 @@ const writeShopLocations = async (
 ): Promise<void> => {
   let fileContent: string = "";
   fileContent += `import * as sdt from "./types";\n`;
-  fileContent += `export const SHOP_LOCATIONS: sdt.ShopLocations = ${JSON.stringify(
+  fileContent += `export const SHOP_LOCATIONS: sdt.ShopLocations = ${stringifyWithNumberKeys(
     shopLocations
   )};\n`;
-  fileContent += `export const SYSTEM_NAMES: sdt.SystemNames = ${JSON.stringify(
+  fileContent += `export const SHOP_SYSTEM_NAMES: sdt.SystemNames = ${stringifyWithNumberKeys(
     systemNames
   )};\n`;
-  fileContent += `export const REGION_NAMES: sdt.RegionNames = ${JSON.stringify(
+  fileContent += `export const SHOP_REGION_NAMES: sdt.RegionNames = ${stringifyWithNumberKeys(
     regionNames
   )};\n`;
   return writeFile(filePath, fileContent);
+};
+
+const stringifyWithNumberKeys = (obj: { [key: number]: any }): string => {
+  let str: string = "{";
+  for (const key in obj) {
+    str += `[${key}]:${JSON.stringify(obj[key])},`;
+  }
+  str += "}";
+  return str;
 };
