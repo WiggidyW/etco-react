@@ -7,6 +7,8 @@ steps:
   args:
   - 'build'
   - '--build-arg'
+  - 'ETCO_GRPC_URL=${_ETCO_GO_URL}'
+  - '--build-arg'
   - 'ETCO_EVE_AUTH_CLIENT_ID=${_ESI_AUTH_CLIENT_ID}'
   - '--build-arg'
   - 'ETCO_EVE_AUTH_CLIENT_SECRET=${_ESI_AUTH_CLIENT_SECRET}'
