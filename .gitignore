@@ -1,5 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# etc
+package-lock.json
+.env
+/placeholder
+placeholder
+placeholder/*
+/placeholder/*
+
 # dependencies
 /node_modules
 /.pnp
@@ -39,8 +47,3 @@ src/proto/staticdata/sde_types.ts
 src/proto/staticdata/buyback_systems.ts
 src/proto/staticdata/shop_locations.ts
 src/proto/staticdata/sde_systems.ts
-
-# etc
-package-lock.json
-.env
-/placeholder
