@@ -1,21 +1,11 @@
-import {
-  Result,
-  ResultErr,
-  ResultOk,
-  Option,
-  OptionNone,
-  OptionSome,
-} from "@/components/todo";
+import { Result, Option, OptionNone, OptionSome } from "@/components/todo";
 import { useEffect, useState } from "react";
 
-export const useServerAction = <T>(action: () => Promise<T>): Option<T> => {
+export const useServerAction = <T>(
+  action: () => Promise<Result<T, unknown>>
+): Option<T> => {
   // call the promise immediately
-  const resultPromise = useState<Promise<Result<T, unknown>>>(() =>
-    action().then(
-      (val) => ResultOk(val),
-      (err) => ResultErr(err)
-    )
-  )[0];
+  const resultPromise = useState<Promise<Result<T, unknown>>>(action)[0];
 
   // don't throw promise or set result until initialized
   const [result, setResult] = useState<Result<T, unknown> | null>(null);
