@@ -22,6 +22,14 @@ export const ResultErr = <T, E>(error: E): Result<T, E> => ({
   error,
 });
 
+export const ResultThrow = <T, E>(result: Result<T, E>): T => {
+  if (result.ok) {
+    return result.value;
+  } else {
+    throw result.error;
+  }
+};
+
 export type Option<T> = { some: true; value: T } | { some: false };
 
 export const OptionSome = <T>(value: T): Option<T> => ({
