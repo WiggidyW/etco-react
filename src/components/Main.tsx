@@ -7,6 +7,7 @@ import { ParsedJSONError } from "@/error/error";
 import { ErrorBoundaryGoBack } from "./ErrorBoundary";
 import { Character, ICharacter } from "@/browser/character";
 import { throwErr } from "@/server-actions/throw";
+import { ParsedErrorThrower } from "./ErrorThrower";
 
 export interface MainProps extends PropsWithChildren {
   character?: Character | ICharacter | null;
@@ -41,7 +42,7 @@ export const LoggedInMain = ({
   children,
 }: MainProps): ReactElement => (
   <Main character={character} path={path}>
-    <ErrorBoundaryGoBack href={`${path}/login`}>
+    <ErrorBoundaryGoBack href={`${path}/login`} resetTitle="Login">
       <LoginChecker character={character}>{children}</LoginChecker>
     </ErrorBoundaryGoBack>
   </Main>
@@ -55,11 +56,15 @@ const LoginChecker = ({
   children,
 }: LoginCheckerProps): ReactElement => {
   if (character === null || character === undefined) {
-    return throwErr(
-      new ParsedJSONError({
-        kind: ["NotLoggedIn"],
-        message: "Please log in",
-      })
+    return (
+      <ParsedErrorThrower
+        error={
+          new ParsedJSONError({
+            kind: ["NotLoggedIn"],
+            message: "Please log in",
+          })
+        }
+      />
     );
   } else {
     return <>{children}</>;
@@ -72,7 +77,7 @@ export const AdminMain = ({
   children,
 }: MainProps): ReactElement => (
   <Main character={character} path={path}>
-    <ErrorBoundaryGoBack href={`${path}/login`}>
+    <ErrorBoundaryGoBack href={`${path}/login`} resetTitle="Login">
       <AdminChecker character={character}>{children}</AdminChecker>
     </ErrorBoundaryGoBack>
   </Main>
@@ -86,18 +91,26 @@ const AdminChecker = ({
   children,
 }: AdminCheckerProps): ReactElement => {
   if (character === null || character === undefined) {
-    return throwErr(
-      new ParsedJSONError({
-        kind: ["NotAdmin", "NotLoggedIn"],
-        message: "Please log in",
-      })
+    return (
+      <ParsedErrorThrower
+        error={
+          new ParsedJSONError({
+            kind: ["NotAdmin", "NotLoggedIn"],
+            message: "Please log in",
+          })
+        }
+      />
     );
   } else if (!character.admin) {
-    return throwErr(
-      new ParsedJSONError({
-        kind: ["NotAdmin", "CharacterNotAdmin"],
-        message: "Please log in as an admin character",
-      })
+    return (
+      <ParsedErrorThrower
+        error={
+          new ParsedJSONError({
+            kind: ["NotAdmin", "CharacterNotAdmin"],
+            message: "Please log in as an admin character",
+          })
+        }
+      />
     );
   } else {
     return <>{children}</>;
