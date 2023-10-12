@@ -41,7 +41,6 @@ steps:
   - 'push'
   - 'gcr.io/$PROJECT_ID/etco-react:latest'
 
-
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'gcloud'
   args:
@@ -55,6 +54,18 @@ steps:
   - '--ingress'
   - 'all'
   - '--allow-unauthenticated'
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args:
+  - 'run'
+  - 'services'
+  - 'add-iam-policy-binding'
+  - 'etco-react'
+  - '--member'
+  - 'allUsers'
+  - '--role'
+  - 'roles/run.invoker'
 
 images: ['gcr.io/$PROJECT_ID/etco-react:latest']
 
