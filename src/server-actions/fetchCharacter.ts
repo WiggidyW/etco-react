@@ -11,6 +11,7 @@ import {
 import { ICharacter } from "@/browser/character";
 import { unknownToParsedJSONError } from "@/error/error";
 import { ThrowKind, throwErr } from "./throw";
+import { withCatchResult } from "./withResult";
 
 // export const fetchCharacterFromId = async (
 //   id: number,
@@ -67,6 +68,7 @@ export const fetchCharacter = async (
     return throwErr(error, throwKind);
   }
 };
+export const resultFetchCharacter = withCatchResult(fetchCharacter);
 
 interface IAuthFromCodeRep {
   access_token: string;
