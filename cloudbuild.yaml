@@ -61,11 +61,13 @@ steps:
   - 'run'
   - 'services'
   - 'add-iam-policy-binding'
-  - 'etco-react'
+  - '--region'
+  - '${_REGION}'
   - '--member'
   - 'allUsers'
   - '--role'
   - 'roles/run.invoker'
+  - 'etco-react'
 
 images: ['gcr.io/$PROJECT_ID/etco-react:latest']
 
