@@ -75,7 +75,7 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
 );
 
 const LoginImage = ({ path, character }: NavBarProps): ReactElement => (
-  <Link href={`${path}/login`}>
+  <Link href={`${path === "/" ? "" : path}/login`}>
     {character === null || character === undefined ? (
       <Image
         src={"/eve-sso-login-black-large.png"}
