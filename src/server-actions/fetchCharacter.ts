@@ -12,29 +12,29 @@ import { ICharacter } from "@/browser/character";
 import { unknownToParsedJSONError } from "@/error/error";
 import { ThrowKind, throwErr } from "./throw";
 
-export const fetchCharacterFromId = async (
-  id: number,
-  admin: boolean = false,
-  throwKind?: ThrowKind
-): Promise<ICharacter> => {
-  try {
-    const { name, corporationId, allianceId } = await CharacterInfo.fetchNew(
-      id
-    );
-    return {
-      refreshToken: "",
-      name,
-      id,
-      admin,
-      corporationId,
-      allianceId,
-    };
-  } catch (e) {
-    const error = unknownToParsedJSONError(e);
-    error.message.kind = ["FetchCharacterFromId", ...error.message.kind];
-    return throwErr(error, throwKind);
-  }
-};
+// export const fetchCharacterFromId = async (
+//   id: number,
+//   admin: boolean = false,
+//   throwKind?: ThrowKind
+// ): Promise<ICharacter> => {
+//   try {
+//     const { name, corporationId, allianceId } = await CharacterInfo.fetchNew(
+//       id
+//     );
+//     return {
+//       refreshToken: "",
+//       name,
+//       id,
+//       admin,
+//       corporationId,
+//       allianceId,
+//     };
+//   } catch (e) {
+//     const error = unknownToParsedJSONError(e);
+//     error.message.kind = ["FetchCharacterFromId", ...error.message.kind];
+//     return throwErr(error, throwKind);
+//   }
+// };
 
 export const fetchCharacter = async (
   code: string,
