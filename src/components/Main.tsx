@@ -6,7 +6,6 @@ import { NavBar } from "./NavBar";
 import { ParsedJSONError } from "@/error/error";
 import { ErrorBoundaryGoBack } from "./ErrorBoundary";
 import { Character, ICharacter } from "@/browser/character";
-import { throwErr } from "@/server-actions/throw";
 import { ParsedErrorThrower } from "./ErrorThrower";
 
 export interface MainProps extends PropsWithChildren {
