@@ -7,10 +7,11 @@ import { EveAuthCallbackClientSide } from "./EveAuthCallbackClientSide";
 import { Loading } from "@/components/Loading";
 import { ReactElement, Suspense } from "react";
 import { ParsedJSONError, unknownToParsedJSONError } from "@/error/error";
-import { ThrowKind, throwErr } from "@/server-actions/throw";
 import { ICharacter } from "@/browser/character";
 import { ErrorBoundaryGoBack } from "@/components/ErrorBoundary";
 import { isAdmin } from "@/server-actions/grpc/other";
+import { Result } from "@/components/todo";
+import { ErrorThrower } from "@/components/ErrorThrower";
 
 export interface EveAuthCallbackProps {
   clientId: string;
@@ -47,7 +48,7 @@ const EveAuthCallbackServerSide = async ({
   const code = searchParams["code"];
   const checkIsAdmin = canBeAdmin && serverCookiesGetCheckIsAdmin();
 
-  const fetch = async (): Promise<ICharacter> => {
+  const fetch = async (): Promise<Result<ICharacter, ParsedJSONError>> => {
     try {
       // validate code
       if (code === undefined || typeof code !== "string") {
@@ -62,33 +63,32 @@ const EveAuthCallbackServerSide = async ({
         code,
         clientId,
         clientSecret,
-        checkIsAdmin,
-        ThrowKind.Parsed
+        checkIsAdmin
       );
 
       // check if admin and set admin if so
       if (checkIsAdmin) {
-        character.admin = await isAdmin(
-          character.refreshToken,
-          ThrowKind.Parsed
-        );
+        character.admin = await isAdmin(character.refreshToken);
       }
 
-      return character;
+      return { ok: true, value: character };
     } catch (e) {
       const error = unknownToParsedJSONError(e);
       error.message.kind = ["EveAuthCallback", ...error.message.kind];
-      return throwErr(error, ThrowKind.Minified);
+      return { ok: false, error };
     }
   };
 
-  const character = await fetch();
-
-  return (
-    <EveAuthCallbackClientSide
-      character={character}
-      charactersKey={charactersKey}
-      redirectHref={redirectHref}
-    />
-  );
+  const characterResult = await fetch();
+  if (characterResult.ok) {
+    return (
+      <EveAuthCallbackClientSide
+        character={characterResult.value}
+        charactersKey={charactersKey}
+        redirectHref={redirectHref}
+      />
+    );
+  } else {
+    return <ErrorThrower error={characterResult.error} />;
+  }
 };
