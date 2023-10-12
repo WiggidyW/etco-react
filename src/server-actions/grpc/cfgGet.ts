@@ -22,7 +22,7 @@ export interface CfgGetAuthListLoadRep {
   permitCorporations: Map<number, ICorporation>;
   permitAlliances: Map<number, IAlliance>;
 }
-export const CfgGetAuthListLoad = async (
+export const cfgGetAuthListLoad = async (
   token: string,
   domainKey: string,
   throwKind?: ThrowKind
@@ -65,7 +65,7 @@ export const CfgGetAuthListLoad = async (
     },
     throwKind
   );
-export const resultCfgGetAuthListLoad = withCatchResult(CfgGetAuthListLoad);
+export const resultCfgGetAuthListLoad = withCatchResult(cfgGetAuthListLoad);
 
 const authListCharacterInfo = (
   ids: number[],
