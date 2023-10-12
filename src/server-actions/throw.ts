@@ -8,7 +8,7 @@ export enum ThrowKind {
 
 export const throwErr = (
   e: ParsedJSONError,
-  kind: ThrowKind = ThrowKind.Minified
+  kind: ThrowKind = ThrowKind.Parsed
 ): never => {
   switch (kind) {
     case ThrowKind.Minified:
