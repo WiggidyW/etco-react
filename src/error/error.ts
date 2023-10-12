@@ -1,6 +1,7 @@
 export const unknownToError = (e: unknown): Error => {
   if (e instanceof Error) return e;
   if (e instanceof ParsedJSONError) return e.toErrorMinified();
+  if (typeof e === "string") return new Error(e);
 
   let message: string;
   try {
@@ -16,6 +17,14 @@ export const unknownToParsedJSONError = (e: unknown): ParsedJSONError => {
   if (e instanceof ParsedJSONError) {
     // return it as-is
     return e;
+  } else if (typeof e === "string") {
+    // check if the string is a serialized ParsedJSONErrorMessage
+    const parsedMessage = toParsedJSONErrorMessage(e);
+    if (parsedMessage !== null) {
+      return new ParsedJSONError(parsedMessage);
+    } else {
+      return new ParsedJSONError({ kind: [], message: e });
+    }
   } else if (e instanceof Error) {
     // check if the message is an embedded ParsedJSONErrorMessage
     const parsedMessage = toParsedJSONErrorMessage(e.message);
