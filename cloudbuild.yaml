@@ -1,0 +1,66 @@
+﻿substitutions:
+  _CORP_NAME: 'Eve Trading Co.'
+  _REGION: 'us-central1'
+
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'build'
+  - '--build-arg'
+  - 'ETCO_EVE_AUTH_CLIENT_ID=${_ESI_AUTH_CLIENT_ID}'
+  - '--build-arg'
+  - 'ETCO_EVE_AUTH_CLIENT_SECRET=${_ESI_AUTH_CLIENT_SECRET}'
+  - '--build-arg'
+  - 'ETCO_EVE_MARKETS_CLIENT_ID=${_ESI_MARKETS_CLIENT_ID}'
+  - '--build-arg'
+  - 'ETCO_EVE_MARKETS_CLIENT_SECRET=${_ESI_MARKETS_CLIENT_SECRET}'
+  - '--build-arg'
+  - 'ETCO_EVE_STRUCTURE_INFO_CLIENT_ID=${_ESI_STRUCTURE_INFO_CLIENT_ID}'
+  - '--build-arg'
+  - 'ETCO_EVE_STRUCTURE_INFO_CLIENT_SECRET=${_ESI_STRUCTURE_INFO_CLIENT_SECRET}'
+  - '--build-arg'
+  - 'ETCO_EVE_CORPORATION_CLIENT_ID=${_ESI_CORPORATION_CLIENT_ID}'
+  - '--build-arg'
+  - 'ETCO_EVE_CORPORATION_CLIENT_SECRET=${_ESI_CORPORATION_CLIENT_SECRET}'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_ETCO_CORP_NAME=${_CORP_NAME}'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_ETCO_BASE_URL=${_BASE_URL}'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_ETCO_BASE_DOMAIN=${_BASE_DOMAIN}'
+  - '-t'
+  - 'gcr.io/$PROJECT_ID/etco-react:latest'
+  - '-f'
+  - 'Dockerfile'
+  - '.'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/etco-react:latest'
+
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args:
+  - 'run'
+  - 'deploy'
+  - 'etco-react'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/etco-react:latest'
+  - '--region'
+  - '${_REGION}'
+  - '--ingress'
+  - 'all'
+  - '--member'
+  - 'allUsers'
+  - '--role'
+  - 'roles/run.invoker'
+  - '--allow-unauthenticated'
+
+images: ['gcr.io/$PROJECT_ID/etco-react:latest']
+
+timeout: '1200s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
