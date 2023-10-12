@@ -29,8 +29,8 @@ import {
   CfgBuybackTypePricing,
   CfgTypePricing,
 } from "@/proto/etco";
-import { cfgGetBuybackSystemTypeMapsBuilderLoad } from "@/server-actions/grpc/cfgGet";
-import { cfgMergeBuybackSystemTypeMapsBuilder } from "@/server-actions/grpc/cfgMerge";
+import { resultCfgGetBuybackSystemTypeMapsBuilderLoad } from "@/server-actions/grpc/cfgGet";
+import { resultCfgMergeBuybackSystemTypeMapsBuilder } from "@/server-actions/grpc/cfgMerge";
 
 export interface ConfigureBuybackTypePricingProps {
   refreshToken: string;
@@ -45,8 +45,8 @@ export const ConfigureBuybackTypePricing = ({
   <ConfigureBase
     initial={{}}
     refreshToken={refreshToken}
-    actionLoad={cfgGetBuybackSystemTypeMapsBuilderLoad}
-    actionMerge={cfgMergeBuybackSystemTypeMapsBuilder}
+    actionLoad={resultCfgGetBuybackSystemTypeMapsBuilderLoad}
+    actionMerge={resultCfgMergeBuybackSystemTypeMapsBuilder}
     deepClone={deepCloneBuilder}
     mergeUpdates={mergeBuilder}
     undoCap={undoCap}

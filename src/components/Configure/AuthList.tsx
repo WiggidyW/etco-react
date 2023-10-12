@@ -15,10 +15,10 @@ import classNames from "classnames";
 import { Button, ManipulatorSelector, NumberInput } from "../Input/Manipulator";
 import { ConfigureBase } from "./Base";
 import {
-  CfgGetAuthListLoad,
   CfgGetAuthListLoadRep,
+  resultCfgGetAuthListLoad,
 } from "@/server-actions/grpc/cfgGet";
-import { cfgSetAuthList } from "@/server-actions/grpc/cfgMerge";
+import { resultCfgSetAuthList } from "@/server-actions/grpc/cfgMerge";
 import { Entity, EntityKind } from "@/browser/entity";
 
 export interface ConfigureAuthListProps {
@@ -42,8 +42,10 @@ export const ConfigureAuthList = ({
       permitAllianceIds: [],
     }}
     refreshToken={refreshToken}
-    actionLoad={(token) => CfgGetAuthListLoad(token, domainKey)}
-    actionMerge={(token, updated) => cfgSetAuthList(token, domainKey, updated)}
+    actionLoad={(token) => resultCfgGetAuthListLoad(token, domainKey)}
+    actionMerge={(token, updated) =>
+      resultCfgSetAuthList(token, domainKey, updated)
+    }
     deepClone={deepCloneAuthList}
     mergeUpdates={mergeAuthLists}
     undoCap={undoCap}

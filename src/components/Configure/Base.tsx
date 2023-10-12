@@ -12,6 +12,7 @@ import { useBrowserContext } from "@/browser/context";
 import { useServerAction } from "@/server-actions/util";
 import { FooterButton } from "../Input/FooterButton";
 import { ContentPortal } from "../Content";
+import { Result } from "../todo";
 
 export interface PartialConfigureChildArgs<GET> {
   rep: GET;
@@ -31,8 +32,11 @@ export interface ConfigureBaseProps<
 > {
   initial: CFG;
   refreshToken: string;
-  actionLoad: (refreshToken: string) => Promise<GET>;
-  actionMerge: (refreshToken: string, updated: CFG) => Promise<MRG>;
+  actionLoad: (refreshToken: string) => Promise<Result<GET, unknown>>;
+  actionMerge: (
+    refreshToken: string,
+    updated: CFG
+  ) => Promise<Result<MRG, unknown>>;
   mergeUpdates: (cfg: CFG, updates: CFG) => void;
   deepClone: (cfg: CFG) => CFG;
   undoCap?: number;
@@ -137,7 +141,7 @@ export const ConfigureBase = <
 };
 
 interface CommitProps<MRG extends CfgMergeResponse> {
-  actionMerge: () => Promise<MRG>;
+  actionMerge: () => Promise<Result<MRG, unknown>>;
   onFinish: () => void;
 }
 const Commit = <MRG extends CfgMergeResponse>({
@@ -159,7 +163,7 @@ const Commit = <MRG extends CfgMergeResponse>({
 };
 
 interface LoadProps<GET> {
-  actionLoad: () => Promise<GET>;
+  actionLoad: () => Promise<Result<GET, unknown>>;
   children?: (args: { rep: GET }) => ReactNode;
 }
 const Load = <GET,>({ actionLoad, children }: LoadProps<GET>): ReactElement => {

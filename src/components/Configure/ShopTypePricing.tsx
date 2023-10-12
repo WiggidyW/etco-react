@@ -27,8 +27,8 @@ import {
   MARKET_GROUP_NAMES,
 } from "@/proto/staticdata/sde_types";
 import { ConfigureBase } from "./Base";
-import { cfgGetShopLocationTypeMapsBuilderLoad } from "@/server-actions/grpc/cfgGet";
-import { cfgMergeShopLocationTypeMapsBuilder } from "@/server-actions/grpc/cfgMerge";
+import { resultCfgGetShopLocationTypeMapsBuilderLoad } from "@/server-actions/grpc/cfgGet";
+import { resultCfgMergeShopLocationTypeMapsBuilder } from "@/server-actions/grpc/cfgMerge";
 
 export interface ConfigureShopTypePricingProps {
   refreshToken: string;
@@ -43,8 +43,8 @@ export const ConfigureShopTypePricing = ({
   <ConfigureBase
     initial={{}}
     refreshToken={refreshToken}
-    actionLoad={cfgGetShopLocationTypeMapsBuilderLoad}
-    actionMerge={cfgMergeShopLocationTypeMapsBuilder}
+    actionLoad={resultCfgGetShopLocationTypeMapsBuilderLoad}
+    actionMerge={resultCfgMergeShopLocationTypeMapsBuilder}
     deepClone={deepCloneBuilder}
     mergeUpdates={mergeBuilder}
     undoCap={undoCap}

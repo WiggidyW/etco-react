@@ -20,8 +20,8 @@ import classNames from "classnames";
 import { SDE_REGION_NAMES, SDE_SYSTEMS } from "@/proto/staticdata/sde_systems";
 import { Button, ManipulatorSelector, NumberInput } from "../Input/Manipulator";
 import { ConfigureBase } from "./Base";
-import { cfgGetBuybackSystemsLoad } from "@/server-actions/grpc/cfgGet";
-import { cfgMergeBuybackSystems } from "@/server-actions/grpc/cfgMerge";
+import { resultCfgGetBuybackSystemsLoad } from "@/server-actions/grpc/cfgGet";
+import { resultCfgMergeBuybackSystems } from "@/server-actions/grpc/cfgMerge";
 
 export interface ConfigureBuybackSystemsProps {
   refreshToken: string;
@@ -36,8 +36,8 @@ export const ConfigureBuybackSystems = ({
   <ConfigureBase
     initial={{}}
     refreshToken={refreshToken}
-    actionLoad={cfgGetBuybackSystemsLoad}
-    actionMerge={cfgMergeBuybackSystems}
+    actionLoad={resultCfgGetBuybackSystemsLoad}
+    actionMerge={resultCfgMergeBuybackSystems}
     deepClone={deepCloneSystems}
     mergeUpdates={mergeSystems}
     undoCap={undoCap}

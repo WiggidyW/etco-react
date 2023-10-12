@@ -26,8 +26,8 @@ import {
   isLocationIdStructure,
   isLocationIdValid,
 } from "../../utils/locationId";
-import { cfgGetMarketsLoad } from "@/server-actions/grpc/cfgGet";
-import { cfgMergeMarkets } from "@/server-actions/grpc/cfgMerge";
+import { resultCfgGetMarketsLoad } from "@/server-actions/grpc/cfgGet";
+import { resultCfgMergeMarkets } from "@/server-actions/grpc/cfgMerge";
 
 export interface ConfigureMarketsProps {
   refreshToken: string;
@@ -44,8 +44,8 @@ export const ConfigureMarkets = ({
   <ConfigureBase
     initial={{}}
     refreshToken={refreshToken}
-    actionLoad={cfgGetMarketsLoad}
-    actionMerge={cfgMergeMarkets}
+    actionLoad={resultCfgGetMarketsLoad}
+    actionMerge={resultCfgMergeMarkets}
     deepClone={deepCloneMarkets}
     mergeUpdates={mergeMarkets}
     undoCap={undoCap}

@@ -25,8 +25,8 @@ import {
 import { ContentPortal } from "../Content";
 import { Popup } from "../Popup";
 import { BannedFlagsSelector } from "./BannedFlagSelector";
-import { cfgGetShopLocationsLoad } from "@/server-actions/grpc/cfgGet";
-import { cfgMergeShopLocations } from "@/server-actions/grpc/cfgMerge";
+import { resultCfgGetShopLocationsLoad } from "@/server-actions/grpc/cfgGet";
+import { resultCfgMergeShopLocations } from "@/server-actions/grpc/cfgMerge";
 
 type Locations = { [locationId: number]: CfgShopLocation };
 
@@ -43,8 +43,8 @@ export const ConfigureShopLocations = ({
   <ConfigureBase
     initial={{}}
     refreshToken={refreshToken}
-    actionLoad={cfgGetShopLocationsLoad}
-    actionMerge={cfgMergeShopLocations}
+    actionLoad={resultCfgGetShopLocationsLoad}
+    actionMerge={resultCfgMergeShopLocations}
     deepClone={deepCloneLocations}
     mergeUpdates={mergeLocations}
     undoCap={undoCap}
