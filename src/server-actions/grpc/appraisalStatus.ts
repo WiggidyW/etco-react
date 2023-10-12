@@ -9,6 +9,7 @@ import { allianceInfo, characterInfo, corporationInfo } from "./other";
 import { ICorporation } from "@/browser/corporation";
 import { IAlliance } from "@/browser/alliance";
 import { ItemNamesOnly, LocationNamesAll } from "./util";
+import { withCatchResult } from "../withResult";
 
 export type AppraisalEntity =
   | {
@@ -66,6 +67,9 @@ export const statusBuybackAppraisal = async (
     (rep) => newFullAppraisalStatus({ kind: "buyback", rep }, ThrowKind.Parsed),
     throwKind
   );
+export const resultStatusBuybackAppraisal = withCatchResult(
+  statusBuybackAppraisal
+);
 
 export const statusShopAppraisal = async (
   code: string,
@@ -79,6 +83,7 @@ export const statusShopAppraisal = async (
     (rep) => newFullAppraisalStatus({ kind: "shop", rep }, ThrowKind.Parsed),
     throwKind
   );
+export const resultStatusShopAppraisal = withCatchResult(statusShopAppraisal);
 
 function newStatusAppraisalRequest(
   kind: "buyback",

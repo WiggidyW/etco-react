@@ -4,6 +4,7 @@ import * as pb from "@/proto/etco";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
 import { ThrowKind } from "../throw";
 import { asIs, dispatchAuthenticated } from "./grpc";
+import { withCatchResult } from "../withResult";
 
 export const cfgSetAuthList = async (
   token: string,
@@ -17,6 +18,7 @@ export const cfgSetAuthList = async (
     (rep) => ({ ...rep, modified: true }),
     throwKind
   );
+export const resultCfgSetAuthList = withCatchResult(cfgSetAuthList);
 
 export const cfgMergeBuybackSystemTypeMapsBuilder = async (
   token: string,
@@ -29,6 +31,9 @@ export const cfgMergeBuybackSystemTypeMapsBuilder = async (
     asIs,
     throwKind
   );
+export const resultCfgMergeBuybackSystemTypeMapsBuilder = withCatchResult(
+  cfgMergeBuybackSystemTypeMapsBuilder
+);
 
 export const cfgMergeShopLocationTypeMapsBuilder = async (
   token: string,
@@ -41,6 +46,9 @@ export const cfgMergeShopLocationTypeMapsBuilder = async (
     asIs,
     throwKind
   );
+export const resultCfgMergeShopLocationTypeMapsBuilder = withCatchResult(
+  cfgMergeShopLocationTypeMapsBuilder
+);
 
 export const cfgMergeBuybackSystems = async (
   token: string,
@@ -53,6 +61,9 @@ export const cfgMergeBuybackSystems = async (
     asIs,
     throwKind
   );
+export const resultCfgMergeBuybackSystems = withCatchResult(
+  cfgMergeBuybackSystems
+);
 
 export const cfgMergeShopLocations = async (
   token: string,
@@ -65,6 +76,9 @@ export const cfgMergeShopLocations = async (
     asIs,
     throwKind
   );
+export const resultCfgMergeShopLocations = withCatchResult(
+  cfgMergeShopLocations
+);
 
 export const cfgMergeMarkets = async (
   token: string,
@@ -77,3 +91,4 @@ export const cfgMergeMarkets = async (
     asIs,
     throwKind
   );
+export const resultCfgMergeMarkets = withCatchResult(cfgMergeMarkets);

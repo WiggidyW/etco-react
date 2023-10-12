@@ -23,6 +23,7 @@ import {
 } from "@/shared/obfuscatedCharacterId";
 import { characterInfo } from "./other";
 import { ItemNamesOnly } from "./util";
+import { withCatchResult } from "../withResult";
 
 export const getBuybackAppraisal = async (
   code: string,
@@ -38,6 +39,7 @@ export const getBuybackAppraisal = async (
     throwKind
   );
 };
+export const resultGetBuybackAppraisal = withCatchResult(getBuybackAppraisal);
 
 export const getShopAppraisal = async (
   code: string,
@@ -52,6 +54,7 @@ export const getShopAppraisal = async (
     throwKind
   );
 };
+export const resultGetShopAppraisal = withCatchResult(getShopAppraisal);
 
 function getAppraisalRequest(
   kind: "buyback",

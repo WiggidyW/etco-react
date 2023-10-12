@@ -13,6 +13,7 @@ import { ICharacter } from "@/browser/character";
 import { ICorporation } from "@/browser/corporation";
 import { IAlliance } from "@/browser/alliance";
 import { allianceInfo, characterInfo, corporationInfo } from "./other";
+import { withCatchResult } from "../withResult";
 
 export interface CfgGetAuthListLoadRep {
   bannedCharacters: Map<number, ICharacter>;
@@ -64,6 +65,7 @@ export const CfgGetAuthListLoad = async (
     },
     throwKind
   );
+export const resultCfgGetAuthListLoad = withCatchResult(CfgGetAuthListLoad);
 
 const authListCharacterInfo = (
   ids: number[],
@@ -142,6 +144,7 @@ export const cfgGetMarketsLoad = async (
     }),
     throwKind
   );
+export const resultCfgGetMarketsLoad = withCatchResult(cfgGetMarketsLoad);
 
 export interface CfgGetShopLocationsLoadRep {
   locations: { [locationId: number]: pb.CfgShopLocation };
@@ -181,6 +184,9 @@ export const cfgGetShopLocationsLoad = async (
   ]);
   return { bundleKeys, ...locationData };
 };
+export const resultCfgGetShopLocationsLoad = withCatchResult(
+  cfgGetShopLocationsLoad
+);
 
 export interface CfgGetBuybackSystemsLoadRep {
   systems: { [systemId: number]: pb.CfgBuybackSystem };
@@ -206,6 +212,9 @@ export const cfgGetBuybackSystemsLoad = async (
   ]);
   return { systems, bundleKeys };
 };
+export const resultCfgGetBuybackSystemsLoad = withCatchResult(
+  cfgGetBuybackSystemsLoad
+);
 
 export interface CfgGetBuybackSystemTypeMapsBuilderLoadRep {
   builder: { [key: number]: pb.CfgBuybackSystemTypeBundle };
@@ -235,6 +244,9 @@ export const cfgGetBuybackSystemTypeMapsBuilderLoad = async (
   ]);
   return { builder, bundleKeys, marketNames };
 };
+export const resultCfgGetBuybackSystemTypeMapsBuilderLoad = withCatchResult(
+  cfgGetBuybackSystemTypeMapsBuilderLoad
+);
 
 export interface CfgGetShopLocationTypeMapsBuilderLoadRep {
   builder: { [key: number]: pb.CfgShopLocationTypeBundle };
@@ -264,6 +276,9 @@ export const cfgGetShopLocationTypeMapsBuilderLoad = async (
   ]);
   return { builder, bundleKeys, marketNames };
 };
+export const resultCfgGetShopLocationTypeMapsBuilderLoad = withCatchResult(
+  cfgGetShopLocationTypeMapsBuilderLoad
+);
 
 interface BuilderWithBundleKeys<P> {
   builder: TypeMapsBuilder<P>;

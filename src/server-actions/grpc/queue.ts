@@ -13,6 +13,7 @@ import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
 import { LocationNamesAll } from "./util";
 import { ThrowKind } from "../throw";
 import * as pb from "@/proto/etco";
+import { withCatchResult } from "../withResult";
 
 export interface ContractQueueEntry extends ContractStatus {
   code: string;
@@ -45,6 +46,7 @@ export const buybackContractQueue = async (
     (rep) => newContractQueue("buyback", rep, ThrowKind.Parsed),
     throwKind
   );
+export const resultBuybackContractQueue = withCatchResult(buybackContractQueue);
 
 export const shopContractQueue = async (
   token: string,
@@ -56,6 +58,7 @@ export const shopContractQueue = async (
     (rep) => newContractQueue("shop", rep, ThrowKind.Parsed),
     throwKind
   );
+export const resultShopContractQueue = withCatchResult(shopContractQueue);
 
 export type PurchaseQueue = string[];
 export const purchaseQueue = async (
@@ -72,6 +75,7 @@ export const purchaseQueue = async (
     (rep) => rep.queue.map((entry) => entry.code),
     throwKind
   );
+export const resultPurchaseQueue = withCatchResult(purchaseQueue);
 
 export const userData = async (
   token: string,
@@ -97,6 +101,7 @@ export const userData = async (
     }),
     throwKind
   );
+export const resultUserData = withCatchResult(userData);
 
 const newBuybackUserQueueEntry = ({
   contract,

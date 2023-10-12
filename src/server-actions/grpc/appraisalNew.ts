@@ -8,6 +8,7 @@ import { ICharacter } from "@/browser/character";
 import { BuybackAppraisal, ShopAppraisal, toNewAppraisal } from "./appraisal";
 import { parse } from "./other";
 import { EmptyPbBuybackAppraisal, ItemNamesOnly } from "./util";
+import { withCatchResult } from "../withResult";
 
 export interface ParsedBuybackAppraisal {
   unknownItems: pb.NamedBasicItem[];
@@ -61,6 +62,9 @@ export const parseNewBuybackAppraisal = async (
     unknownItems
   );
 };
+export const resultParseNewBuybackAppraisal = withCatchResult(
+  parseNewBuybackAppraisal
+);
 
 export interface MakePurchaseAppraisal {
   makePurchaseStatus: pb.MakePurchaseStatus;
@@ -95,3 +99,4 @@ export const shopMakePurchase = async (
     };
   }
 };
+export const resultShopMakePurchase = withCatchResult(shopMakePurchase);

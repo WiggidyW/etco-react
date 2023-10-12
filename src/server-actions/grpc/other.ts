@@ -8,6 +8,7 @@ import { ICharacter } from "@/browser/character";
 import { ICorporation } from "@/browser/corporation";
 import { IAlliance } from "@/browser/alliance";
 import { TypeNamesAll } from "./util";
+import { withCatchResult } from "../withResult";
 
 export const characterInfo = async (
   characterId: number,
@@ -28,6 +29,7 @@ export const characterInfo = async (
     }),
     throwKind
   );
+export const resultCharacterInfo = withCatchResult(characterInfo);
 
 export const corporationInfo = async (
   corporationId: number,
@@ -45,6 +47,7 @@ export const corporationInfo = async (
     }),
     throwKind
   );
+export const resultCorporationInfo = withCatchResult(corporationInfo);
 
 export const allianceInfo = async (
   allianceId: number,
@@ -60,6 +63,7 @@ export const allianceInfo = async (
     }),
     throwKind
   );
+export const resultAllianceInfo = withCatchResult(allianceInfo);
 
 export interface ValidShopItem extends Omit<pb.ShopItem, "typeNamingIndexes"> {
   typeNamingIndexes: pb.TypeNamingIndexes;
@@ -98,6 +102,7 @@ export const shopInventory = async (
     },
     throwKind
   );
+export const resultShopInventory = withCatchResult(shopInventory);
 
 export interface ParsedItems {
   knownItems: pb.NamedBasicItem[];
@@ -113,6 +118,7 @@ export const parse = async (
     ({ knownItems, unknownItems }) => ({ knownItems, unknownItems }),
     throwKind
   );
+export const resultParse = withCatchResult(parse);
 
 export const isAdmin = async (
   token: string,
@@ -124,6 +130,7 @@ export const isAdmin = async (
     (rep) => rep.isAdmin,
     throwKind
   );
+export const resultIsAdmin = withCatchResult(isAdmin);
 
 // admin-only endpoint
 export const delPurchases = async (
@@ -137,6 +144,7 @@ export const delPurchases = async (
     () => ({}),
     throwKind
   );
+export const resultDelPurchases = withCatchResult(delPurchases);
 
 // user endpoint
 export const cancelPurchase = async (
@@ -150,3 +158,4 @@ export const cancelPurchase = async (
     () => ({}),
     throwKind
   );
+export const resultCancelPurchase = withCatchResult(cancelPurchase);
