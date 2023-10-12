@@ -1,14 +1,9 @@
 import { StoreKind } from "@/server-actions/grpc/grpc";
 import {
-  ContractStatus as PBContractStatus,
-  Contract as PBContract,
-} from "@/proto/etco";
-import {
-  UserQueueEntry,
-  buybackContractQueue,
-  purchaseQueue,
-  shopContractQueue,
-  userData,
+  resultBuybackContractQueue,
+  resultPurchaseQueue,
+  resultShopContractQueue,
+  resultUserData,
 } from "@/server-actions/grpc/queue";
 import { ReactElement } from "react";
 import {
@@ -22,6 +17,7 @@ import {
   PurchaseQueueViewer,
   UserQueueViewer,
 } from "./Viewer";
+import { ErrorThrower } from "../ErrorThrower";
 
 export interface ContractQueueLoaderProps {
   kind: StoreKind;
@@ -31,18 +27,26 @@ export const ContractQueueLoader = async ({
   kind,
   token,
 }: ContractQueueLoaderProps): Promise<ReactElement> => {
-  const { queue, locationNamingMaps } =
+  const queueResult =
     kind === "buyback"
-      ? await buybackContractQueue(token)
-      : await shopContractQueue(token);
-  queue.sort((a, b) => b.contract.expires - a.contract.expires);
-  return (
-    <ContractQueueViewer
-      kind={kind}
-      locationNamingMaps={locationNamingMaps}
-      queue={newGroupedContractQueue(kind, queue)}
-    />
-  );
+      ? await resultBuybackContractQueue(token)
+      : await resultShopContractQueue(token);
+
+  if (queueResult.ok) {
+    const { queue, locationNamingMaps } = queueResult.value;
+
+    queue.sort((a, b) => b.contract.expires - a.contract.expires);
+
+    return (
+      <ContractQueueViewer
+        kind={kind}
+        locationNamingMaps={locationNamingMaps}
+        queue={newGroupedContractQueue(kind, queue)}
+      />
+    );
+  } else {
+    return <ErrorThrower error={queueResult.error} />; // throw error on client
+  }
 };
 
 export interface PurchaseQueueLoaderProps {
@@ -51,8 +55,12 @@ export interface PurchaseQueueLoaderProps {
 export const PurchaseQueueLoader = async ({
   token,
 }: PurchaseQueueLoaderProps): Promise<ReactElement> => {
-  const queue = await purchaseQueue(token);
-  return <PurchaseQueueViewer queue={queue} />;
+  const queueResult = await resultPurchaseQueue(token);
+  if (queueResult.ok) {
+    return <PurchaseQueueViewer queue={queueResult.value} />;
+  } else {
+    return <ErrorThrower error={queueResult.error} />; // throw error on client
+  }
 };
 
 export interface UserQueueLoaderProps {
@@ -61,24 +69,34 @@ export interface UserQueueLoaderProps {
 export const UserQueueLoader = async ({
   token,
 }: UserQueueLoaderProps): Promise<ReactElement> => {
-  const {
-    buybackHistory: unfltBuybackHistory,
-    shopHistory: unfltShopHistory,
-    madePurchase,
-    cancelledPurchase,
-  } = await userData(token);
-  const buybackHistory = newFlattenedUserQueue("buyback", unfltBuybackHistory);
-  const shopHistory = newFlattenedUserQueue("shop", unfltShopHistory);
-  buybackHistory.sort(historyCompare);
-  shopHistory.sort(historyCompare);
-  return (
-    <UserQueueViewer
-      buybackHistory={buybackHistory}
-      shopHistory={shopHistory}
-      madePurchase={madePurchase}
-      cancelledPurchase={cancelledPurchase}
-    />
-  );
+  const userDataResult = await resultUserData(token);
+  if (userDataResult.ok) {
+    const {
+      buybackHistory: unfltBuybackHistory,
+      shopHistory: unfltShopHistory,
+      madePurchase,
+      cancelledPurchase,
+    } = userDataResult.value;
+
+    const buybackHistory = newFlattenedUserQueue(
+      "buyback",
+      unfltBuybackHistory
+    );
+    const shopHistory = newFlattenedUserQueue("shop", unfltShopHistory);
+    buybackHistory.sort(historyCompare);
+    shopHistory.sort(historyCompare);
+
+    return (
+      <UserQueueViewer
+        buybackHistory={buybackHistory}
+        shopHistory={shopHistory}
+        madePurchase={madePurchase}
+        cancelledPurchase={cancelledPurchase}
+      />
+    );
+  } else {
+    return <ErrorThrower error={userDataResult.error} />; // throw error on client
+  }
 };
 
 type UserCompareValue = {
