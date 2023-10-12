@@ -7,9 +7,10 @@ import { ErrorBoundaryTryAgain } from "../ErrorBoundary";
 import { ShopAppraisalContainer } from "./ShopAppraisalContainer";
 import { BuybackAppraisalContainer } from "./BuybackAppraisalContainer";
 import {
-  getBuybackAppraisal,
-  getShopAppraisal,
+  resultGetBuybackAppraisal,
+  resultGetShopAppraisal,
 } from "@/server-actions/grpc/appraisalGet";
+import { ErrorThrower } from "../ErrorThrower";
 
 export interface AppraisalContainerLoaderProps {
   character?: ICharacter;
@@ -25,10 +26,16 @@ export const AppraisalContainerLoader = async ({
   options,
   basePath,
 }: AppraisalContainerLoaderProps): Promise<ReactElement> => {
-  const appraisal =
+  const appraisalResult =
     kind === "buyback"
-      ? await getBuybackAppraisal(code, character)
-      : await getShopAppraisal(code, character);
+      ? await resultGetBuybackAppraisal(code, character)
+      : await resultGetShopAppraisal(code, character);
+
+  if (!appraisalResult.ok) {
+    return <ErrorThrower error={appraisalResult.error} />; // throw error on client
+  }
+  const appraisal = appraisalResult.value;
+
   if (appraisal === null) {
     return notFound();
   } else if (kind === "shop") {

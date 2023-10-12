@@ -19,8 +19,10 @@ import { ShopInventory } from "./Inventory";
 import { ValidShopItem } from "@/server-actions/grpc/other";
 import {
   MakePurchaseAppraisal,
+  resultShopMakePurchase,
   shopMakePurchase,
 } from "@/server-actions/grpc/appraisalNew";
+import { Result } from "../todo";
 
 export interface PurchaseContainerProps
   extends Omit<ShopAppraisalContainerProps, "containerChildren"> {
@@ -47,8 +49,8 @@ export const PurchaseContainer = ({
 
   const actionMakePurchase = (
     items: BasicItem[]
-  ): Promise<MakePurchaseAppraisal> =>
-    shopMakePurchase(locationId, items, character);
+  ): Promise<Result<MakePurchaseAppraisal, unknown>> =>
+    resultShopMakePurchase(locationId, items, character);
 
   if (checkout.checkingOut) {
     return (
@@ -90,11 +92,10 @@ export const PurchaseContainer = ({
       />
     );
   }
-  return <></>;
 };
 
 interface MakePurchaseProps {
-  actionMakePurchase: () => Promise<MakePurchaseAppraisal>;
+  actionMakePurchase: () => Promise<Result<MakePurchaseAppraisal, unknown>>;
   children?: (args: { rep: MakePurchaseAppraisal }) => ReactNode;
 }
 const MakePurchase = ({

@@ -1,6 +1,6 @@
 "use client";
 
-import { parseNewBuybackAppraisal } from "@/server-actions/grpc/appraisalNew";
+import { resultParseNewBuybackAppraisal } from "@/server-actions/grpc/appraisalNew";
 import { ReactElement, useState } from "react";
 import { AppraisalContainer } from "./Container";
 import { PasteSubmit } from "./PasteSubmit";
@@ -11,6 +11,7 @@ import {
 } from "./ContainerChildren";
 import { ICharacter } from "@/browser/character";
 import { useAppraisalCodeURIEffect } from "./useAppraisalCode";
+import { ResultThrow } from "../todo";
 
 export interface BuybackAppraisalContainerProps {
   basePath: string;
@@ -30,8 +31,12 @@ export const BuybackAppraisalContainer = ({
   const [code, setCode] = useState<string | null>(null);
   useAppraisalCodeURIEffect(basePath, code);
 
-  const action = async (text: string, systemId: number) => {
-    const appraisal = await parseNewBuybackAppraisal(systemId, text, character);
+  const actionParseNewAppraisal = async (text: string, systemId: number) => {
+    const appraisal = await resultParseNewBuybackAppraisal(
+      systemId,
+      text,
+      character
+    ).then((result) => ResultThrow(result));
     setCode(appraisal.code);
     setContainerChildren(newAppraisalContainerChildren(appraisal));
   };
@@ -47,7 +52,7 @@ export const BuybackAppraisalContainer = ({
             "ml-auto",
             "mr-auto"
           )}
-          action={action}
+          action={actionParseNewAppraisal}
           options={options}
         />
       </>
@@ -57,7 +62,7 @@ export const BuybackAppraisalContainer = ({
       <AppraisalContainer containerChildren={containerChildren}>
         <PasteSubmit
           className={classNames("w-96", "justify-self-start")}
-          action={action}
+          action={actionParseNewAppraisal}
           options={options}
         />
       </AppraisalContainer>
