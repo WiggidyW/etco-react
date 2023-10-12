@@ -8,6 +8,12 @@ placeholder
 placeholder/*
 /placeholder/*
 
+# static data
+src/proto/staticdata/sde_types.ts
+src/proto/staticdata/buyback_systems.ts
+src/proto/staticdata/shop_locations.ts
+src/proto/staticdata/sde_systems.ts
+
 # dependencies
 /node_modules
 /.pnp
@@ -41,9 +47,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 # next-env.d.ts
-
-# static data
-src/proto/staticdata/sde_types.ts
-src/proto/staticdata/buyback_systems.ts
-src/proto/staticdata/shop_locations.ts
-src/proto/staticdata/sde_systems.ts
