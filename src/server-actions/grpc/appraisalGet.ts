@@ -121,7 +121,7 @@ function newAppraisal(
   },
   character?: ICharacter,
   throwKind?: ThrowKind
-): Promise<BuybackAppraisal>;
+): Promise<BuybackAppraisal | null>;
 function newAppraisal(
   param: {
     kind: "shop";
@@ -129,7 +129,7 @@ function newAppraisal(
   },
   character?: ICharacter,
   throwKind?: ThrowKind
-): Promise<ShopAppraisal>;
+): Promise<ShopAppraisal | null>;
 function newAppraisal(
   param:
     | {
@@ -142,9 +142,9 @@ function newAppraisal(
       },
   character?: ICharacter,
   throwKind?: ThrowKind
-): Promise<BuybackAppraisal | ShopAppraisal> {
+): Promise<BuybackAppraisal | ShopAppraisal | null> {
   if (param.rep.appraisal === undefined) {
-    return throwInvalid("appraisal is undefined", throwKind);
+    return Promise.resolve(null);
   }
 
   const { admin, refreshToken } = character ?? { admin: false };
