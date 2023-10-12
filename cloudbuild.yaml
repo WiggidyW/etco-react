@@ -54,10 +54,6 @@ steps:
   - '${_REGION}'
   - '--ingress'
   - 'all'
-  - '--member'
-  - 'allUsers'
-  - '--role'
-  - 'roles/run.invoker'
   - '--allow-unauthenticated'
 
 images: ['gcr.io/$PROJECT_ID/etco-react:latest']
