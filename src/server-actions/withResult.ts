@@ -1,6 +1,7 @@
 "use server";
 
 import { Result, ResultErr, ResultOk } from "@/components/todo";
+import { unknownToParsedJSONError } from "@/error/error";
 
 export const withCatchResult =
   <T, A extends any[]>(
@@ -9,5 +10,6 @@ export const withCatchResult =
   async (...args: A) =>
     fn(...args).then(
       (ok) => ResultOk(ok),
-      (err) => ResultErr(err)
+      (err) =>
+        ResultErr(unknownToParsedJSONError(err).toErrorMinified().message)
     );
