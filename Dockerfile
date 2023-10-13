@@ -13,6 +13,7 @@ ARG NEXT_PUBLIC_ETCO_CORP_NAME='Eve Trading Co.'
 ARG NEXT_PUBLIC_ETCO_BASE_URL
 ARG NEXT_PUBLIC_ETCO_BASE_DOMAIN
 ARG ETCO_GRPC_URL
+ARG BOOTSTRAP
 
 COPY ./ /root/etco-react/
 WORKDIR /root/etco-react/
@@ -31,7 +32,12 @@ RUN echo "ETCO_EVE_AUTH_CLIENT_ID=${ETCO_EVE_AUTH_CLIENT_ID}" >> .env && \
     echo "ETCO_GRPC_URL=${ETCO_GRPC_URL}" >> .env
 
 RUN npm install
-RUN npm run generate-static-data
+RUN if [ -z "$BOOTSTRAP" ]; then \
+        echo "BOOTSTRAP false: generating static data"; \
+        npm run generate-static-data; \
+    else \
+        echo "BOOTSTRAP true: skip generating static data"; \
+    fi
 RUN npm run build
 
 # Runner
