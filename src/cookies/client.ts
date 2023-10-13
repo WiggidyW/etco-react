@@ -1,119 +1,91 @@
 "use client";
 
 import { Character, ICharacter } from "@/browser/character";
-import Cookies from "universal-cookie";
+import Cookies, { CookieSetOptions } from "universal-cookie";
 import { EnvStore } from "@/env";
 
-// const clientCookiesGet = (key: string): string | null => {
-//   const val = new Cookies().get(key, { doNotParse: true });
-//   if (val === undefined || val === null) {
-//     return null;
-//   } else if (typeof val !== "string") {
-//     throw new Error(`invalid cookie value: ${val}`);
-//   } else {
-//     return val;
-//   }
-// };
+const getCookieSetOptOrDefault = <K extends keyof CookieSetOptions>(
+  opts: CookieSetOptions,
+  property: K,
+  defaultVal: CookieSetOptions[K]
+): CookieSetOptions[K] => (property in opts ? opts[property] : defaultVal);
 
-// // Current Character
-
-// export const clientCookiesGetCurrentCharacter = (): Character | null => {
-//   const val = clientCookiesGet("currentCharacter");
-//   if (val === null) {
-//     return null;
-//   } else {
-//     return Character.fromStr(val);
-//   }
-// };
+const newCookieSetOpts = (opts: CookieSetOptions = {}): CookieSetOptions => ({
+  path: getCookieSetOptOrDefault(opts, "path", "/"),
+  expires: getCookieSetOptOrDefault(opts, "expires", undefined),
+  maxAge: getCookieSetOptOrDefault(opts, "maxAge", undefined),
+  domain: getCookieSetOptOrDefault(
+    opts,
+    "domain",
+    EnvStore.getPublic("BASE_DOMAIN")
+  ),
+  secure: getCookieSetOptOrDefault(
+    opts,
+    "secure",
+    !EnvStore.getPublic("DEV_MODE")
+  ),
+  httpOnly: getCookieSetOptOrDefault(opts, "httpOnly", false),
+  sameSite: getCookieSetOptOrDefault(opts, "sameSite", "lax"),
+});
 
 export const clientCookiesSetCurrentCharacter = (
   character: Character | ICharacter
-): void => {
-  new Cookies().set("currentCharacter", JSON.stringify(character), {
-    domain: EnvStore.getPublic("BASE_DOMAIN"),
-    secure: !EnvStore.getPublic("DEV_MODE"),
-    path: "/",
-    expires: undefined,
-    maxAge: 60 * 60 * 24 * 30, // 30 days
-    httpOnly: false,
-    sameSite: "lax",
-  });
-};
+): void =>
+  new Cookies().set(
+    "currentCharacter",
+    JSON.stringify(character),
+    newCookieSetOpts({ maxAge: 60 * 60 * 24 * 30 }) // 30 days
+  );
 
 export const clientCookiesDelCurrentCharacter = (): void =>
-  new Cookies().remove("currentCharacter");
+  new Cookies().set(
+    "currentCharacter",
+    "",
+    newCookieSetOpts({ expires: new Date(0) })
+  );
 
 // // Login Callback Redirect Path
 
-// export const clientCookiesGetLoginCallbackRedirect = (): string | null =>
-//   clientCookiesGet("loginCallbackRedirect");
-
 export const clientCookiesSetLoginCallbackRedirect = (
   redirectPath: string
-): void => {
-  new Cookies().set("loginCallbackRedirect", redirectPath, {
-    domain: EnvStore.getPublic("BASE_DOMAIN"),
-    secure: !EnvStore.getPublic("DEV_MODE"),
-    path: "/",
-    expires: undefined,
-    maxAge: 60 * 30, // 30 minutes
-    httpOnly: false,
-    sameSite: "lax",
-  });
-};
+): void =>
+  new Cookies().set(
+    "loginCallbackRedirect",
+    redirectPath,
+    newCookieSetOpts({ maxAge: 60 * 30 }) // 30 minutes
+  );
 
 export const clientCookiesDelLoginCallbackRedirect = (): void =>
-  new Cookies().remove("loginCallbackRedirect");
+  new Cookies().set(
+    "loginCallbackRedirect",
+    "",
+    newCookieSetOpts({ expires: new Date(0) })
+  );
 
 // // Theme
 
-// export const clientCookiesGetTheme = (): "light" | "dark" | null => {
-//   const val = clientCookiesGet("theme");
-//   if (val === null) {
-//     return null;
-//   } else if (val === "light" || val === "dark") {
-//     return val;
-//   } else {
-//     return null;
-//   }
-// };
+export const clientCookiesSetTheme = (theme: "light" | "dark"): void =>
+  new Cookies().set(
+    "theme",
+    theme,
+    newCookieSetOpts({ maxAge: 60 * 60 * 24 * 365 }) // 365 days
+  );
 
-export const clientCookiesSetTheme = (theme: "light" | "dark"): void => {
-  new Cookies().set("theme", theme, {
-    domain: EnvStore.getPublic("BASE_DOMAIN"),
-    secure: !EnvStore.getPublic("DEV_MODE"),
-    path: "/",
-    expires: undefined,
-    maxAge: 60 * 60 * 24 * 365, // 365 days
-    httpOnly: false,
-    sameSite: "lax",
-  });
-};
-
-export const clientCookiesDelTheme = (): void => new Cookies().remove("theme");
+export const clientCookiesDelTheme = (): void =>
+  new Cookies().set("theme", "", newCookieSetOpts({ expires: new Date(0) }));
 
 // // Check Is Admin
 
-// export const clientCookiesGetCheckIsAdmin = (): boolean => {
-//   const val = clientCookiesGet("checkIsAdmin");
-//   if (val === "true") {
-//     return true;
-//   } else {
-//     return false;
-//   }
-// };
-
-export const clientCookiesSetCheckIsAdmin = (isAdmin: boolean): void => {
-  new Cookies().set("checkIsAdmin", isAdmin.toString(), {
-    domain: EnvStore.getPublic("BASE_DOMAIN"),
-    secure: !EnvStore.getPublic("DEV_MODE"),
-    path: "/",
-    expires: undefined,
-    maxAge: 60 * 30, // 30 minutes
-    httpOnly: false,
-    sameSite: "lax",
-  });
-};
+export const clientCookiesSetCheckIsAdmin = (isAdmin: boolean): void =>
+  new Cookies().set(
+    "checkIsAdmin",
+    isAdmin.toString(),
+    newCookieSetOpts({ maxAge: 60 * 30 }) // 30 minutes
+  );
 
 export const clientCookiesDelCheckIsAdmin = (): void =>
-  new Cookies().remove("checkIsAdmin");
+  new Cookies().set(
+    "checkIsAdmin",
+    "",
+    newCookieSetOpts({ expires: new Date(0) })
+  );
