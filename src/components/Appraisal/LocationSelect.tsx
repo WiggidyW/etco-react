@@ -2,7 +2,7 @@
 
 import { Button, FormSelectInput, SelectOption } from "../Input/Manipulator";
 import { ReactElement, useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import classNames from "classnames";
 
 export interface LocationSelectProps {
@@ -17,7 +17,7 @@ export const LocationSelect = ({
   basePath,
   options,
 }: LocationSelectProps): ReactElement => {
-  const router = useRouter();
+  // const router = useRouter();
   const setLocation = useState<SelectOption<string> | null>(
     defaultOption ?? null
   )[1];
@@ -26,7 +26,12 @@ export const LocationSelect = ({
       className={className}
       action={(formData) => {
         const locationId = Number(formData.get("locationId") as string);
-        router.push(`${basePath}?locationId=${locationId}`);
+        // router.push(`${basePath}?locationId=${locationId}`);
+        window.history.pushState(
+          {},
+          "",
+          `${basePath}?locationId=${locationId}`
+        );
         window.location.reload();
       }}
     >
