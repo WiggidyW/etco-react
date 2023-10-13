@@ -4,27 +4,27 @@ import { Character, ICharacter } from "@/browser/character";
 import Cookies from "universal-cookie";
 import { EnvStore } from "@/env";
 
-const clientCookiesGet = (key: string): string | null => {
-  const val = new Cookies().get(key, { doNotParse: true });
-  if (val === undefined || val === null) {
-    return null;
-  } else if (typeof val !== "string") {
-    throw new Error(`invalid cookie value: ${val}`);
-  } else {
-    return val;
-  }
-};
+// const clientCookiesGet = (key: string): string | null => {
+//   const val = new Cookies().get(key, { doNotParse: true });
+//   if (val === undefined || val === null) {
+//     return null;
+//   } else if (typeof val !== "string") {
+//     throw new Error(`invalid cookie value: ${val}`);
+//   } else {
+//     return val;
+//   }
+// };
 
 // // Current Character
 
-export const clientCookiesGetCurrentCharacter = (): Character | null => {
-  const val = clientCookiesGet("currentCharacter");
-  if (val === null) {
-    return null;
-  } else {
-    return Character.fromStr(val);
-  }
-};
+// export const clientCookiesGetCurrentCharacter = (): Character | null => {
+//   const val = clientCookiesGet("currentCharacter");
+//   if (val === null) {
+//     return null;
+//   } else {
+//     return Character.fromStr(val);
+//   }
+// };
 
 export const clientCookiesSetCurrentCharacter = (
   character: Character | ICharacter
@@ -45,8 +45,8 @@ export const clientCookiesDelCurrentCharacter = (): void =>
 
 // // Login Callback Redirect Path
 
-export const clientCookiesGetLoginCallbackRedirect = (): string | null =>
-  clientCookiesGet("loginCallbackRedirect");
+// export const clientCookiesGetLoginCallbackRedirect = (): string | null =>
+//   clientCookiesGet("loginCallbackRedirect");
 
 export const clientCookiesSetLoginCallbackRedirect = (
   redirectPath: string
@@ -67,16 +67,16 @@ export const clientCookiesDelLoginCallbackRedirect = (): void =>
 
 // // Theme
 
-export const clientCookiesGetTheme = (): "light" | "dark" | null => {
-  const val = clientCookiesGet("theme");
-  if (val === null) {
-    return null;
-  } else if (val === "light" || val === "dark") {
-    return val;
-  } else {
-    return null;
-  }
-};
+// export const clientCookiesGetTheme = (): "light" | "dark" | null => {
+//   const val = clientCookiesGet("theme");
+//   if (val === null) {
+//     return null;
+//   } else if (val === "light" || val === "dark") {
+//     return val;
+//   } else {
+//     return null;
+//   }
+// };
 
 export const clientCookiesSetTheme = (theme: "light" | "dark"): void => {
   new Cookies().set("theme", theme, {
@@ -94,14 +94,14 @@ export const clientCookiesDelTheme = (): void => new Cookies().remove("theme");
 
 // // Check Is Admin
 
-export const clientCookiesGetCheckIsAdmin = (): boolean => {
-  const val = clientCookiesGet("checkIsAdmin");
-  if (val === "true") {
-    return true;
-  } else {
-    return false;
-  }
-};
+// export const clientCookiesGetCheckIsAdmin = (): boolean => {
+//   const val = clientCookiesGet("checkIsAdmin");
+//   if (val === "true") {
+//     return true;
+//   } else {
+//     return false;
+//   }
+// };
 
 export const clientCookiesSetCheckIsAdmin = (isAdmin: boolean): void => {
   new Cookies().set("checkIsAdmin", isAdmin.toString(), {
@@ -111,7 +111,7 @@ export const clientCookiesSetCheckIsAdmin = (isAdmin: boolean): void => {
     expires: undefined,
     maxAge: 60 * 30, // 30 minutes
     httpOnly: false,
-    sameSite: "strict",
+    sameSite: "lax",
   });
 };
 
