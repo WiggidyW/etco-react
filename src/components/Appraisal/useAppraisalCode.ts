@@ -19,7 +19,14 @@ export const useAppraisalCodeURIEffect = (
     ) {
       // inject code into the URL without triggering refresh
       uriHistory.current = { code, basePath };
-      history.pushState({}, "", `${basePath}/${code}`);
+      setTimeout(() => {
+        // I have no idea why the timeout is necessary but it is
+        if (code === "" || code === null) {
+          window.history.pushState({}, "", basePath);
+        } else {
+          window.history.pushState({}, "", `${basePath}/${code}`);
+        }
+      }, 1);
     }
   }, [browserCtx, basePath, code]);
 };
