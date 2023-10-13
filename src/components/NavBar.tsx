@@ -5,6 +5,7 @@ import { CharacterPortrait } from "./Character/Portrait";
 import Link from "next/link";
 import Image from "next/image";
 import { Character, ICharacter } from "@/browser/character";
+import LoginImagePNG from "@/../public/eve-sso-login-black-large.png";
 
 export interface NavBarProps {
   path: string;
@@ -77,12 +78,7 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
 const LoginImage = ({ path, character }: NavBarProps): ReactElement => (
   <Link href={`${path === "/" ? "" : path}/login`}>
     {character === null || character === undefined ? (
-      <Image
-        src={"/eve-sso-login-black-large.png"}
-        alt="Login"
-        width={270}
-        height={45}
-      />
+      <Image src={LoginImagePNG} alt="Login" width={270} height={45} />
     ) : (
       <CharacterPortrait character={character} size="md" rounded />
     )}
