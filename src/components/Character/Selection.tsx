@@ -20,6 +20,7 @@ import {
 } from "@/browser/storage";
 import {
   clientCookiesDelCheckIsAdmin,
+  clientCookiesDelCurrentCharacter,
   clientCookiesSetCheckIsAdmin,
   clientCookiesSetCurrentCharacter,
   clientCookiesSetLoginCallbackRedirect,
@@ -108,8 +109,15 @@ export const LoginCharacterSelection = ({
   );
 
   useEffect(() => {
-    if (browserCtx !== null && mutCharacters.characters.length === 0) {
-      setMutCharacters(loadMutCharactersOrDefault(browserCtx, charactersKey));
+    if (browserCtx !== null) {
+      clientCookiesDelCurrentCharacter(); // logout current character
+      clientCookiesSetLoginCallbackRedirect(redirectAfterLoginCallbackPath); // set redirect
+      checkIsAdmin // set check admin or delete check admin
+        ? clientCookiesSetCheckIsAdmin(true)
+        : clientCookiesDelCheckIsAdmin();
+      if (mutCharacters.characters.length === 0) {
+        setMutCharacters(loadMutCharactersOrDefault(browserCtx, charactersKey));
+      }
     }
   }, [browserCtx]);
 
@@ -130,10 +138,6 @@ export const LoginCharacterSelection = ({
   const onLogin = (e: ReactMouseEvent): void => {
     if (forbidSelect.current) return e.preventDefault();
     console.log("login");
-    clientCookiesSetLoginCallbackRedirect(redirectAfterLoginCallbackPath);
-    checkIsAdmin
-      ? clientCookiesSetCheckIsAdmin(true)
-      : clientCookiesDelCheckIsAdmin();
   };
 
   return (
