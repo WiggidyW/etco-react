@@ -21,6 +21,7 @@ export const useAppraisalCodeURIEffect = (
       uriHistory.current = { code, basePath };
       setTimeout(() => {
         // I have no idea why the timeout is necessary but it is
+        // TODO: Revisit this if related dependencies (like Next.js) are updated, to see if the issue persists.
         if (code === "" || code === null) {
           window.history.pushState({}, "", basePath);
         } else {
