@@ -6,7 +6,7 @@ import { NavBar } from "./NavBar";
 import { ParsedJSONError } from "@/error/error";
 import { ErrorBoundaryGoBack } from "./ErrorBoundary";
 import { Character, ICharacter } from "@/browser/character";
-import { ParsedErrorThrower } from "./ErrorThrower";
+import { ErrorThrower } from "./ErrorThrower";
 
 export interface MainProps extends PropsWithChildren {
   character?: Character | ICharacter | null;
@@ -56,12 +56,12 @@ const LoginChecker = ({
 }: LoginCheckerProps): ReactElement => {
   if (character === null || character === undefined) {
     return (
-      <ParsedErrorThrower
+      <ErrorThrower
         error={
           new ParsedJSONError({
             kind: ["NotLoggedIn"],
             message: "Please log in",
-          })
+          }).toErrorMinified().message
         }
       />
     );
@@ -91,23 +91,23 @@ const AdminChecker = ({
 }: AdminCheckerProps): ReactElement => {
   if (character === null || character === undefined) {
     return (
-      <ParsedErrorThrower
+      <ErrorThrower
         error={
           new ParsedJSONError({
             kind: ["NotAdmin", "NotLoggedIn"],
             message: "Please log in",
-          })
+          }).toErrorMinified().message
         }
       />
     );
   } else if (!character.admin) {
     return (
-      <ParsedErrorThrower
+      <ErrorThrower
         error={
           new ParsedJSONError({
             kind: ["NotAdmin", "CharacterNotAdmin"],
             message: "Please log in as an admin character",
-          })
+          }).toErrorMinified().message
         }
       />
     );
