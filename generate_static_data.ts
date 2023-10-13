@@ -8,6 +8,6 @@ import { generateStaticData } from "./src/proto/rpc_gen_static";
     await generateStaticData("src/proto/staticdata");
   } catch (e) {
     console.error(e);
-    process.exit(0);
+    process.exit(1);
   }
 })();
