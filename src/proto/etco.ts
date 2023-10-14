@@ -393,6 +393,10 @@ export interface BuybackAppraisal {
      * @generated from protobuf field: int32 system_id = 6;
      */
     systemId: number; // system used for the appraisal
+    /**
+     * @generated from protobuf field: double fee = 7;
+     */
+    fee: number; // sum of item fees
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.BuybackParentItem
@@ -422,6 +426,10 @@ export interface BuybackParentItem {
      * @generated from protobuf field: eve_trading_co_proto.TypeNamingIndexes type_naming_indexes = 6;
      */
     typeNamingIndexes?: TypeNamingIndexes;
+    /**
+     * @generated from protobuf field: double fee = 7;
+     */
+    fee: number;
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.BuybackChildItem
@@ -3792,11 +3800,12 @@ class BuybackAppraisal$Type extends MessageType<BuybackAppraisal> {
             { no: 3, name: "price", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "time", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 2 /*LongType.NUMBER*/ },
             { no: 5, name: "version", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 6, name: "system_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 6, name: "system_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "fee", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<BuybackAppraisal>): BuybackAppraisal {
-        const message = { items: [], code: "", price: 0, time: 0, version: "", systemId: 0 };
+        const message = { items: [], code: "", price: 0, time: 0, version: "", systemId: 0, fee: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<BuybackAppraisal>(this, message, value);
@@ -3824,6 +3833,9 @@ class BuybackAppraisal$Type extends MessageType<BuybackAppraisal> {
                     break;
                 case /* int32 system_id */ 6:
                     message.systemId = reader.int32();
+                    break;
+                case /* double fee */ 7:
+                    message.fee = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -3855,6 +3867,9 @@ class BuybackAppraisal$Type extends MessageType<BuybackAppraisal> {
         /* int32 system_id = 6; */
         if (message.systemId !== 0)
             writer.tag(6, WireType.Varint).int32(message.systemId);
+        /* double fee = 7; */
+        if (message.fee !== 0)
+            writer.tag(7, WireType.Bit64).double(message.fee);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -3874,11 +3889,12 @@ class BuybackParentItem$Type extends MessageType<BuybackParentItem> {
             { no: 3, name: "price_per_unit", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "description", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "children", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BuybackChildItem },
-            { no: 6, name: "type_naming_indexes", kind: "message", T: () => TypeNamingIndexes }
+            { no: 6, name: "type_naming_indexes", kind: "message", T: () => TypeNamingIndexes },
+            { no: 7, name: "fee", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<BuybackParentItem>): BuybackParentItem {
-        const message = { typeId: 0, quantity: 0, pricePerUnit: 0, description: "", children: [] };
+        const message = { typeId: 0, quantity: 0, pricePerUnit: 0, description: "", children: [], fee: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<BuybackParentItem>(this, message, value);
@@ -3906,6 +3922,9 @@ class BuybackParentItem$Type extends MessageType<BuybackParentItem> {
                     break;
                 case /* eve_trading_co_proto.TypeNamingIndexes type_naming_indexes */ 6:
                     message.typeNamingIndexes = TypeNamingIndexes.internalBinaryRead(reader, reader.uint32(), options, message.typeNamingIndexes);
+                    break;
+                case /* double fee */ 7:
+                    message.fee = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -3937,6 +3956,9 @@ class BuybackParentItem$Type extends MessageType<BuybackParentItem> {
         /* eve_trading_co_proto.TypeNamingIndexes type_naming_indexes = 6; */
         if (message.typeNamingIndexes)
             TypeNamingIndexes.internalBinaryWrite(message.typeNamingIndexes, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* double fee = 7; */
+        if (message.fee !== 0)
+            writer.tag(7, WireType.Bit64).double(message.fee);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
