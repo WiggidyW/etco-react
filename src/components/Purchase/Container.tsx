@@ -36,7 +36,6 @@ export const PurchaseContainer = ({
   items,
   character,
   locationId,
-  basePath,
   ...appraisalProps
 }: PurchaseContainerProps): ReactElement => {
   const [checkout, setCheckout] = useState<
@@ -66,13 +65,10 @@ export const PurchaseContainer = ({
             actionMakePurchase={() => actionMakePurchase(checkout.items)}
           >
             {({ rep: { appraisal, makePurchaseStatus: status } }) => (
-              <ErrorBoundaryGoBack
-                href={`${basePath}?locationId=${locationId}`}
-              >
+              <ErrorBoundaryGoBack href={`/shop/inventory/${locationId}`}>
                 <PurchaseResult
                   appraisal={appraisal}
                   status={status}
-                  basePath={basePath}
                   {...appraisalProps}
                 />
               </ErrorBoundaryGoBack>
@@ -87,7 +83,6 @@ export const PurchaseContainer = ({
         items={items}
         typeNamingLists={typeNamingLists}
         onCheckout={(items) => setCheckout({ checkingOut: true, items })}
-        basePath={basePath}
         {...appraisalProps}
       />
     );
@@ -118,12 +113,11 @@ interface PurchaseResultProps
 const PurchaseResult = ({
   appraisal,
   status,
-  basePath,
   ...appraisalProps
 }: PurchaseResultProps): ReactElement => {
   const appraisalOk =
     appraisal !== undefined && status === MakePurchaseStatus.MPS_SUCCESS;
-  useAppraisalCodeURIEffect(basePath, appraisalOk ? appraisal.code : null);
+  useAppraisalCodeURIEffect("/shop", appraisalOk ? appraisal.code : null);
 
   if (!appraisalOk) {
     let message: string;
@@ -162,7 +156,6 @@ const PurchaseResult = ({
     return (
       <ShopAppraisalContainer
         containerChildren={newAppraisalContainerChildren(appraisal)}
-        basePath={basePath}
         {...appraisalProps}
       />
     );

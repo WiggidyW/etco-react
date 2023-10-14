@@ -25,7 +25,6 @@ export default function Page({
           <ErrorBoundaryRefresh>
             <AppraisalContainerLoader
               options={getSystems()}
-              basePath={BASE_PATH}
               code={code}
               kind="buyback"
               character={character}

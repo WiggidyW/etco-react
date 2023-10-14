@@ -6,11 +6,9 @@ import { AppraisalContainerChildren } from "./ContainerChildren";
 
 export interface ShopAppraisalContainerProps {
   options: { label: string; value: string }[];
-  basePath: string;
   containerChildren?: AppraisalContainerChildren;
 }
 export const ShopAppraisalContainer = ({
-  basePath,
   containerChildren,
   options,
 }: ShopAppraisalContainerProps): ReactElement => {
@@ -20,7 +18,6 @@ export const ShopAppraisalContainer = ({
         <div className={classNames("h-[5%]")} />
         <LocationSelect
           className={classNames("ml-auto", "mr-auto")}
-          basePath={basePath}
           options={options}
         />
       </>
@@ -30,7 +27,6 @@ export const ShopAppraisalContainer = ({
       <AppraisalContainer containerChildren={containerChildren}>
         <LocationSelect
           className={classNames("w-96", "justify-self-start")}
-          basePath={basePath}
           options={options}
         />
       </AppraisalContainer>

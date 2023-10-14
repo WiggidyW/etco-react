@@ -25,7 +25,6 @@ export default function Page({
           <ErrorBoundaryRefresh>
             <AppraisalContainerLoader
               options={getLocations()}
-              basePath={BASE_PATH}
               code={code}
               kind="shop"
               character={character}

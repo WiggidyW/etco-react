@@ -14,7 +14,6 @@ export default function Page(): ReactElement {
       <ErrorBoundaryTryAgain>
         <BuybackAppraisalContainer
           options={getSystems()}
-          basePath={`${PATH}`}
           character={character}
         />
       </ErrorBoundaryTryAgain>

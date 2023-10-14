@@ -14,14 +14,12 @@ import { useAppraisalCodeURIEffect } from "./useAppraisalCode";
 import { ResultThrow } from "../todo";
 
 export interface BuybackAppraisalContainerProps {
-  basePath: string;
   character?: ICharacter;
   containerChildren?: AppraisalContainerChildren;
   options: { label: string; value: string }[];
 }
 export const BuybackAppraisalContainer = ({
   options,
-  basePath,
   character,
   containerChildren: serverContainerChildren,
 }: BuybackAppraisalContainerProps): ReactElement => {
@@ -29,7 +27,7 @@ export const BuybackAppraisalContainer = ({
     AppraisalContainerChildren | undefined
   >(serverContainerChildren);
   const [code, setCode] = useState<string | null>(null);
-  useAppraisalCodeURIEffect(basePath, code);
+  useAppraisalCodeURIEffect("/buyback", code);
 
   const actionParseNewAppraisal = async (text: string, systemId: number) => {
     const appraisal = await resultParseNewBuybackAppraisal(

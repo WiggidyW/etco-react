@@ -16,7 +16,6 @@ export interface AppraisalContainerLoaderProps {
   character?: ICharacter;
   code: string;
   kind: StoreKind;
-  basePath: string;
   options: { label: string; value: string }[];
 }
 export const AppraisalContainerLoader = async ({
@@ -24,7 +23,6 @@ export const AppraisalContainerLoader = async ({
   code,
   kind,
   options,
-  basePath,
 }: AppraisalContainerLoaderProps): Promise<ReactElement> => {
   const appraisalResult =
     kind === "buyback"
@@ -43,7 +41,6 @@ export const AppraisalContainerLoader = async ({
       <ErrorBoundaryTryAgain>
         <ShopAppraisalContainer
           options={options}
-          basePath={basePath}
           containerChildren={newAppraisalContainerChildren(appraisal)}
         />
       </ErrorBoundaryTryAgain>
@@ -54,7 +51,6 @@ export const AppraisalContainerLoader = async ({
       <ErrorBoundaryTryAgain>
         <BuybackAppraisalContainer
           options={options}
-          basePath={basePath}
           character={character}
           containerChildren={newAppraisalContainerChildren(appraisal)}
         />
