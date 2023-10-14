@@ -78,7 +78,7 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
 const LoginImage = ({ path, character }: NavBarProps): ReactElement => (
   <Link href={`${path === "/" ? "" : path}/login`}>
     {character === null || character === undefined ? (
-      <Image src={LoginImagePNG} alt="Login" width={270} height={45} />
+      <img src={LoginImagePNG.src} alt="Login" width={270} height={45} />
     ) : (
       <CharacterPortrait character={character} size="md" rounded />
     )}
