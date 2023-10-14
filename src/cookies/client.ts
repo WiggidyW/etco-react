@@ -2,7 +2,7 @@
 
 import { Character, ICharacter } from "@/browser/character";
 import Cookies, { CookieSetOptions } from "universal-cookie";
-import { EnvStore } from "@/env";
+import { PUBLIC_ENV } from "@/env/public";
 
 const getCookieSetOptOrDefault = <K extends keyof CookieSetOptions>(
   opts: CookieSetOptions,
@@ -14,16 +14,8 @@ const newCookieSetOpts = (opts: CookieSetOptions = {}): CookieSetOptions => ({
   path: getCookieSetOptOrDefault(opts, "path", "/"),
   expires: getCookieSetOptOrDefault(opts, "expires", undefined),
   maxAge: getCookieSetOptOrDefault(opts, "maxAge", undefined),
-  domain: getCookieSetOptOrDefault(
-    opts,
-    "domain",
-    EnvStore.getPublic("BASE_DOMAIN")
-  ),
-  secure: getCookieSetOptOrDefault(
-    opts,
-    "secure",
-    !EnvStore.getPublic("DEV_MODE")
-  ),
+  domain: getCookieSetOptOrDefault(opts, "domain", PUBLIC_ENV.BASE_DOMAIN),
+  secure: getCookieSetOptOrDefault(opts, "secure", !PUBLIC_ENV.DEV_MODE),
   httpOnly: getCookieSetOptOrDefault(opts, "httpOnly", false),
   sameSite: getCookieSetOptOrDefault(opts, "sameSite", "lax"),
 });

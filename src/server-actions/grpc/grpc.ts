@@ -19,7 +19,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { RpcError } from "@protobuf-ts/runtime-rpc";
 import { ThrowKind, throwErr } from "../throw";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
-import { EnvStore } from "@/env";
+import { PRIVATE_ENV } from "@/env/private";
 
 export type StoreKind = "shop" | "buyback";
 export type BuybackKinded<B> = { kind: "buyback"; value: B };
@@ -53,7 +53,7 @@ class GrpcClient {
       try {
         GrpcClient._instance = new pbClient(
           new GrpcTransport({
-            host: EnvStore.getPrivate("GRPC_URL")!,
+            host: PRIVATE_ENV.GRPC_URL,
             channelCredentials: ChannelCredentials.createSsl(),
           })
         );

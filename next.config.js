@@ -6,4 +6,7 @@ const nextConfig = {
   output: "standalone"
 }
 
+const validate = require('./src/env/validate')
+validate.validateEnv()
+
 module.exports = nextConfig
