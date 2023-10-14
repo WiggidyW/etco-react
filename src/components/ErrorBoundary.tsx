@@ -4,7 +4,7 @@ import { ParsedJSONError, unknownToParsedJSONError } from "@/error/error";
 import { ErrorBoundary as _ErrorBoundary } from "react-error-boundary";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
 
 export interface ErrorBoundaryRefreshProps extends PropsWithChildren {
   resetTitle?: string;
