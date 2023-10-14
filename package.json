@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-static-data": "ts-node --project tsconfig.tsnode.json -r tsconfig-paths/register ./generate_static_data.ts"
+    "genstaticdata": "ts-node --project tsconfig.tsnode.json -r tsconfig-paths/register ./genstaticdata_run.ts"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.3",

@@ -23,7 +23,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "generate_static_data.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "genstaticdata.ts", "genstaticdata_run.ts"],
   "exclude": ["node_modules"]
 }
   
