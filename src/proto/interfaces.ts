@@ -49,18 +49,19 @@ export interface RPCMethod<RQ extends RPCRequest, RP extends RPCResponse> {
   (input: RQ, options?: RpcOptions): UnaryCall<RQ, RP>;
 }
 
-export interface PricedItem {
-  typeId: number;
-  pricePerUnit: number;
-  description: string;
-  typeNamingIndexes?: pb.TypeNamingIndexes;
-}
+// export interface PricedItem {
+//   typeId: number;
+//   pricePerUnit: number;
+//   description: string;
+//   typeNamingIndexes?: pb.TypeNamingIndexes;
+// }
 
-export interface PricedChildItem extends PricedItem {
-  quantityPerParent: number;
-}
+// export interface PricedChildItem extends PricedItem {
+//   quantityPerParent: number;
+// }
 
-export interface PricedParentItem extends PricedItem {
-  children?: PricedChildItem[];
-  quantity: number;
-}
+// export interface PricedParentItem extends PricedItem {
+//   children?: PricedChildItem[];
+//   feePerUnit?: number;
+//   quantity: number;
+// }
