@@ -6,7 +6,7 @@ import {
   Systems as SDESystems,
   System as SDESystem,
   RegionNames as SDERegionNames,
-} from "@/proto/staticdata/types";
+} from "@/staticdata/types";
 import { ModificationState } from "./modificationState";
 import { CfgBuybackSystem } from "@/proto/etco";
 import {
@@ -17,7 +17,7 @@ import {
 } from "../Table/Column";
 import { SelectAllableTable, rowClassName } from "../Table/Table";
 import classNames from "classnames";
-import { SDE_REGION_NAMES, SDE_SYSTEMS } from "@/proto/staticdata/sde_systems";
+import { SDE_REGION_NAMES, SDE_SYSTEMS } from "@/staticdata/sde_systems";
 import { Button, ManipulatorSelector, NumberInput } from "../Input/Manipulator";
 import { ConfigureBase } from "./Base";
 import { resultCfgGetBuybackSystemsLoad } from "@/server-actions/grpc/cfgGet";

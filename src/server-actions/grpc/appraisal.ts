@@ -3,19 +3,19 @@ import * as pb from "@/proto/etco";
 import {
   BUYBACK_REGION_NAMES,
   BUYBACK_SYSTEMS,
-} from "@/proto/staticdata/buyback_systems";
+} from "@/staticdata/buyback_systems";
 import {
   SHOP_LOCATIONS,
   SHOP_REGION_NAMES,
   SHOP_SYSTEM_NAMES,
-} from "@/proto/staticdata/shop_locations";
+} from "@/staticdata/shop_locations";
 import {
   BuybackAppraisalStatus,
   FullBuybackAppraisalStatus,
   FullShopAppraisalStatus,
   ShopAppraisalStatus,
 } from "./appraisalStatus";
-import { ShopLocation, System } from "@/proto/staticdata/types";
+import { ShopLocation, System } from "@/staticdata/types";
 
 export type NotBoolean<T> = T extends boolean ? never : T;
 

@@ -5,7 +5,7 @@ import { Button, ManipulatorSelector, NumberInput } from "../Input/Manipulator";
 import { PricingDesc, ReprocessingDesc } from "./description";
 import { ReactElement, useMemo, useState } from "react";
 import { ModificationState } from "./modificationState";
-import { SDEType } from "@/proto/staticdata/types";
+import { SDEType } from "@/staticdata/types";
 import { ColumnType } from "antd/es/table";
 import { ConfigureBase } from "./Base";
 import classNames from "classnames";
@@ -14,7 +14,7 @@ import {
   GROUP_NAMES,
   CATEGORY_NAMES,
   MARKET_GROUP_NAMES,
-} from "@/proto/staticdata/sde_types";
+} from "@/staticdata/sde_types";
 import {
   useSearchableCategoryColumn,
   useSearchableGroupColumn,

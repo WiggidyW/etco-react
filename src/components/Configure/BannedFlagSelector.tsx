@@ -1,6 +1,6 @@
 "use client";
 
-import { LOCATION_FLAGS } from "@/proto/staticdata/sde_location_flags";
+import { LOCATION_FLAGS } from "@/staticdata/sde_location_flags";
 import { ModificationState } from "./modificationState";
 import { RowKeyStringColumn } from "../Table/Column";
 import { ReactElement, useMemo } from "react";

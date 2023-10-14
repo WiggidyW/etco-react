@@ -1,5 +1,5 @@
-import { BUYBACK_SYSTEMS } from "@/proto/staticdata/buyback_systems";
-import { SHOP_LOCATIONS } from "@/proto/staticdata/shop_locations";
+import { BUYBACK_SYSTEMS } from "@/staticdata/buyback_systems";
+import { SHOP_LOCATIONS } from "@/staticdata/shop_locations";
 
 export const getSystems = (): { label: string; value: string }[] =>
   Object.entries(BUYBACK_SYSTEMS).map(([systemId, { systemName }]) => ({
