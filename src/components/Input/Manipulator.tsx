@@ -12,6 +12,7 @@ import {
   useMemo,
   DragEvent,
   useRef,
+  useEffect,
 } from "react";
 import Image from "next/image";
 import { AddAll, DelAll } from "../SVG";
@@ -78,8 +79,17 @@ export const SelectInput = <V extends InputValue>({
   hFull = false,
   wFull = false,
 }: SelectInputProps<V>): ReactElement => {
+  const [valueCopy, setValueCopy] = useState<SelectOption<V> | null>(value);
   const [label, setLabel] = useState<string>(value?.label ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (value?.value !== valueCopy?.value) {
+      // value changed from outside, update label to reflect that
+      setValueCopy(value);
+      setLabel(value?.label ?? "");
+    }
+  }, [value, valueCopy]);
 
   const {
     labelOptionsMap,
@@ -108,9 +118,11 @@ export const SelectInput = <V extends InputValue>({
   const handleGlobal = (l: string): void => {
     const option = labelOptionsMap.get(l);
     if (option) {
+      setValueCopy(option);
       setValue(option);
     } else {
       setLabel("");
+      setValueCopy(null);
       setValue(null);
     }
   };
