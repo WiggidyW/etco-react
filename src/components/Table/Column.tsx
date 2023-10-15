@@ -460,7 +460,9 @@ export const TaxRateColumn = <T extends OptionalField<{ taxRate: number }>>(
   dataIndex: "taxRate",
   key: "taxRate",
   render: (_, o) =>
-    o.taxRate ? `${(o.taxRate * 100).toFixed(2)}%` : undefined,
+    o.taxRate !== null && o.taxRate !== undefined
+      ? `${(o.taxRate * 100).toFixed(2)}%`
+      : undefined,
   sorter: (a, b) =>
     sortOptional(
       a.taxRate,
