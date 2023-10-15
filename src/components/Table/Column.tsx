@@ -452,6 +452,23 @@ export const IdColumn = <T extends { id: number }>(
   sorter: (a, b) => a.id - b.id,
 });
 
+export const TaxRateColumn = <T extends OptionalField<{ taxRate: number }>>(
+  className?: string
+): ColumnType<T> => ({
+  className,
+  title: "Tax Rate",
+  dataIndex: "taxRate",
+  key: "taxRate",
+  render: (_, o) =>
+    o.taxRate ? `${(o.taxRate * 100).toFixed(2)}%` : undefined,
+  sorter: (a, b) =>
+    sortOptional(
+      a.taxRate,
+      b.taxRate,
+      (aTaxRate, bTaxRate) => aTaxRate - bTaxRate
+    ),
+});
+
 export const useSearchableBundleKeyColumn = <
   T extends OptionalField<{ bundleKey: string }>
 >(

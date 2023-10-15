@@ -12,6 +12,7 @@ import {
   useSearchableBannedFlagsColumn,
   LocationKindColumn,
   LocationIdColumn,
+  TaxRateColumn,
 } from "../Table/Column";
 import { SelectAllableTable, rowClassName } from "../Table/Table";
 import classNames from "classnames";
@@ -96,6 +97,7 @@ const mergeLocations = (locations: Locations, updates: Locations): void => {
 
 const EMPTY: CfgShopLocation = {
   bundleKey: "",
+  taxRate: 0,
   bannedFlags: [],
 };
 
@@ -167,6 +169,9 @@ class Record {
   get bannedFlags(): string[] | undefined {
     return this.location?.bannedFlags;
   }
+  get taxRate(): number | undefined {
+    return this.location?.taxRate;
+  }
 
   get rowKey(): number {
     return this.locationId;
@@ -174,7 +179,11 @@ class Record {
 
   getModificationState(): ModificationState {
     if (this.newLocation === undefined) return ModificationState.Unmodified;
-    if (this.bundleKey === "" && this.bannedFlags?.length === 0)
+    if (
+      this.newLocation.bundleKey === "" &&
+      this.newLocation.bannedFlags?.length === 0 &&
+      this.newLocation.taxRate === 0
+    )
       return ModificationState.Deleted;
     return ModificationState.Modified;
   }
@@ -272,14 +281,17 @@ const Manipulator = ({
   const [bannedFlags, setBannedFlags] = useState<string[] | null>(null);
   const [bundleKey, setBundleKey] = useState<string | null>(null);
   const [locationId, setLocationId] = useState<number | null>(null);
+  const [taxRate, setTaxRate] = useState<number | null>(null);
 
   const anySelected = selectedRecords.length > 0;
   const bundleKeyValid = bundleKey !== null && bundleKey !== "";
   const bannedFlagsValid = true;
+  const taxRateValid = taxRate === null || (taxRate >= 0 && taxRate <= 100);
 
   const savePossible =
     bundleKeyValid &&
     bannedFlagsValid &&
+    taxRateValid &&
     (anySelected || isLocationIdValid(locationId));
 
   const save = () => {
@@ -287,7 +299,8 @@ const Manipulator = ({
       return;
     }
     const location: CfgShopLocation = {
-      bundleKey: bundleKey,
+      bundleKey,
+      taxRate: taxRate ? taxRate / 100 : 0,
       bannedFlags: bannedFlags ?? [],
     };
     if (anySelected) {
@@ -335,6 +348,15 @@ const Manipulator = ({
           setSelected={setBundleKey}
         />
 
+        {/* Tax Rate Input */}
+        <NumberInput
+          min={0}
+          max={100}
+          title="Tax Rate"
+          value={taxRate}
+          setValue={(n: number | null) => setTaxRate(n)}
+        />
+
         {/* Banned Flags Button */}
         <Button variant="lightblue" onClick={() => setBanningFlags(true)}>
           Banned Flags
@@ -373,6 +395,7 @@ const Table = ({
     useSearchableSystemColumn(),
     useSearchableRegionColumn(),
     useSearchableBundleKeyColumn(undefined, "Template"),
+    TaxRateColumn(),
     useSearchableBannedFlagsColumn(),
   ];
   return (

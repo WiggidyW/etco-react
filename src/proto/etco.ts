@@ -142,6 +142,10 @@ export interface CfgBuybackSystem {
      * @generated from protobuf field: double m3_fee = 2;
      */
     m3Fee: number; // fee per m3
+    /**
+     * @generated from protobuf field: double tax_rate = 3;
+     */
+    taxRate: number; // tax rate (0-1)
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.CfgShopLocation
@@ -155,6 +159,10 @@ export interface CfgShopLocation {
      * @generated from protobuf field: repeated string banned_flags = 2;
      */
     bannedFlags: string[]; // banned asset flags
+    /**
+     * @generated from protobuf field: double tax_rate = 3;
+     */
+    taxRate: number; // tax rate (0-1)
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.CfgMarket
@@ -397,6 +405,18 @@ export interface BuybackAppraisal {
      * @generated from protobuf field: double fee = 7;
      */
     fee: number; // sum of item fees
+    /**
+     * @generated from protobuf field: double fee_per_m3 = 8;
+     */
+    feePerM3: number; // fee per m3
+    /**
+     * @generated from protobuf field: double tax_rate = 9;
+     */
+    taxRate: number; // tax rate (0-1)
+    /**
+     * @generated from protobuf field: double tax = 10;
+     */
+    tax: number;
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.BuybackParentItem
@@ -427,9 +447,9 @@ export interface BuybackParentItem {
      */
     typeNamingIndexes?: TypeNamingIndexes;
     /**
-     * @generated from protobuf field: double fee = 7;
+     * @generated from protobuf field: double fee_per_unit = 7;
      */
-    fee: number;
+    feePerUnit: number;
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.BuybackChildItem
@@ -484,6 +504,14 @@ export interface ShopAppraisal {
      * @generated from protobuf field: int64 location_id = 6;
      */
     locationId: number; // location used for the appraisal
+    /**
+     * @generated from protobuf field: double tax_rate = 7;
+     */
+    taxRate: number; // tax rate (0-1)
+    /**
+     * @generated from protobuf field: double tax = 8;
+     */
+    tax: number;
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.ShopItem
@@ -2900,11 +2928,12 @@ class CfgBuybackSystem$Type extends MessageType<CfgBuybackSystem> {
     constructor() {
         super("eve_trading_co_proto.CfgBuybackSystem", [
             { no: 1, name: "bundle_key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "m3_fee", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 2, name: "m3_fee", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "tax_rate", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<CfgBuybackSystem>): CfgBuybackSystem {
-        const message = { bundleKey: "", m3Fee: 0 };
+        const message = { bundleKey: "", m3Fee: 0, taxRate: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<CfgBuybackSystem>(this, message, value);
@@ -2920,6 +2949,9 @@ class CfgBuybackSystem$Type extends MessageType<CfgBuybackSystem> {
                     break;
                 case /* double m3_fee */ 2:
                     message.m3Fee = reader.double();
+                    break;
+                case /* double tax_rate */ 3:
+                    message.taxRate = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2939,6 +2971,9 @@ class CfgBuybackSystem$Type extends MessageType<CfgBuybackSystem> {
         /* double m3_fee = 2; */
         if (message.m3Fee !== 0)
             writer.tag(2, WireType.Bit64).double(message.m3Fee);
+        /* double tax_rate = 3; */
+        if (message.taxRate !== 0)
+            writer.tag(3, WireType.Bit64).double(message.taxRate);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -2954,11 +2989,12 @@ class CfgShopLocation$Type extends MessageType<CfgShopLocation> {
     constructor() {
         super("eve_trading_co_proto.CfgShopLocation", [
             { no: 1, name: "bundle_key", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "banned_flags", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+            { no: 2, name: "banned_flags", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "tax_rate", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<CfgShopLocation>): CfgShopLocation {
-        const message = { bundleKey: "", bannedFlags: [] };
+        const message = { bundleKey: "", bannedFlags: [], taxRate: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<CfgShopLocation>(this, message, value);
@@ -2974,6 +3010,9 @@ class CfgShopLocation$Type extends MessageType<CfgShopLocation> {
                     break;
                 case /* repeated string banned_flags */ 2:
                     message.bannedFlags.push(reader.string());
+                    break;
+                case /* double tax_rate */ 3:
+                    message.taxRate = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2993,6 +3032,9 @@ class CfgShopLocation$Type extends MessageType<CfgShopLocation> {
         /* repeated string banned_flags = 2; */
         for (let i = 0; i < message.bannedFlags.length; i++)
             writer.tag(2, WireType.LengthDelimited).string(message.bannedFlags[i]);
+        /* double tax_rate = 3; */
+        if (message.taxRate !== 0)
+            writer.tag(3, WireType.Bit64).double(message.taxRate);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -3801,11 +3843,14 @@ class BuybackAppraisal$Type extends MessageType<BuybackAppraisal> {
             { no: 4, name: "time", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 2 /*LongType.NUMBER*/ },
             { no: 5, name: "version", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 6, name: "system_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "fee", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 7, name: "fee", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "fee_per_m3", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 9, name: "tax_rate", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 10, name: "tax", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<BuybackAppraisal>): BuybackAppraisal {
-        const message = { items: [], code: "", price: 0, time: 0, version: "", systemId: 0, fee: 0 };
+        const message = { items: [], code: "", price: 0, time: 0, version: "", systemId: 0, fee: 0, feePerM3: 0, taxRate: 0, tax: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<BuybackAppraisal>(this, message, value);
@@ -3836,6 +3881,15 @@ class BuybackAppraisal$Type extends MessageType<BuybackAppraisal> {
                     break;
                 case /* double fee */ 7:
                     message.fee = reader.double();
+                    break;
+                case /* double fee_per_m3 */ 8:
+                    message.feePerM3 = reader.double();
+                    break;
+                case /* double tax_rate */ 9:
+                    message.taxRate = reader.double();
+                    break;
+                case /* double tax */ 10:
+                    message.tax = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -3870,6 +3924,15 @@ class BuybackAppraisal$Type extends MessageType<BuybackAppraisal> {
         /* double fee = 7; */
         if (message.fee !== 0)
             writer.tag(7, WireType.Bit64).double(message.fee);
+        /* double fee_per_m3 = 8; */
+        if (message.feePerM3 !== 0)
+            writer.tag(8, WireType.Bit64).double(message.feePerM3);
+        /* double tax_rate = 9; */
+        if (message.taxRate !== 0)
+            writer.tag(9, WireType.Bit64).double(message.taxRate);
+        /* double tax = 10; */
+        if (message.tax !== 0)
+            writer.tag(10, WireType.Bit64).double(message.tax);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -3890,11 +3953,11 @@ class BuybackParentItem$Type extends MessageType<BuybackParentItem> {
             { no: 4, name: "description", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 5, name: "children", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BuybackChildItem },
             { no: 6, name: "type_naming_indexes", kind: "message", T: () => TypeNamingIndexes },
-            { no: 7, name: "fee", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 7, name: "fee_per_unit", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<BuybackParentItem>): BuybackParentItem {
-        const message = { typeId: 0, quantity: 0, pricePerUnit: 0, description: "", children: [], fee: 0 };
+        const message = { typeId: 0, quantity: 0, pricePerUnit: 0, description: "", children: [], feePerUnit: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<BuybackParentItem>(this, message, value);
@@ -3923,8 +3986,8 @@ class BuybackParentItem$Type extends MessageType<BuybackParentItem> {
                 case /* eve_trading_co_proto.TypeNamingIndexes type_naming_indexes */ 6:
                     message.typeNamingIndexes = TypeNamingIndexes.internalBinaryRead(reader, reader.uint32(), options, message.typeNamingIndexes);
                     break;
-                case /* double fee */ 7:
-                    message.fee = reader.double();
+                case /* double fee_per_unit */ 7:
+                    message.feePerUnit = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -3956,9 +4019,9 @@ class BuybackParentItem$Type extends MessageType<BuybackParentItem> {
         /* eve_trading_co_proto.TypeNamingIndexes type_naming_indexes = 6; */
         if (message.typeNamingIndexes)
             TypeNamingIndexes.internalBinaryWrite(message.typeNamingIndexes, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* double fee = 7; */
-        if (message.fee !== 0)
-            writer.tag(7, WireType.Bit64).double(message.fee);
+        /* double fee_per_unit = 7; */
+        if (message.feePerUnit !== 0)
+            writer.tag(7, WireType.Bit64).double(message.feePerUnit);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -4053,11 +4116,13 @@ class ShopAppraisal$Type extends MessageType<ShopAppraisal> {
             { no: 3, name: "price", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "time", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 2 /*LongType.NUMBER*/ },
             { no: 5, name: "version", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 6, name: "location_id", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 2 /*LongType.NUMBER*/ }
+            { no: 6, name: "location_id", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 2 /*LongType.NUMBER*/ },
+            { no: 7, name: "tax_rate", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "tax", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value?: PartialMessage<ShopAppraisal>): ShopAppraisal {
-        const message = { items: [], code: "", price: 0, time: 0, version: "", locationId: 0 };
+        const message = { items: [], code: "", price: 0, time: 0, version: "", locationId: 0, taxRate: 0, tax: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<ShopAppraisal>(this, message, value);
@@ -4085,6 +4150,12 @@ class ShopAppraisal$Type extends MessageType<ShopAppraisal> {
                     break;
                 case /* int64 location_id */ 6:
                     message.locationId = reader.int64().toNumber();
+                    break;
+                case /* double tax_rate */ 7:
+                    message.taxRate = reader.double();
+                    break;
+                case /* double tax */ 8:
+                    message.tax = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -4116,6 +4187,12 @@ class ShopAppraisal$Type extends MessageType<ShopAppraisal> {
         /* int64 location_id = 6; */
         if (message.locationId !== 0)
             writer.tag(6, WireType.Varint).int64(message.locationId);
+        /* double tax_rate = 7; */
+        if (message.taxRate !== 0)
+            writer.tag(7, WireType.Bit64).double(message.taxRate);
+        /* double tax = 8; */
+        if (message.tax !== 0)
+            writer.tag(8, WireType.Bit64).double(message.tax);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

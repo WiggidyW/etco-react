@@ -14,6 +14,7 @@ import {
   useSearchableRegionColumn,
   M3FeeColumn,
   useSearchableBundleKeyColumn,
+  TaxRateColumn,
 } from "../Table/Column";
 import { SelectAllableTable, rowClassName } from "../Table/Table";
 import classNames from "classnames";
@@ -78,6 +79,7 @@ const mergeSystems = (
 
 const EMPTY: CfgBuybackSystem = {
   bundleKey: "",
+  taxRate: 0,
   m3Fee: 0,
 };
 
@@ -125,6 +127,9 @@ class Record {
   get bundleKey(): string | undefined {
     return this.system?.bundleKey;
   }
+  get taxRate(): number | undefined {
+    return this.system?.taxRate;
+  }
 
   get rowKey(): number {
     return this.systemId;
@@ -133,7 +138,11 @@ class Record {
   getModificationState(): ModificationState {
     if (this.newSystem === undefined) return ModificationState.Unmodified;
     else {
-      if (this.newSystem.bundleKey === "" && this.newSystem.m3Fee === 0)
+      if (
+        this.newSystem.bundleKey === "" &&
+        this.newSystem.m3Fee === 0 &&
+        this.newSystem.taxRate === 0
+      )
         return ModificationState.Deleted;
       return ModificationState.Modified;
     }
@@ -207,11 +216,13 @@ const Manipulator = ({
 }: ManipulatorProps): ReactElement => {
   const [m3Fee, setM3Fee] = useState<number | null>(null);
   const [bundleKey, setBundleKey] = useState<string | null>(null);
+  const [taxRate, setTaxRate] = useState<number | null>(null);
 
   const bundleKeyValid = bundleKey !== null && bundleKey !== "";
-  const m3FeeValid = m3Fee !== null && m3Fee >= 0;
+  const m3FeeValid = m3Fee === null || m3Fee >= 0;
+  const taxRateValid = taxRate === null || (taxRate >= 0 && taxRate <= 100);
 
-  const savePossible = bundleKeyValid && m3FeeValid;
+  const savePossible = bundleKeyValid && m3FeeValid && taxRateValid;
 
   return (
     <div className={classNames("w-full", "flex", "items-end", "space-x-4")}>
@@ -223,6 +234,15 @@ const Manipulator = ({
         title="Select Template"
         selected={bundleKey}
         setSelected={setBundleKey}
+      />
+
+      {/* Tax Rate Input */}
+      <NumberInput
+        min={0}
+        max={100}
+        title="Tax Rate"
+        value={taxRate}
+        setValue={(n: number | null) => setTaxRate(n)}
       />
 
       {/* M3 Fee Input */}
@@ -243,9 +263,16 @@ const Manipulator = ({
       <Button
         variant="success"
         disabled={!savePossible || !anySelected}
-        onClick={() => savePossible && onSave({ bundleKey, m3Fee })}
+        onClick={() =>
+          savePossible &&
+          onSave({
+            bundleKey,
+            taxRate: taxRate ? taxRate / 100 : 0,
+            m3Fee: m3Fee ?? 0,
+          })
+        }
       >
-        Save
+        {anySelected ? "Save" : "Add"}
       </Button>
 
       <span className={classNames("flex-grow")} />
@@ -267,6 +294,7 @@ const Table = ({
     useSearchableSystemColumn(),
     useSearchableRegionColumn(),
     useSearchableBundleKeyColumn(undefined, "Template"),
+    TaxRateColumn(),
     M3FeeColumn(),
   ];
   return (
