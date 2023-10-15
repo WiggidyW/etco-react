@@ -6,10 +6,10 @@ import * as sdt from "./src/staticdata/types";
 import * as pb from "./src/proto/etco";
 import fs from "fs";
 
-const SDE_TYPES_FILENAME: string = "sde_types.ts";
-const SDE_SYSTEMS_FILENAME: string = "sde_systems.ts";
-const BUYBACK_SYSTEMS_FILENAME: string = "buyback_systems.ts";
-const SHOP_LOCATIONS_FILENAME: string = "shop_locations.ts";
+const SDE_TYPES_FILENAME: string = "sde_types.js";
+const SDE_SYSTEMS_FILENAME: string = "sde_systems.js";
+const BUYBACK_SYSTEMS_FILENAME: string = "buyback_systems.js";
+const SHOP_LOCATIONS_FILENAME: string = "shop_locations.js";
 
 export const genStaticData = async (dirPath: string): Promise<void> => {
   await Promise.all([
