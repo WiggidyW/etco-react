@@ -207,15 +207,7 @@ export function toNewAppraisal(
       param.appraisal.version,
       param.newAppraisal?.version
     ),
-    items: newAppraisalItems(
-      {
-        kind: param.kind as any,
-        appraisalItems: param.appraisal.items,
-        newAppraisalItems: param.newAppraisal?.items,
-      },
-      contractItems,
-      unknownItems
-    ),
+    items: newAppraisalItems(param, contractItems, unknownItems),
   };
 }
 
@@ -223,22 +215,21 @@ const newAppraisalItems = (
   param:
     | {
         kind: "buyback";
-        appraisalItems: pb.BuybackParentItem[];
-        newAppraisalItems?: pb.BuybackParentItem[];
+        appraisal: pb.BuybackAppraisal;
+        newAppraisal?: pb.BuybackAppraisal | undefined;
       }
     | {
         kind: "shop";
-        appraisalItems: pb.ShopItem[];
-        newAppraisalItems?: pb.ShopItem[];
+        appraisal: pb.ShopAppraisal;
+        newAppraisal?: pb.ShopAppraisal | undefined;
       },
   contractItems?: pb.ContractItem[],
   unknownItems?: pb.NamedBasicItem[]
 ): AppraisalItem[] => {
   const appraisalItemMap = new Map<number, AppraisalItemMapped>();
 
-  for (const item of param.appraisalItems) {
-    const childItems =
-      param.kind === "buyback" ? (item as pb.BuybackParentItem).children : [];
+  for (const item of param.appraisal.items) {
+    const childItems = "children" in item ? item.children : [];
     const children: Map<number, AppraisalChildItem> = new Map(
       (function* () {
         for (const childItem of childItems) {
@@ -258,6 +249,7 @@ const newAppraisalItems = (
         }
       })()
     );
+
     appraisalItemMap.set(item.typeId, {
       typeId: item.typeId,
       name: item.typeNamingIndexes?.name || "undefined",
@@ -271,7 +263,9 @@ const newAppraisalItems = (
     });
   }
 
-  for (const item of param.newAppraisalItems ?? []) {
+  for (const item of (param.newAppraisal?.items ?? []) as
+    | pb.BuybackParentItem[]
+    | pb.ShopItem[]) {
     const appraisalItem = appraisalItemMap.get(item.typeId);
     if (appraisalItem === undefined) {
       console.warn(
@@ -289,36 +283,33 @@ const newAppraisalItems = (
       item.description
     );
 
-    const childItems =
-      param.kind === "buyback" ? (item as pb.BuybackParentItem).children : [];
-    if (param.kind === "buyback") {
-      for (const childItem of childItems) {
-        const appraisalChildItem = appraisalItem.children.get(childItem.typeId);
-        if (appraisalChildItem === undefined) {
-          appraisalItem.children.set(childItem.typeId, {
-            typeId: childItem.typeId,
-            name: childItem.typeNamingIndexes?.name || "undefined",
-            pricePerUnit: 0,
-            newPricePerUnit: childItem.pricePerUnit,
-            description: "",
-            newDescription: childItem.description,
-            quantityPerParent: 0,
-            newQuantityPerParent: childItem.quantityPerParent,
-          });
-        } else {
-          appraisalChildItem.newPricePerUnit = newSameOrNew(
-            appraisalChildItem.pricePerUnit,
-            childItem.pricePerUnit
-          );
-          appraisalChildItem.newDescription = newSameOrNew(
-            appraisalChildItem.description,
-            childItem.description
-          );
-          appraisalChildItem.newQuantityPerParent = newSameOrNew(
-            appraisalChildItem.quantityPerParent,
-            childItem.quantityPerParent
-          );
-        }
+    const childItems = "children" in item ? item.children : [];
+    for (const childItem of childItems) {
+      const appraisalChildItem = appraisalItem.children.get(childItem.typeId);
+      if (appraisalChildItem === undefined) {
+        appraisalItem.children.set(childItem.typeId, {
+          typeId: childItem.typeId,
+          name: childItem.typeNamingIndexes?.name || "undefined",
+          pricePerUnit: 0,
+          newPricePerUnit: childItem.pricePerUnit,
+          description: "",
+          newDescription: childItem.description,
+          quantityPerParent: 0,
+          newQuantityPerParent: childItem.quantityPerParent,
+        });
+      } else {
+        appraisalChildItem.newPricePerUnit = newSameOrNew(
+          appraisalChildItem.pricePerUnit,
+          childItem.pricePerUnit
+        );
+        appraisalChildItem.newDescription = newSameOrNew(
+          appraisalChildItem.description,
+          childItem.description
+        );
+        appraisalChildItem.newQuantityPerParent = newSameOrNew(
+          appraisalChildItem.quantityPerParent,
+          childItem.quantityPerParent
+        );
       }
     }
   }
@@ -359,12 +350,70 @@ const newAppraisalItems = (
           name: unknownItem.name,
           pricePerUnit: 0,
           newPricePerUnit: true,
+          feePerUnit: 0,
+          newFeePerUnit: true,
           description: "",
           newDescription: true,
           quantity: unknownItem.quantity,
           contractQuantity: 0,
           children: [],
           unknown: true,
+        };
+      }
+      if (param.appraisal.tax > 0 || (param.newAppraisal?.tax ?? 0) > 0) {
+        const pricePerUnit =
+          param.kind === "buyback" ? -param.appraisal.tax : param.appraisal.tax;
+        const newPricePerUnit = newSameOrNew(
+          pricePerUnit,
+          param.kind === "buyback"
+            ? -(param.newAppraisal?.tax ?? pricePerUnit)
+            : param.newAppraisal?.tax
+        );
+        const description = `${(param.appraisal.taxRate * 100).toFixed(2)}%`;
+        const newDescription = newSameOrNew(
+          description,
+          param.newAppraisal?.taxRate
+            ? `${(param.newAppraisal?.taxRate * 100).toFixed(2)}%`
+            : undefined
+        );
+        yield {
+          typeId: 0,
+          name: "Tax",
+          pricePerUnit,
+          newPricePerUnit,
+          description,
+          newDescription,
+          quantity: 1,
+          contractQuantity: 0,
+          children: [],
+        };
+      }
+      if (
+        param.kind === "buyback" &&
+        (param.appraisal.fee > 0 || (param.newAppraisal?.fee ?? 0) > 0)
+      ) {
+        const pricePerUnit = -param.appraisal.fee;
+        const newPricePerUnit = newSameOrNew(
+          pricePerUnit,
+          -(param.newAppraisal?.fee ?? pricePerUnit)
+        );
+        const description = `${param.appraisal.feePerM3} ISK/m3`;
+        const newDescription = newSameOrNew(
+          description,
+          param.newAppraisal?.feePerM3
+            ? `${param.newAppraisal?.feePerM3} ISK/m3`
+            : undefined
+        );
+        yield {
+          typeId: 0,
+          name: "Fee",
+          pricePerUnit,
+          newPricePerUnit,
+          description,
+          newDescription,
+          quantity: 1,
+          contractQuantity: 0,
+          children: [],
         };
       }
     })()
