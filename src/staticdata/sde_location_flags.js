@@ -1,4 +1,4 @@
-export const LOCATION_FLAGS = [
+const LOCATION_FLAGS = [
   "AssetSafety",
   "AutoFit",
   "Bonus",
@@ -121,3 +121,5 @@ export const LOCATION_FLAGS = [
   "Wallet",
   "Wardrobe",
 ];
+
+module.exports = { LOCATION_FLAGS };
