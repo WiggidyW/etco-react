@@ -24,4 +24,8 @@ export const EmptyPbBuybackAppraisal: pb.BuybackAppraisal = {
   time: 0,
   version: "",
   systemId: -1,
+  feePerM3: 0,
+  fee: 0,
+  taxRate: 0,
+  tax: 0,
 };
