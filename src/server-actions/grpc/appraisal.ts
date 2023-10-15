@@ -1,3 +1,4 @@
+import { ShopLocation, System } from "@/staticdata/types";
 import { ICharacter } from "@/browser/character";
 import * as pb from "@/proto/etco";
 import {
@@ -15,7 +16,9 @@ import {
   FullShopAppraisalStatus,
   ShopAppraisalStatus,
 } from "./appraisalStatus";
-import { ShopLocation, System } from "@/staticdata/types";
+
+export const TAX_TYPE_ID = -100;
+export const FEE_TYPE_ID = -101;
 
 export type NotBoolean<T> = T extends boolean ? never : T;
 
@@ -207,215 +210,394 @@ export function toNewAppraisal(
       param.appraisal.version,
       param.newAppraisal?.version
     ),
-    items: newAppraisalItems(param, contractItems, unknownItems),
+    items:
+      param.kind === "buyback"
+        ? newBuybackAppraisalItems(
+            param.appraisal,
+            param.newAppraisal,
+            contractItems,
+            unknownItems
+          )
+        : newShopAppraisalItems(
+            param.appraisal,
+            param.newAppraisal,
+            contractItems,
+            unknownItems
+          ),
   };
 }
 
-const newAppraisalItems = (
-  param:
-    | {
-        kind: "buyback";
-        appraisal: pb.BuybackAppraisal;
-        newAppraisal?: pb.BuybackAppraisal | undefined;
+type AppraisalItemKind = "buyback_parent" | "buyback_child" | "shop";
+type Item = pb.BuybackParentItem | pb.BuybackChildItem | pb.ShopItem;
+type FeeData = {
+  oldFee: number;
+  oldFeePerM3: number;
+  newFee: number;
+  newFeePerM3: number;
+};
+type TaxData = {
+  oldTax: number;
+  oldTaxRate: number;
+  newTax: number;
+  newTaxRate: number;
+};
+
+const newFeeItem = (fee: number, feePerM3: number): pb.BuybackChildItem => ({
+  typeId: FEE_TYPE_ID,
+  pricePerUnit: -fee,
+  description: `${feePerM3} ISK/m3`,
+  quantityPerParent: 1,
+  typeNamingIndexes: {
+    name: "M3 Fee",
+    groupIndex: -1,
+    categoryIndex: -1,
+    marketGroupIndexes: [],
+  },
+});
+
+const newTaxItem = (
+  kind: AppraisalItemKind,
+  tax: number,
+  taxRate: number
+): pb.BuybackParentItem | pb.ShopItem => {
+  const BaseItem: pb.ShopItem = {
+    typeId: TAX_TYPE_ID,
+    quantity: 1,
+    pricePerUnit: kind === "shop" ? tax : -tax,
+    description: `Remitted ${(taxRate * 100).toFixed(2)}% Tax`,
+    typeNamingIndexes: {
+      name: "Tax",
+      groupIndex: -1,
+      categoryIndex: -1,
+      marketGroupIndexes: [],
+    },
+  };
+  if (kind === "shop") {
+    return BaseItem;
+  } else if (kind === "buyback_parent") {
+    return {
+      ...BaseItem,
+      children: [],
+      feePerUnit: 0,
+    } as pb.BuybackParentItem;
+  } else {
+    throw new Error(`newTaxItem: Invalid kind ${kind}`);
+  }
+};
+
+type TypedItemsMinOne<T> =
+  | {
+      oldItem: T | null;
+      newItem: T;
+      contractItem: pb.ContractItem | null;
+      unknownItem: null;
+    }
+  | {
+      oldItem: T;
+      newItem: T | null;
+      contractItem: pb.ContractItem | null;
+      unknownItem: null;
+    }
+  | {
+      oldItem: T | null;
+      newItem: T | null;
+      contractItem: pb.ContractItem;
+      unknownItem: null;
+    }
+  | {
+      oldItem: null;
+      newItem: null;
+      contractItem: null;
+      unknownItem: pb.NamedBasicItem;
+    };
+
+function iterAppraisalItems(
+  kind: "buyback_parent",
+  oldItems: pb.BuybackParentItem[],
+  newItems: pb.BuybackParentItem[],
+  contractItems: pb.ContractItem[],
+  unknownItems: pb.NamedBasicItem[],
+  taxData: TaxData // always pass
+): IterableIterator<TypedItemsMinOne<pb.BuybackParentItem>>;
+function iterAppraisalItems(
+  kind: "buyback_child",
+  oldItems: pb.BuybackChildItem[],
+  newItems: pb.BuybackChildItem[],
+  contractItems: never[],
+  unknownItems: never[],
+  taxData: undefined,
+  feeData: FeeData // always pass
+): IterableIterator<TypedItemsMinOne<pb.BuybackChildItem>>;
+function iterAppraisalItems(
+  kind: "shop",
+  oldItems: pb.ShopItem[],
+  newItems: pb.ShopItem[],
+  contractItems: pb.ContractItem[],
+  unknownItems: pb.NamedBasicItem[],
+  taxData: TaxData // always pass
+): IterableIterator<TypedItemsMinOne<pb.ShopItem>>;
+function iterAppraisalItems(
+  kind: AppraisalItemKind,
+  oldItems: Item[],
+  newItems: Item[],
+  contractItems: pb.ContractItem[],
+  unknownItems: pb.NamedBasicItem[],
+  taxData?: TaxData, // yielded if present AND either tax not 0
+  feeData?: FeeData // yielded if present AND either fee not 0
+): IterableIterator<TypedItemsMinOne<Item>> {
+  return (function* () {
+    // const oldItemsSorted = [...oldItems].sort((a, b) => a.typeId - b.typeId);
+    // const newItemsSorted = [...newItems].sort((a, b) => a.typeId - b.typeId);
+
+    // smallest typeid first
+    oldItems.sort((a, b) => a.typeId - b.typeId);
+    newItems.sort((a, b) => a.typeId - b.typeId);
+    contractItems.sort((a, b) => a.typeId - b.typeId);
+    let oldIdx = 0;
+    let newIdx = 0;
+    let contractIdx = 0;
+
+    // yield shared items between old, new, and contract, smallest typeId first
+    while (true) {
+      let oldItem: Item | null =
+        oldIdx >= oldItems.length ? null : oldItems[oldIdx];
+      let newItem: Item | null =
+        newIdx >= newItems.length ? null : newItems[newIdx];
+      let contractItem: pb.ContractItem | null =
+        contractIdx >= contractItems.length ? null : contractItems[contractIdx];
+
+      if (oldItem === null && newItem === null && contractItem === null) {
+        break; // exhausted
       }
-    | {
-        kind: "shop";
-        appraisal: pb.ShopAppraisal;
-        newAppraisal?: pb.ShopAppraisal | undefined;
-      },
+
+      let smallestTypeId: number = Math.min(
+        oldItem?.typeId ?? Infinity,
+        newItem?.typeId ?? Infinity,
+        contractItem?.typeId ?? Infinity
+      );
+
+      if (oldItem?.typeId !== smallestTypeId) oldItem = null;
+      if (newItem?.typeId !== smallestTypeId) newItem = null;
+      if (contractItem?.typeId !== smallestTypeId) contractItem = null;
+
+      yield {
+        oldItem,
+        newItem,
+        contractItem,
+        unknownItem: null,
+      } as TypedItemsMinOne<Item>;
+    }
+
+    // yield all unknown items
+    for (const unknownItem of unknownItems) {
+      yield { oldItem: null, newItem: null, contractItem: null, unknownItem };
+    }
+
+    // maybe yield the tax
+    if (taxData !== undefined) {
+      const oldItem: Item | null =
+        taxData.oldTax > 0
+          ? newTaxItem(kind, taxData.oldTax, taxData.oldTaxRate)
+          : null;
+      const newItem: Item | null =
+        taxData.newTax > 0
+          ? newTaxItem(kind, taxData.newTax, taxData.newTaxRate)
+          : null;
+      if (oldItem !== null || newItem !== null) {
+        yield {
+          oldItem,
+          newItem,
+          contractItem: null,
+          unknownItem: null,
+        } as TypedItemsMinOne<Item>;
+      }
+    }
+
+    // maybe yield the fee
+    if (feeData !== undefined) {
+      const oldItem: pb.BuybackChildItem | null =
+        feeData.oldFee > 0
+          ? newFeeItem(feeData.oldFee, feeData.oldFeePerM3)
+          : null;
+      const newItem: pb.BuybackChildItem | null =
+        feeData.newFee > 0
+          ? newFeeItem(feeData.newFee, feeData.newFeePerM3)
+          : null;
+      if (oldItem !== null || newItem !== null) {
+        yield {
+          oldItem,
+          newItem,
+          contractItem: null,
+          unknownItem: null,
+        } as TypedItemsMinOne<Item>;
+      }
+    }
+  })();
+}
+
+function newAppraisalItemBase(
+  items: TypedItemsMinOne<Item>,
+  hasNewAppraisal: boolean
+): AppraisalItemBase {
+  let typeId: number;
+  let name: string;
+  if (items.oldItem !== null) {
+    typeId = items.oldItem.typeId;
+    name = items.oldItem.typeNamingIndexes!.name;
+  } else if (items.newItem !== null) {
+    typeId = items.newItem.typeId;
+    name = items.newItem.typeNamingIndexes!.name;
+  } else if (items.contractItem !== null) {
+    typeId = items.contractItem.typeId;
+    name = items.contractItem.typeNamingIndexes!.name;
+  } else {
+    typeId = items.unknownItem.typeId;
+    name = items.unknownItem.name;
+  }
+  const pricePerUnit = items.oldItem?.pricePerUnit ?? 0;
+  const newPricePerUnit = hasNewAppraisal
+    ? newSameOrNew(pricePerUnit, items.newItem?.pricePerUnit)
+    : true;
+  const description = items.oldItem?.description ?? "N/A";
+  const newDescription = hasNewAppraisal
+    ? newSameOrNew(description, items.newItem?.description)
+    : true;
+  return {
+    typeId,
+    name,
+    pricePerUnit,
+    newPricePerUnit,
+    description,
+    newDescription,
+  };
+}
+
+function newAppraisalItem(
+  items: TypedItemsMinOne<pb.ShopItem>,
+  hasNewAppraisal: boolean,
+  hasContract: boolean
+): AppraisalItem;
+function newAppraisalItem(
+  items: TypedItemsMinOne<pb.BuybackParentItem>,
+  hasNewAppraisal: boolean,
+  hasContract: boolean,
+  children: AppraisalChildItem[]
+): AppraisalItem;
+function newAppraisalItem(
+  items: TypedItemsMinOne<pb.ShopItem> | TypedItemsMinOne<pb.BuybackParentItem>,
+  hasNewAppraisal: boolean,
+  hasContract: boolean,
+  children?: AppraisalChildItem[]
+): AppraisalItem {
+  const quantity = items.oldItem?.quantity ?? 0;
+  const contractQuantity = hasContract
+    ? newSameOrNew(quantity, items.contractItem?.quantity ?? 0)
+    : true;
+  return {
+    ...newAppraisalItemBase(items, hasNewAppraisal),
+    quantity,
+    contractQuantity,
+    children: children ?? [],
+  };
+}
+
+function newAppraisalChildItem(
+  items: TypedItemsMinOne<pb.BuybackChildItem>,
+  hasNewAppraisal: boolean
+): AppraisalChildItem {
+  const quantityPerParent = items.oldItem?.quantityPerParent ?? 0;
+  const newQuantityPerParent = hasNewAppraisal
+    ? newSameOrNew(quantityPerParent, items.newItem?.quantityPerParent)
+    : true;
+  return {
+    ...newAppraisalItemBase(items, hasNewAppraisal),
+    quantityPerParent,
+    newQuantityPerParent,
+  };
+}
+
+function newShopAppraisalItems(
+  appraisal: pb.ShopAppraisal,
+  newAppraisal?: pb.ShopAppraisal,
   contractItems?: pb.ContractItem[],
   unknownItems?: pb.NamedBasicItem[]
-): AppraisalItem[] => {
-  const appraisalItemMap = new Map<number, AppraisalItemMapped>();
-
-  for (const item of param.appraisal.items) {
-    const childItems = "children" in item ? item.children : [];
-    const children: Map<number, AppraisalChildItem> = new Map(
-      (function* () {
-        for (const childItem of childItems) {
-          yield [
-            childItem.typeId,
-            {
-              typeId: childItem.typeId,
-              name: childItem.typeNamingIndexes?.name || "undefined",
-              pricePerUnit: childItem.pricePerUnit,
-              newPricePerUnit: true,
-              description: childItem.description,
-              newDescription: true,
-              quantityPerParent: childItem.quantityPerParent,
-              newQuantityPerParent: true,
-            },
-          ];
-        }
-      })()
-    );
-
-    appraisalItemMap.set(item.typeId, {
-      typeId: item.typeId,
-      name: item.typeNamingIndexes?.name || "undefined",
-      pricePerUnit: item.pricePerUnit,
-      newPricePerUnit: true,
-      description: item.description,
-      newDescription: true,
-      quantity: item.quantity,
-      contractQuantity: 0,
-      children,
-    });
-  }
-
-  for (const item of (param.newAppraisal?.items ?? []) as
-    | pb.BuybackParentItem[]
-    | pb.ShopItem[]) {
-    const appraisalItem = appraisalItemMap.get(item.typeId);
-    if (appraisalItem === undefined) {
-      console.warn(
-        `newAppraisalItems has typeId ${item.typeId} but appraisalItems does not`
-      );
-      continue;
-    }
-
-    appraisalItem.newPricePerUnit = newSameOrNew(
-      appraisalItem.pricePerUnit,
-      item.pricePerUnit
-    );
-    appraisalItem.newDescription = newSameOrNew(
-      appraisalItem.description,
-      item.description
-    );
-
-    const childItems = "children" in item ? item.children : [];
-    for (const childItem of childItems) {
-      const appraisalChildItem = appraisalItem.children.get(childItem.typeId);
-      if (appraisalChildItem === undefined) {
-        appraisalItem.children.set(childItem.typeId, {
-          typeId: childItem.typeId,
-          name: childItem.typeNamingIndexes?.name || "undefined",
-          pricePerUnit: 0,
-          newPricePerUnit: childItem.pricePerUnit,
-          description: "",
-          newDescription: childItem.description,
-          quantityPerParent: 0,
-          newQuantityPerParent: childItem.quantityPerParent,
-        });
-      } else {
-        appraisalChildItem.newPricePerUnit = newSameOrNew(
-          appraisalChildItem.pricePerUnit,
-          childItem.pricePerUnit
-        );
-        appraisalChildItem.newDescription = newSameOrNew(
-          appraisalChildItem.description,
-          childItem.description
-        );
-        appraisalChildItem.newQuantityPerParent = newSameOrNew(
-          appraisalChildItem.quantityPerParent,
-          childItem.quantityPerParent
-        );
-      }
-    }
-  }
-
-  for (const item of contractItems ?? []) {
-    const appraisalItem = appraisalItemMap.get(item.typeId);
-    if (appraisalItem === undefined) {
-      appraisalItemMap.set(item.typeId, {
-        typeId: item.typeId,
-        name: item.typeNamingIndexes?.name || "undefined",
-        pricePerUnit: 0,
-        newPricePerUnit: true,
-        description: "",
-        newDescription: true,
-        quantity: 0,
-        contractQuantity: item.quantity,
-        children: new Map(),
-      });
-    } else {
-      appraisalItem.contractQuantity = newSameOrNew(
-        appraisalItem.quantity,
-        item.quantity
-      );
-    }
-  }
-
+): AppraisalItem[] {
   return Array.from(
     (function* () {
-      for (const appraisalItem of appraisalItemMap.values()) {
-        (appraisalItem as unknown as AppraisalItem).children = Array.from(
-          appraisalItem.children.values()
+      for (const items of iterAppraisalItems(
+        "shop",
+        appraisal.items,
+        newAppraisal?.items ?? [],
+        contractItems ?? [],
+        unknownItems ?? [],
+        {
+          oldTax: appraisal.tax,
+          oldTaxRate: appraisal.taxRate,
+          newTax: newAppraisal?.tax ?? 0,
+          newTaxRate: newAppraisal?.taxRate ?? 0,
+        }
+      )) {
+        yield newAppraisalItem(
+          items,
+          newAppraisal !== undefined,
+          contractItems !== undefined
         );
-        yield appraisalItem as unknown as AppraisalItem;
-      }
-      for (const unknownItem of unknownItems ?? []) {
-        yield {
-          typeId: 0,
-          name: unknownItem.name,
-          pricePerUnit: 0,
-          newPricePerUnit: true,
-          feePerUnit: 0,
-          newFeePerUnit: true,
-          description: "",
-          newDescription: true,
-          quantity: unknownItem.quantity,
-          contractQuantity: 0,
-          children: [],
-          unknown: true,
-        };
-      }
-      if (param.appraisal.tax > 0 || (param.newAppraisal?.tax ?? 0) > 0) {
-        const pricePerUnit =
-          param.kind === "buyback" ? -param.appraisal.tax : param.appraisal.tax;
-        const newPricePerUnit = newSameOrNew(
-          pricePerUnit,
-          param.kind === "buyback"
-            ? -(param.newAppraisal?.tax ?? pricePerUnit)
-            : param.newAppraisal?.tax
-        );
-        const description = `${(param.appraisal.taxRate * 100).toFixed(2)}%`;
-        const newDescription = newSameOrNew(
-          description,
-          param.newAppraisal?.taxRate
-            ? `${(param.newAppraisal?.taxRate * 100).toFixed(2)}%`
-            : undefined
-        );
-        yield {
-          typeId: 0,
-          name: "Tax",
-          pricePerUnit,
-          newPricePerUnit,
-          description,
-          newDescription,
-          quantity: 1,
-          contractQuantity: 0,
-          children: [],
-        };
-      }
-      if (
-        param.kind === "buyback" &&
-        (param.appraisal.fee > 0 || (param.newAppraisal?.fee ?? 0) > 0)
-      ) {
-        const pricePerUnit = -param.appraisal.fee;
-        const newPricePerUnit = newSameOrNew(
-          pricePerUnit,
-          -(param.newAppraisal?.fee ?? pricePerUnit)
-        );
-        const description = `${param.appraisal.feePerM3} ISK/m3`;
-        const newDescription = newSameOrNew(
-          description,
-          param.newAppraisal?.feePerM3
-            ? `${param.newAppraisal?.feePerM3} ISK/m3`
-            : undefined
-        );
-        yield {
-          typeId: 0,
-          name: "Fee",
-          pricePerUnit,
-          newPricePerUnit,
-          description,
-          newDescription,
-          quantity: 1,
-          contractQuantity: 0,
-          children: [],
-        };
       }
     })()
   );
-};
+}
+
+function newBuybackAppraisalItems(
+  appraisal: pb.BuybackAppraisal,
+  newAppraisal?: pb.BuybackAppraisal,
+  contractItems?: pb.ContractItem[],
+  unknownItems?: pb.NamedBasicItem[]
+): AppraisalItem[] {
+  return Array.from(
+    (function* () {
+      for (const items of iterAppraisalItems(
+        "buyback_parent",
+        appraisal.items,
+        newAppraisal?.items ?? [],
+        contractItems ?? [],
+        unknownItems ?? [],
+        {
+          oldTax: appraisal.tax,
+          oldTaxRate: appraisal.taxRate,
+          newTax: newAppraisal?.tax ?? 0,
+          newTaxRate: newAppraisal?.taxRate ?? 0,
+        }
+      )) {
+        const children = Array.from(
+          (function* () {
+            for (const childItems of iterAppraisalItems(
+              "buyback_child",
+              items.oldItem?.children ?? [],
+              items.newItem?.children ?? [],
+              [],
+              [],
+              undefined,
+              {
+                oldFee: items.oldItem?.feePerUnit ?? 0,
+                oldFeePerM3: appraisal.feePerM3,
+                newFee: items.newItem?.feePerUnit ?? 0,
+                newFeePerM3: newAppraisal?.feePerM3 ?? 0,
+              }
+            )) {
+              yield newAppraisalChildItem(
+                childItems,
+                newAppraisal !== undefined
+              );
+            }
+          })()
+        );
+        yield newAppraisalItem(
+          items,
+          newAppraisal !== undefined,
+          contractItems !== undefined,
+          children
+        );
+      }
+    })()
+  );
+}
