@@ -9,10 +9,10 @@ placeholder/*
 /placeholder/*
 
 # static data
-src/staticdata/sde_types.ts
-src/staticdata/buyback_systems.ts
-src/staticdata/shop_locations.ts
-src/staticdata/sde_systems.ts
+src/staticdata/sde_types.js
+src/staticdata/buyback_systems.js
+src/staticdata/shop_locations.js
+src/staticdata/sde_systems.js
 
 # dependencies
 /node_modules
