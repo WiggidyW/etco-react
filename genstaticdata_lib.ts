@@ -230,30 +230,6 @@ const writeFile = async (
   });
 };
 
-const writeNamedSDETypeData = async (
-  filePath: string,
-  types: sdt.SDETypes,
-  groupNames: sdt.GroupNames,
-  categoryNames: sdt.CategoryNames,
-  marketGroupNames: sdt.MarketGroupNames
-): Promise<void> => {
-  let fileContent: string = "";
-  fileContent += `import * as sdt from "./types";\n`;
-  fileContent += `export const SDE_TYPE_DATA: sdt.SDETypes = ${JSON.stringify(
-    types
-  )};\n`;
-  fileContent += `export const GROUP_NAMES: sdt.GroupNames = ${JSON.stringify(
-    groupNames
-  )};\n`;
-  fileContent += `export const CATEGORY_NAMES: sdt.CategoryNames = ${JSON.stringify(
-    categoryNames
-  )};\n`;
-  fileContent += `export const MARKET_GROUP_NAMES: sdt.MarketGroupNames = ${JSON.stringify(
-    marketGroupNames
-  )};\n`;
-  return writeFile(filePath, fileContent);
-};
-
 const writeBuybackSystems = async (
   filePath: string,
   systems: sdt.Systems,
@@ -288,13 +264,9 @@ const writeSystems = async (
   regionsConstName: string
 ): Promise<void> => {
   let fileContent: string = "";
-  fileContent += `import * as sdt from "./types";\n`;
-  fileContent += `export const ${systemsConstName}: sdt.Systems = ${stringifyWithNumberKeys(
-    systems
-  )};\n`;
-  fileContent += `export const ${regionsConstName}: sdt.RegionNames = ${stringifyWithNumberKeys(
-    regionNames
-  )};\n`;
+  fileContent += `const ${systemsConstName} = ${stringifyWithNumberKeys(systems)};\n`; // prettier-ignore
+  fileContent += `const ${regionsConstName} = ${stringifyWithNumberKeys(regionNames)};\n`; // prettier-ignore
+  fileContent += `module.exports = { ${systemsConstName}, ${regionsConstName} };\n`;
   return writeFile(filePath, fileContent);
 };
 
@@ -305,16 +277,26 @@ const writeShopLocations = async (
   regionNames: sdt.RegionNames
 ): Promise<void> => {
   let fileContent: string = "";
-  fileContent += `import * as sdt from "./types";\n`;
-  fileContent += `export const SHOP_LOCATIONS: sdt.ShopLocations = ${stringifyWithNumberKeys(
-    shopLocations
-  )};\n`;
-  fileContent += `export const SHOP_SYSTEM_NAMES: sdt.SystemNames = ${stringifyWithNumberKeys(
-    systemNames
-  )};\n`;
-  fileContent += `export const SHOP_REGION_NAMES: sdt.RegionNames = ${stringifyWithNumberKeys(
-    regionNames
-  )};\n`;
+  fileContent += `const SHOP_LOCATIONS = ${stringifyWithNumberKeys(shopLocations)};\n`; // prettier-ignore
+  fileContent += `const SHOP_SYSTEM_NAMES = ${stringifyWithNumberKeys(systemNames)};\n`; // prettier-ignore
+  fileContent += `const SHOP_REGION_NAMES = ${stringifyWithNumberKeys(regionNames)};\n`; // prettier-ignore
+  fileContent += `module.exports = { SHOP_LOCATIONS, SHOP_SYSTEM_NAMES, SHOP_REGION_NAMES };\n`;
+  return writeFile(filePath, fileContent);
+};
+
+const writeNamedSDETypeData = async (
+  filePath: string,
+  types: sdt.SDETypes,
+  groupNames: sdt.GroupNames,
+  categoryNames: sdt.CategoryNames,
+  marketGroupNames: sdt.MarketGroupNames
+): Promise<void> => {
+  let fileContent: string = "";
+  fileContent += `const SDE_TYPE_DATA = ${JSON.stringify(types)};\n`;
+  fileContent += `const GROUP_NAMES = ${JSON.stringify(groupNames)};\n`;
+  fileContent += `const CATEGORY_NAMES = ${JSON.stringify(categoryNames)};\n`;
+  fileContent += `const MARKET_GROUP_NAMES = ${JSON.stringify(marketGroupNames)};\n`; // prettier-ignore
+  fileContent += `module.exports = { SDE_TYPE_DATA, GROUP_NAMES, CATEGORY_NAMES, MARKET_GROUP_NAMES };\n`;
   return writeFile(filePath, fileContent);
 };
 
