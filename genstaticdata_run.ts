@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { genStaticData } from "./genstaticdata";
+import { genStaticData } from "./genstaticdata_lib";
 
 const MAX_RETRY_ATTEMPTS: number = 3;
 const RETRY_SLEEP_MS: number = 5000;

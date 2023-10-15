@@ -34,7 +34,7 @@ RUN echo "ETCO_EVE_AUTH_CLIENT_ID=${ETCO_EVE_AUTH_CLIENT_ID}" >> .env && \
 RUN npm install
 RUN if [ -z "$BOOTSTRAP" ]; then \
         echo "BOOTSTRAP false: generating static data"; \
-        npm run generate-static-data; \
+        npm run genstaticdata; \
     else \
         echo "BOOTSTRAP true: skip generating static data"; \
     fi
