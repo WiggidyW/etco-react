@@ -60,3 +60,21 @@ export type NextLinkProps = Omit<
 > &
   LinkProps &
   React.RefAttributes<HTMLAnchorElement>;
+
+type UnionPropType<
+  O extends object,
+  PROP extends string | number | symbol
+> = O extends { [K in PROP]: infer U } ? U : undefined;
+
+export const getOpt = <O extends object, PROP extends string | number | symbol>(
+  obj: O,
+  key: PROP
+): UnionPropType<O, PROP> => (key in obj ? (obj as any)[key] : undefined);
+
+export const getOptFromOpt = <
+  O extends object,
+  PROP extends string | number | symbol
+>(
+  obj: O | undefined | null,
+  key: PROP
+): UnionPropType<O, PROP> | undefined => (obj ? getOpt(obj, key) : undefined);
