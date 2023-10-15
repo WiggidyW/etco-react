@@ -224,11 +224,16 @@ const transformShopLocations = (
 const writeFile = async (
   filePath: string,
   fileContent: string
-): Promise<void> => {
-  return fs.writeFile(filePath, fileContent, "utf8", (err) => {
-    if (err !== null) throw err;
-  });
-};
+): Promise<void> =>
+  new Promise((resolve, reject) =>
+    fs.writeFile(filePath, fileContent, "utf8", (err) => {
+      if (err === null) {
+        resolve();
+      } else {
+        reject(err);
+      }
+    })
+  );
 
 const writeBuybackSystems = async (
   filePath: string,
