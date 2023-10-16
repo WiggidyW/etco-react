@@ -18,11 +18,14 @@ import {
 } from "../Table/Column";
 import { SelectAllableTable, rowClassName } from "../Table/Table";
 import classNames from "classnames";
-import { SDE_REGION_NAMES, SDE_SYSTEMS } from "@/staticdata/sde_systems";
 import { Button, ManipulatorSelector, NumberInput } from "../Input/Manipulator";
 import { ConfigureBase } from "./Base";
 import { resultCfgGetBuybackSystemsLoad } from "@/server-actions/grpc/cfgGet";
 import { resultCfgMergeBuybackSystems } from "@/server-actions/grpc/cfgMerge";
+
+import sde_systems_json from "@/staticdata/sde_systems.json";
+import { ContentSdeSystems } from "@/staticdata/sde_systems";
+const { SDE_SYSTEMS, SDE_REGION_NAMES }: ContentSdeSystems = sde_systems_json;
 
 export interface ConfigureBuybackSystemsProps {
   refreshToken: string;

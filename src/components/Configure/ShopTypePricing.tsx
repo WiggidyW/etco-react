@@ -20,15 +20,18 @@ import { SelectAllableTable, TableTabs, rowClassName } from "../Table/Table";
 import classNames from "classnames";
 import { Button, ManipulatorSelector, NumberInput } from "../Input/Manipulator";
 import { PricingDesc } from "./description";
-import {
+import { ConfigureBase } from "./Base";
+import { resultCfgGetShopLocationTypeMapsBuilderLoad } from "@/server-actions/grpc/cfgGet";
+import { resultCfgMergeShopLocationTypeMapsBuilder } from "@/server-actions/grpc/cfgMerge";
+
+import sde_types_json from "@/staticdata/sde_types.json";
+import { ContentSdeTypes } from "@/staticdata/sde_types";
+const {
   SDE_TYPE_DATA,
   GROUP_NAMES,
   CATEGORY_NAMES,
   MARKET_GROUP_NAMES,
-} from "@/staticdata/sde_types";
-import { ConfigureBase } from "./Base";
-import { resultCfgGetShopLocationTypeMapsBuilderLoad } from "@/server-actions/grpc/cfgGet";
-import { resultCfgMergeShopLocationTypeMapsBuilder } from "@/server-actions/grpc/cfgMerge";
+}: ContentSdeTypes = sde_types_json;
 
 export interface ConfigureShopTypePricingProps {
   refreshToken: string;

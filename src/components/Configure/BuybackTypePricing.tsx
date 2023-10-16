@@ -10,12 +10,6 @@ import { ColumnType } from "antd/es/table";
 import { ConfigureBase } from "./Base";
 import classNames from "classnames";
 import {
-  SDE_TYPE_DATA,
-  GROUP_NAMES,
-  CATEGORY_NAMES,
-  MARKET_GROUP_NAMES,
-} from "@/staticdata/sde_types";
-import {
   useSearchableCategoryColumn,
   useSearchableGroupColumn,
   useSearchableMarketGroupColumn,
@@ -31,6 +25,15 @@ import {
 } from "@/proto/etco";
 import { resultCfgGetBuybackSystemTypeMapsBuilderLoad } from "@/server-actions/grpc/cfgGet";
 import { resultCfgMergeBuybackSystemTypeMapsBuilder } from "@/server-actions/grpc/cfgMerge";
+
+import sde_types_json from "@/staticdata/sde_types.json";
+import { ContentSdeTypes } from "@/staticdata/sde_types";
+const {
+  SDE_TYPE_DATA,
+  GROUP_NAMES,
+  CATEGORY_NAMES,
+  MARKET_GROUP_NAMES,
+}: ContentSdeTypes = sde_types_json;
 
 export interface ConfigureBuybackTypePricingProps {
   refreshToken: string;

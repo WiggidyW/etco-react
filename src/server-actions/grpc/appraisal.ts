@@ -2,20 +2,23 @@ import { ShopLocation, System } from "@/staticdata/types";
 import { ICharacter } from "@/browser/character";
 import * as pb from "@/proto/etco";
 import {
-  BUYBACK_REGION_NAMES,
-  BUYBACK_SYSTEMS,
-} from "@/staticdata/buyback_systems";
-import {
-  SHOP_LOCATIONS,
-  SHOP_REGION_NAMES,
-  SHOP_SYSTEM_NAMES,
-} from "@/staticdata/shop_locations";
-import {
   BuybackAppraisalStatus,
   FullBuybackAppraisalStatus,
   FullShopAppraisalStatus,
   ShopAppraisalStatus,
 } from "./appraisalStatus";
+
+import buyback_systems_json from "@/staticdata/buyback_systems.json";
+import { ContentBuybackSystems } from "@/staticdata/buyback_systems";
+import shop_locations_json from "@/staticdata/shop_locations.json";
+import { ContentShopLocations } from "@/staticdata/shop_locations";
+const { BUYBACK_REGION_NAMES, BUYBACK_SYSTEMS }: ContentBuybackSystems =
+  buyback_systems_json;
+const {
+  SHOP_LOCATIONS,
+  SHOP_REGION_NAMES,
+  SHOP_SYSTEM_NAMES,
+}: ContentShopLocations = shop_locations_json;
 
 export const TAX_TYPE_ID = -100;
 export const FEE_TYPE_ID = -101;

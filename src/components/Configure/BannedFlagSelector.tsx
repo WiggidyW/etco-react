@@ -1,12 +1,15 @@
 "use client";
 
-import { LOCATION_FLAGS } from "@/staticdata/sde_location_flags";
 import { ModificationState } from "./modificationState";
 import { RowKeyStringColumn } from "../Table/Column";
 import { ReactElement, useMemo } from "react";
 import { rowClassName } from "../Table/Table";
 import classNames from "classnames";
 import { Table } from "antd";
+
+import sde_location_flags_json from "@/staticdata/sde_location_flags.json";
+import { ContentSdeLocationFlags } from "@/staticdata/sde_location_flags";
+const { LOCATION_FLAGS }: ContentSdeLocationFlags = sde_location_flags_json;
 
 class BannedFlag {
   constructor(public readonly name: string) {}
