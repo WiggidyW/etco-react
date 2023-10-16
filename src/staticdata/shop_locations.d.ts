@@ -1,5 +1,12 @@
 import { ShopLocations, RegionNames, SystemNames } from "./types";
 
-export const SHOP_LOCATIONS: ShopLocations;
-export const SHOP_REGION_NAMES: RegionNames;
-export const SHOP_SYSTEM_NAMES: SystemNames;
+export interface ContentShopLocations {
+  SHOP_LOCATIONS: ShopLocations;
+  SHOP_REGION_NAMES: RegionNames;
+  SHOP_SYSTEM_NAMES: SystemNames;
+}
+
+declare module "shop_locations.json" {
+  const content: ContentShopLocations;
+  export default content;
+}

@@ -4,12 +4,16 @@ import { ThrowKind } from "./src/server-actions/throw";
 import * as pbClient from "./src/proto/etco.client";
 import * as sdt from "./src/staticdata/types";
 import * as pb from "./src/proto/etco";
+import { ContentBuybackSystems } from "./src/staticdata/buyback_systems";
+import { ContentSdeSystems } from "./src/staticdata/sde_systems";
+import { ContentShopLocations } from "./src/staticdata/shop_locations";
+import { ContentSdeTypes } from "./src/staticdata/sde_types";
 import fs from "fs";
 
-const SDE_TYPES_FILENAME: string = "sde_types.js";
-const SDE_SYSTEMS_FILENAME: string = "sde_systems.js";
-const BUYBACK_SYSTEMS_FILENAME: string = "buyback_systems.js";
-const SHOP_LOCATIONS_FILENAME: string = "shop_locations.js";
+const SDE_TYPES_FILENAME: string = "sde_types.json";
+const SDE_SYSTEMS_FILENAME: string = "sde_systems.json";
+const BUYBACK_SYSTEMS_FILENAME: string = "buyback_systems.json";
+const SHOP_LOCATIONS_FILENAME: string = "shop_locations.json";
 
 export const genStaticData = async (dirPath: string): Promise<void> => {
   await Promise.all([
@@ -239,40 +243,24 @@ const writeBuybackSystems = async (
   filePath: string,
   systems: sdt.Systems,
   regionNames: sdt.RegionNames
-): Promise<void> =>
-  writeSystems(
-    filePath,
-    systems,
-    regionNames,
-    "BUYBACK_SYSTEMS",
-    "BUYBACK_REGION_NAMES"
-  );
+): Promise<void> => {
+  let content: ContentBuybackSystems = {
+    BUYBACK_SYSTEMS: systems,
+    BUYBACK_REGION_NAMES: regionNames,
+  };
+  return writeFile(filePath, JSON.stringify(content));
+};
 
 const writeSDESystems = async (
   filePath: string,
   systems: sdt.Systems,
   regionNames: sdt.RegionNames
-): Promise<void> =>
-  writeSystems(
-    filePath,
-    systems,
-    regionNames,
-    "SDE_SYSTEMS",
-    "SDE_REGION_NAMES"
-  );
-
-const writeSystems = async (
-  filePath: string,
-  systems: sdt.Systems,
-  regionNames: sdt.RegionNames,
-  systemsConstName: string,
-  regionsConstName: string
 ): Promise<void> => {
-  let fileContent: string = "";
-  fileContent += `const ${systemsConstName} = ${stringifyWithNumberKeys(systems)};\n`; // prettier-ignore
-  fileContent += `const ${regionsConstName} = ${stringifyWithNumberKeys(regionNames)};\n`; // prettier-ignore
-  fileContent += `module.exports = { ${systemsConstName}, ${regionsConstName} };\n`;
-  return writeFile(filePath, fileContent);
+  let content: ContentSdeSystems = {
+    SDE_SYSTEMS: systems,
+    SDE_REGION_NAMES: regionNames,
+  };
+  return writeFile(filePath, JSON.stringify(content));
 };
 
 const writeShopLocations = async (
@@ -281,12 +269,12 @@ const writeShopLocations = async (
   systemNames: sdt.SystemNames,
   regionNames: sdt.RegionNames
 ): Promise<void> => {
-  let fileContent: string = "";
-  fileContent += `const SHOP_LOCATIONS = ${stringifyWithNumberKeys(shopLocations)};\n`; // prettier-ignore
-  fileContent += `const SHOP_SYSTEM_NAMES = ${stringifyWithNumberKeys(systemNames)};\n`; // prettier-ignore
-  fileContent += `const SHOP_REGION_NAMES = ${stringifyWithNumberKeys(regionNames)};\n`; // prettier-ignore
-  fileContent += `module.exports = { SHOP_LOCATIONS, SHOP_SYSTEM_NAMES, SHOP_REGION_NAMES };\n`;
-  return writeFile(filePath, fileContent);
+  let content: ContentShopLocations = {
+    SHOP_LOCATIONS: shopLocations,
+    SHOP_SYSTEM_NAMES: systemNames,
+    SHOP_REGION_NAMES: regionNames,
+  };
+  return writeFile(filePath, JSON.stringify(content));
 };
 
 const writeNamedSDETypeData = async (
@@ -296,20 +284,11 @@ const writeNamedSDETypeData = async (
   categoryNames: sdt.CategoryNames,
   marketGroupNames: sdt.MarketGroupNames
 ): Promise<void> => {
-  let fileContent: string = "";
-  fileContent += `const SDE_TYPE_DATA = ${JSON.stringify(types)};\n`;
-  fileContent += `const GROUP_NAMES = ${JSON.stringify(groupNames)};\n`;
-  fileContent += `const CATEGORY_NAMES = ${JSON.stringify(categoryNames)};\n`;
-  fileContent += `const MARKET_GROUP_NAMES = ${JSON.stringify(marketGroupNames)};\n`; // prettier-ignore
-  fileContent += `module.exports = { SDE_TYPE_DATA, GROUP_NAMES, CATEGORY_NAMES, MARKET_GROUP_NAMES };\n`;
-  return writeFile(filePath, fileContent);
-};
-
-const stringifyWithNumberKeys = (obj: { [key: number]: any }): string => {
-  let str: string = "{";
-  for (const key in obj) {
-    str += `[${key}]:${JSON.stringify(obj[key])},`;
-  }
-  str += "}";
-  return str;
+  let content: ContentSdeTypes = {
+    SDE_TYPE_DATA: types,
+    GROUP_NAMES: groupNames,
+    CATEGORY_NAMES: categoryNames,
+    MARKET_GROUP_NAMES: marketGroupNames,
+  };
+  return writeFile(filePath, JSON.stringify(content));
 };

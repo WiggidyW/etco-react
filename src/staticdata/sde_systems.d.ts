@@ -1,4 +1,11 @@
 import { Systems, RegionNames } from "./types";
 
-export const SDE_SYSTEMS: Systems;
-export const SDE_REGION_NAMES: RegionNames;
+export interface ContentSdeSystems {
+  SDE_SYSTEMS: Systems;
+  SDE_REGION_NAMES: RegionNames;
+}
+
+declare module "sde_systems.json" {
+  const content: ContentSdeSystems;
+  export default content;
+}

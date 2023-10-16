@@ -1,4 +1,11 @@
 import { Systems, RegionNames } from "./types";
 
-export const BUYBACK_SYSTEMS: Systems;
-export const BUYBACK_REGION_NAMES: RegionNames;
+export interface ContentBuybackSystems {
+  BUYBACK_SYSTEMS: Systems;
+  BUYBACK_REGION_NAMES: RegionNames;
+}
+
+declare module "buyback_systems.json" {
+  const content: ContentBuybackSystems;
+  export default content;
+}
