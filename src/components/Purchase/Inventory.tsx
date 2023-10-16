@@ -90,14 +90,12 @@ export const ShopInventory = ({
     >
       <ErrorBoundaryTryAgain>
         {viewingCart && (
-          <ContentPortal>
-            <Cart
-              records={records}
-              price={cartInfo.price}
-              onCheckout={onCheckout}
-              onCancel={() => setViewingCart(false)}
-            />
-          </ContentPortal>
+          <Cart
+            records={records}
+            price={cartInfo.price}
+            onCheckout={onCheckout}
+            onCancel={() => setViewingCart(false)}
+          />
         )}
         <LocationSelect
           className={classNames("pt-2", "ml-auto", "mr-auto")}
@@ -118,13 +116,23 @@ interface FooterProps {
 const Footer = ({ cartInfo, switchViewingCart }: FooterProps): ReactElement => (
   <VerticalBookend
     height={undefined}
-    className={classNames("flex", "items-center", "justify-center")}
+    className={classNames("flex", "items-center")}
   >
-    <LocaleText fmt={formatPrice} v={cartInfo.price} />
+    <span
+      className={classNames(
+        "flex-grow",
+        "basis-0",
+        "ml-1",
+        "mr-1",
+        "text-right"
+      )}
+    >
+      <LocaleText fmt={formatPrice} v={cartInfo.price} />
+    </span>
     <FooterButton canClick={cartInfo.quantity > 0} onClick={switchViewingCart}>
-      Cart
+      View Cart
     </FooterButton>
-    <LocaleText fmt={formatQuantity} v={cartInfo.quantity} />
+    <span className={classNames("flex-grow", "basis-0", "mr-1")} />
   </VerticalBookend>
 );
 
@@ -251,23 +259,25 @@ const Cart = ({
 }: CartProps): ReactElement => {
   const appraisal = newCartAppraisal(records, price);
   return (
-    <Popup
-      onClickOutside={onCancel}
-      percentage={"80"}
-      footer={
-        <Button
-          className={classNames("p-1")}
-          variant="success"
-          onClick={() => onCheckout(appraisal.items)}
-          noPad
-        >
-          Checkout
-        </Button>
-      }
-      footerClassName={classNames("flex", "justify-center")}
-    >
-      <AppraisalTable appraisal={appraisal} />
-    </Popup>
+    <ContentPortal>
+      <Popup
+        onClickOutside={onCancel}
+        percentage={"85"}
+        footer={
+          <Button
+            className={classNames("p-1")}
+            variant="success"
+            onClick={() => onCheckout(appraisal.items)}
+            noPad
+          >
+            Checkout
+          </Button>
+        }
+        footerClassName={classNames("flex", "justify-center")}
+      >
+        <AppraisalTable appraisal={appraisal} />
+      </Popup>
+    </ContentPortal>
   );
 };
 
