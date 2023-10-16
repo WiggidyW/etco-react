@@ -22,6 +22,7 @@ export const TypeImage = ({
         src={`https://images.evetech.net/types/${typeId}/icon?size=32`}
         alt={typeId.toString()}
         width={width}
+        style={{ minWidth: width }}
       />
     )}
   </>
