@@ -94,6 +94,7 @@ interface CellProps extends PropsWithChildren {
   rowSpan?: number;
   th?: boolean;
   wrap?: boolean;
+  alignBottom?: boolean;
 }
 const Cell = ({
   children,
@@ -104,6 +105,7 @@ const Cell = ({
   rowSpan,
   th,
   wrap,
+  alignBottom,
 }: CellProps): ReactElement => {
   const InnerCell = ({
     children,
@@ -120,8 +122,8 @@ const Cell = ({
           "border-primary-base": borderT || borderB,
           "border-t": borderT,
           "border-b": borderB,
-          "pl-1": pad,
-          "pr-1": pad,
+          "align-bottom": alignBottom,
+          [classNames("pl-1", "pr-1")]: pad,
         },
         className
       )}
@@ -145,10 +147,10 @@ const HeadCells = ({
   cellClassName,
 }: HeadCellsProps): ReactElement => (
   <>
-    <Cell className={cellClassName} pad th>
+    <Cell className={cellClassName} pad th wrap alignBottom>
       Item
     </Cell>
-    <Cell className={cellClassName} pad th>
+    <Cell className={cellClassName} pad th wrap alignBottom>
       Quantity
       {hasNewQuantity && (
         <ParabolaEnumerate
@@ -160,15 +162,15 @@ const HeadCells = ({
         />
       )}
     </Cell>
-    <Cell className={cellClassName} pad th>
+    <Cell className={cellClassName} pad th wrap alignBottom>
       PricePer
       {hasNewPrice && <ParabolaEnumerate strs={["Cached", "Live"]} />}
     </Cell>
-    <Cell className={cellClassName} pad th>
+    <Cell className={cellClassName} pad th wrap alignBottom>
       PriceTotal
       {hasNewPrice && <ParabolaEnumerate strs={["Cached", "Live"]} />}
     </Cell>
-    <Cell className={cellClassName} pad th>
+    <Cell className={cellClassName} pad th wrap alignBottom>
       Description
       {hasNewDescription && <ParabolaEnumerate strs={["Cached", "Live"]} />}
     </Cell>
