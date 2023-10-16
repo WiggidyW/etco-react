@@ -2,7 +2,12 @@ import { ICharacter } from "@/browser/character";
 import { ReactElement } from "react";
 import { PurchaseContainer } from "./Container";
 import { ShopAppraisalContainerProps } from "../Appraisal/ShopAppraisalContainer";
-import { shopInventory } from "@/server-actions/grpc/other";
+import {
+  ShopInventory,
+  resultShopInventory,
+} from "@/server-actions/grpc/other";
+import { ErrorThrower } from "../ErrorThrower";
+import { Result } from "../todo";
 
 export interface PurchaseContainerLoaderProps
   extends Omit<ShopAppraisalContainerProps, "containerChildren"> {
@@ -14,17 +19,19 @@ export const PurchaseContainerLoader = async ({
   locationId,
   ...appraisalProps
 }: PurchaseContainerLoaderProps): Promise<ReactElement> => {
-  const { items, typeNamingLists } = await shopInventory(
-    locationId,
-    character.refreshToken
-  );
-  return (
-    <PurchaseContainer
-      {...appraisalProps}
-      items={items}
-      typeNamingLists={typeNamingLists}
-      character={character}
-      locationId={locationId}
-    />
-  );
+  const inventoryResult: Result<ShopInventory, unknown> =
+    await resultShopInventory(locationId, character.refreshToken);
+  if (inventoryResult.ok) {
+    return (
+      <PurchaseContainer
+        {...appraisalProps}
+        items={inventoryResult.value.items}
+        typeNamingLists={inventoryResult.value.typeNamingLists}
+        character={character}
+        locationId={locationId}
+      />
+    );
+  } else {
+    return <ErrorThrower error={inventoryResult.error} />; // throw error on client
+  }
 };
