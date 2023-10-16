@@ -266,7 +266,7 @@ const newTaxItem = (
   const BaseItem: pb.ShopItem = {
     typeId: TAX_TYPE_ID,
     quantity: 1,
-    pricePerUnit: kind === "shop" ? tax : -tax,
+    pricePerUnit: tax === 0 ? 0 : kind === "shop" ? tax : -tax,
     description: `Remitted ${(taxRate * 100).toFixed(2)}% Tax`,
     typeNamingIndexes: {
       name: "Tax",
@@ -288,7 +288,8 @@ const newTaxItem = (
   }
 };
 
-type TypedItemsMinOne<T> =
+// typed means same typeID - nothing to do with Programming Types
+type TypedItemData<T> =
   | {
       oldItem: T | null;
       newItem: T;
@@ -321,7 +322,7 @@ function iterAppraisalItems(
   contractItems: pb.ContractItem[],
   unknownItems: pb.NamedBasicItem[],
   taxData: TaxData // always pass
-): IterableIterator<TypedItemsMinOne<pb.BuybackParentItem>>;
+): IterableIterator<TypedItemData<pb.BuybackParentItem>>;
 function iterAppraisalItems(
   kind: "buyback_child",
   oldItems: pb.BuybackChildItem[],
@@ -330,7 +331,7 @@ function iterAppraisalItems(
   unknownItems: never[],
   taxData: undefined,
   feeData: FeeData // always pass
-): IterableIterator<TypedItemsMinOne<pb.BuybackChildItem>>;
+): IterableIterator<TypedItemData<pb.BuybackChildItem>>;
 function iterAppraisalItems(
   kind: "shop",
   oldItems: pb.ShopItem[],
@@ -338,7 +339,7 @@ function iterAppraisalItems(
   contractItems: pb.ContractItem[],
   unknownItems: pb.NamedBasicItem[],
   taxData: TaxData // always pass
-): IterableIterator<TypedItemsMinOne<pb.ShopItem>>;
+): IterableIterator<TypedItemData<pb.ShopItem>>;
 function iterAppraisalItems(
   kind: AppraisalItemKind,
   oldItems: Item[],
@@ -347,7 +348,7 @@ function iterAppraisalItems(
   unknownItems: pb.NamedBasicItem[],
   taxData?: TaxData, // yielded if present AND either tax not 0
   feeData?: FeeData // yielded if present AND either fee not 0
-): IterableIterator<TypedItemsMinOne<Item>> {
+): IterableIterator<TypedItemData<Item>> {
   return (function* () {
     // const oldItemsSorted = [...oldItems].sort((a, b) => a.typeId - b.typeId);
     // const newItemsSorted = [...newItems].sort((a, b) => a.typeId - b.typeId);
@@ -374,9 +375,9 @@ function iterAppraisalItems(
       }
 
       let smallestTypeId: number = Math.min(
-        oldItem?.typeId ?? Infinity,
-        newItem?.typeId ?? Infinity,
-        contractItem?.typeId ?? Infinity
+        oldItem?.typeId || Infinity,
+        newItem?.typeId || Infinity,
+        contractItem?.typeId || Infinity
       );
 
       if (oldItem?.typeId !== smallestTypeId) oldItem = null;
@@ -392,7 +393,7 @@ function iterAppraisalItems(
         newItem,
         contractItem,
         unknownItem: null,
-      } as TypedItemsMinOne<Item>;
+      } as TypedItemData<Item>;
     }
 
     // yield all unknown items
@@ -416,7 +417,7 @@ function iterAppraisalItems(
           newItem,
           contractItem: null,
           unknownItem: null,
-        } as TypedItemsMinOne<Item>;
+        } as TypedItemData<Item>;
       }
     }
 
@@ -436,27 +437,27 @@ function iterAppraisalItems(
           newItem,
           contractItem: null,
           unknownItem: null,
-        } as TypedItemsMinOne<Item>;
+        } as TypedItemData<Item>;
       }
     }
   })();
 }
 
 function newAppraisalItemBase(
-  items: TypedItemsMinOne<Item>,
+  items: TypedItemData<Item>,
   hasNewAppraisal: boolean
 ): AppraisalItemBase {
   let typeId: number;
   let name: string;
   if (items.oldItem !== null) {
     typeId = items.oldItem.typeId;
-    name = items.oldItem.typeNamingIndexes!.name;
+    name = items.oldItem.typeNamingIndexes?.name ?? "undefined";
   } else if (items.newItem !== null) {
     typeId = items.newItem.typeId;
-    name = items.newItem.typeNamingIndexes!.name;
+    name = items.newItem.typeNamingIndexes?.name ?? "undefined";
   } else if (items.contractItem !== null) {
     typeId = items.contractItem.typeId;
-    name = items.contractItem.typeNamingIndexes!.name;
+    name = items.contractItem.typeNamingIndexes?.name ?? "undefined";
   } else {
     typeId = items.unknownItem.typeId;
     name = items.unknownItem.name;
@@ -480,23 +481,23 @@ function newAppraisalItemBase(
 }
 
 function newAppraisalItem(
-  items: TypedItemsMinOne<pb.ShopItem>,
+  items: TypedItemData<pb.ShopItem>,
   hasNewAppraisal: boolean,
   hasContract: boolean
 ): AppraisalItem;
 function newAppraisalItem(
-  items: TypedItemsMinOne<pb.BuybackParentItem>,
+  items: TypedItemData<pb.BuybackParentItem>,
   hasNewAppraisal: boolean,
   hasContract: boolean,
   children: AppraisalChildItem[]
 ): AppraisalItem;
 function newAppraisalItem(
-  items: TypedItemsMinOne<pb.ShopItem> | TypedItemsMinOne<pb.BuybackParentItem>,
+  items: TypedItemData<pb.ShopItem> | TypedItemData<pb.BuybackParentItem>,
   hasNewAppraisal: boolean,
   hasContract: boolean,
   children?: AppraisalChildItem[]
 ): AppraisalItem {
-  const quantity = items.oldItem?.quantity ?? 0;
+  const quantity = items.oldItem?.quantity || items.newItem?.quantity || 0;
   const contractQuantity = hasContract
     ? newSameOrNew(quantity, items.contractItem?.quantity ?? 0)
     : true;
@@ -509,7 +510,7 @@ function newAppraisalItem(
 }
 
 function newAppraisalChildItem(
-  items: TypedItemsMinOne<pb.BuybackChildItem>,
+  items: TypedItemData<pb.BuybackChildItem>,
   hasNewAppraisal: boolean
 ): AppraisalChildItem {
   const quantityPerParent = items.oldItem?.quantityPerParent ?? 0;
@@ -598,6 +599,10 @@ function newBuybackAppraisalItems(
             }
           })()
         );
+        if (items.oldItem)
+          items.oldItem.pricePerUnit -= items.oldItem.feePerUnit;
+        if (items.newItem)
+          items.newItem.pricePerUnit -= items.newItem.feePerUnit;
         yield newAppraisalItem(
           items,
           newAppraisal !== undefined,
