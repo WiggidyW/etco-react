@@ -151,11 +151,13 @@ const Commit = <MRG extends CfgMergeResponse>({
   const rep = useServerAction(actionMerge);
   if (rep.some) {
     return (
-      <MessagePopup
-        title="Update Successful"
-        message={`Modified: ${rep.value.modified}`}
-        onClickOutside={onFinish}
-      />
+      <ContentPortal>
+        <MessagePopup
+          title="Update Successful"
+          message={`Modified: ${rep.value.modified}`}
+          onClickOutside={onFinish}
+        />
+      </ContentPortal>
     );
   } else {
     return <></>;
