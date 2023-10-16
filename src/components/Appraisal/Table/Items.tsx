@@ -120,8 +120,8 @@ const Cell = ({
           "border-primary-base": borderT || borderB,
           "border-t": borderT,
           "border-b": borderB,
-          "pl-2": pad,
-          "pr-2": pad,
+          "pl-1": pad,
+          "pr-1": pad,
         },
         className
       )}
