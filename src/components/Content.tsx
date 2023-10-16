@@ -22,7 +22,6 @@ const ContentContext = createContext<ContentRef>({ current: null });
 const useContentRef = (): ContentRef => useContext(ContentContext);
 
 export interface ContentProps extends PropsWithChildren {
-  classNameOverride?: string;
   className?: string;
   growAxis?: Axis;
 }
@@ -34,26 +33,25 @@ export const Content = ({ children, ...props }: ContentProps): ReactElement => (
 );
 
 export const ContentDiv = ({
-  classNameOverride,
-  className: classNameArg,
+  className,
   growAxis,
   children,
 }: ContentProps): ReactElement => {
   const ref = useContentRef();
-  const className =
-    classNameOverride ??
-    classNames(
-      "relative",
-      "flex-grow",
-      "overflow-auto",
-      {
-        "w-full": growAxis === "vertical",
-        "h-full": growAxis === "horizontal",
-      },
-      classNameArg
-    );
   return (
-    <div className={className} ref={ref}>
+    <div
+      className={classNames(
+        "relative",
+        "flex-grow",
+        "overflow-auto",
+        {
+          "w-full": growAxis === "vertical",
+          "h-full": growAxis === "horizontal",
+        },
+        className
+      )}
+      ref={ref}
+    >
       {children}
     </div>
   );
