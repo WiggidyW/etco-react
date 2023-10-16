@@ -205,7 +205,6 @@ export const SelectAllableTable = <R extends { rowKey: K }, K extends Key>({
       if (selectedNonMatchRecords.length === 0) {
         setSelected(filteredRecords, filteredRowKeys);
       } else {
-        console.log([...selectedNonMatchRecords, ...filteredRecords].length);
         setSelected(
           [...selectedNonMatchRecords, ...filteredRecords],
           [...selectedNonMatchRowKeys, ...filteredRowKeys]

@@ -23,7 +23,6 @@ export interface EveAuthCallbackProps {
 
 export const EveAuthCallback = (props: EveAuthCallbackProps): ReactElement => {
   const redirectHref = serverCookiesGetLoginCallbackRedirect() ?? "/";
-  console.log("redirectHref", redirectHref);
   return (
     <Suspense fallback={<Loading scale="25%" />}>
       <ErrorBoundaryGoBack href={redirectHref}>

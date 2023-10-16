@@ -16,7 +16,6 @@ export default function Page({
 }: {
   params: { locationid: string };
 }): ReactElement {
-  console.log("locationId", locationid);
   const character = serverCookiesGetCurrentCharacter()?.toObject();
   if (isLocationIdStringValid(locationid)) {
     return (
