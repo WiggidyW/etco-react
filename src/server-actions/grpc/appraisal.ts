@@ -383,6 +383,10 @@ function iterAppraisalItems(
       if (newItem?.typeId !== smallestTypeId) newItem = null;
       if (contractItem?.typeId !== smallestTypeId) contractItem = null;
 
+      if (oldItem !== null) oldIdx++;
+      if (newItem !== null) newIdx++;
+      if (contractItem !== null) contractIdx++;
+
       yield {
         oldItem,
         newItem,
