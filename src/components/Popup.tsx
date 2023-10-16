@@ -9,6 +9,7 @@ import {
   PropsWithChildren,
 } from "react";
 import classNames from "classnames";
+import { useContentRect } from "./Content";
 // import { useRouter } from "next/navigation";
 
 export type PopupStyle = "default" | "success" | "failure";
@@ -45,11 +46,13 @@ export const Popup = ({
   footer,
 }: PopupProps & PropsWithChildren): ReactElement => {
   const popupRef = useOnClickOutside<HTMLDivElement>(onClickOutside);
+  const { x: left, y: top, width, height } = useContentRect();
   return (
     <div
       className={classNames(
-        "absolute",
-        "inset-0",
+        "fixed",
+        // "absolute",
+        // "inset-0",
         "flex",
         "items-center",
         "justify-center",
@@ -57,20 +60,25 @@ export const Popup = ({
         "bg-opacity-70",
         "z-40"
       )}
+      style={{ top, left, width, height }}
     >
       <div
         className={classNames("flex", "flex-col", "border", {
-          "bg-primary-base": popupStyle === "default",
-          "border-primary-border": popupStyle === "default",
-          "text-primary-text": popupStyle === "default",
-
-          "bg-success-base": popupStyle === "success",
-          "border-success-border": popupStyle === "success",
-          "text-success-text": popupStyle === "success",
-
-          "bg-failure-base": popupStyle === "failure",
-          "border-failure-border": popupStyle === "failure",
-          "text-failure-text": popupStyle === "failure",
+          [classNames(
+            "bg-primary-base",
+            "border-primary-border",
+            "text-primary-text"
+          )]: popupStyle === "default",
+          [classNames(
+            "bg-success-base",
+            "border-success-border",
+            "text-success-text"
+          )]: popupStyle === "success",
+          [classNames(
+            "bg-failure-base",
+            "border-failure-border",
+            "text-failure-text"
+          )]: popupStyle === "failure",
         })}
         style={{
           maxWidth: `${percentage}vw`,
@@ -80,7 +88,14 @@ export const Popup = ({
         }}
         ref={popupRef}
       >
-        <div className={classNames("flex-grow", "p-2", childrenClassName)}>
+        <div
+          className={classNames(
+            "flex-grow",
+            "overflow-auto",
+            "p-2",
+            childrenClassName
+          )}
+        >
           {children}
         </div>
         {footer && (
