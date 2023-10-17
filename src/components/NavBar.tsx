@@ -116,8 +116,8 @@ const NavLink = ({
       {
         [classNames(
           "brightness-50",
-          "pointer-events-none",
-          "cursor-not-allowed"
+          "pointer-events-none"
+          // "cursor-not-allowed"
         )]: disabled,
       },
       className
