@@ -16,6 +16,7 @@ import {
 } from "react";
 import Image from "next/image";
 import { AddAll, DelAll } from "../SVG";
+import DatalistInput, { Item as DatalistItem } from "react-datalist-input";
 
 interface InputContainerProps {
   title?: string;
@@ -63,6 +64,25 @@ export const FormSelectInput = <V extends InputValue>(
   return <SelectInput {...props} value={value} setValue={setValue} />;
 };
 
+const newOptionsMapAndAutocomplete = <V extends InputValue>(
+  options: SelectOption<V>[]
+): {
+  labelOptionsMap: Map<string, SelectOption<V>>;
+  autoCompleteOptions: DatalistItem[];
+} => {
+  const labelOptionsMap = new Map<string, SelectOption<V>>();
+  const autoCompleteOptions = new Array<DatalistItem>(options.length);
+  for (let i = 0; i < options.length; i++) {
+    const option = options[i];
+    labelOptionsMap.set(option.label, option);
+    autoCompleteOptions[i] = {
+      id: option.label,
+      value: option.label,
+    };
+  }
+  return { labelOptionsMap, autoCompleteOptions };
+};
+
 export interface SelectInputProps<V extends InputValue>
   extends FormSelectInputProps<V> {
   value: SelectOption<V> | null;
@@ -79,9 +99,19 @@ export const SelectInput = <V extends InputValue>({
   hFull = false,
   wFull = false,
 }: SelectInputProps<V>): ReactElement => {
+  const [isExpanded, setIsExpanded_] = useState<boolean>(false);
   const [valueCopy, setValueCopy] = useState<SelectOption<V> | null>(value);
-  const [label, setLabel] = useState<string>(value?.label ?? "");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [label, setLabel_] = useState<string>(value?.label ?? "");
+  const labelRef = useRef<string>(label);
+  const { labelOptionsMap, autoCompleteOptions } = useMemo(
+    () => newOptionsMapAndAutocomplete(options),
+    [options]
+  );
+
+  const setLabel = (l: string) => {
+    labelRef.current = l;
+    setLabel_(l);
+  };
 
   useEffect(() => {
     if (value?.value !== valueCopy?.value) {
@@ -91,33 +121,10 @@ export const SelectInput = <V extends InputValue>({
     }
   }, [value, valueCopy]);
 
-  const {
-    labelOptionsMap,
-    autoCompleteOptions,
-  }: {
-    labelOptionsMap: Map<string, SelectOption<V>>;
-    autoCompleteOptions: ReactElement[];
-  } = useMemo(() => {
-    const labelOptionsMap = new Map<string, SelectOption<V>>();
-    const autoCompleteOptions = new Array<ReactElement>(options.length);
-    for (let i = 0; i < options.length; i++) {
-      const option = options[i];
-      labelOptionsMap.set(option.label, option);
-      autoCompleteOptions[i] = <option key={i} value={option.label} />;
-    }
-    return { labelOptionsMap, autoCompleteOptions };
-  }, [options]);
-
-  const handleLocal = (l: string): void => {
-    if (document.activeElement === inputRef.current) {
-      setLabel(l);
-    } else {
-      handleGlobal(l);
-    }
-  };
-  const handleGlobal = (l: string): void => {
+  const validateLabel = (l: string) => {
     const option = labelOptionsMap.get(l);
     if (option) {
+      setLabel(l);
       setValueCopy(option);
       setValue(option);
     } else {
@@ -127,10 +134,10 @@ export const SelectInput = <V extends InputValue>({
     }
   };
 
-  const handleChangeEvent = (e: ChangeEvent<HTMLInputElement>) =>
-    handleLocal(e.target.value);
-  const handleBlurEvent = (e: ChangeEvent<HTMLInputElement>) =>
-    handleGlobal(e.target.value);
+  const setIsExpanded = (ie: boolean) => {
+    if (ie === false) validateLabel(labelRef.current);
+    setIsExpanded_(ie);
+  };
 
   return (
     <InputContainer
@@ -146,21 +153,44 @@ export const SelectInput = <V extends InputValue>({
         })}
       >
         {/* visible input */}
-        <input
-          type="text"
-          list="options"
-          required={required}
+        <DatalistInput
+          label=""
+          items={autoCompleteOptions}
+          inputProps={{
+            value: label,
+            type: "text",
+            className: classNames("border", "p-2", {
+              "w-full": wFull,
+              "h-full": hFull,
+            }),
+            autoComplete: "on",
+            required: required,
+            disabled: disabled,
+          }}
+          isExpanded={isExpanded}
+          setIsExpanded={setIsExpanded}
           value={label}
-          ref={inputRef}
-          onChange={handleChangeEvent}
-          onBlur={handleBlurEvent}
-          disabled={disabled}
-          className={classNames("border", "p-2", {
-            "w-full": wFull,
-            "h-full": hFull,
-          })}
+          setValue={setLabel}
+          listboxProps={{
+            className: classNames(
+              "min-w-full",
+              "absolute",
+              "z-20",
+              "bg-primary-base",
+              "overflow-y-scroll",
+              "overflow-x-hidden",
+              "max-h-64",
+              "pl-1",
+              "pr-1"
+            ),
+          }}
+          listboxOptionProps={{
+            className: classNames("whitespace-nowrap"),
+          }}
+          highlightProps={{
+            className: classNames("bg-light-blue-base"),
+          }}
         />
-        <datalist id="options">{autoCompleteOptions}</datalist>
 
         {/* hidden input */}
         <input
