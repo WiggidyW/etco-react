@@ -1,4 +1,4 @@
-import { PurchaseContainerLoader } from "@/components/Purchase/Loader";
+import { PurchaseContainerLoader } from "@/components/Appraisal/Purchase/Loader";
 import { serverCookiesGetCurrentCharacter } from "@/cookies/server";
 import { ErrorBoundaryRefresh } from "@/components/ErrorBoundary";
 import { getLocations } from "@/components/Appraisal/Options";

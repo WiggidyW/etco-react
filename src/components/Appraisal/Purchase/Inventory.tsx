@@ -1,27 +1,21 @@
 "use client";
 
-import { LocaleText, formatPrice, formatQuantity } from "../Appraisal/Util";
-import { ModificationState } from "../Configure/modificationState";
-import { ContentBookend, VerticalBookend } from "../Bookend";
+import { LocaleText, formatPrice, formatQuantity } from "../Util";
+import { ModificationState } from "../../Configure/modificationState";
+import { ContentBookend, VerticalBookend } from "../../Bookend";
 import { AppraisalItem } from "@/server-actions/grpc/appraisal";
 import { BasicItem, TypeNamingLists } from "@/proto/etco";
-import { ErrorBoundaryTryAgain } from "../ErrorBoundary";
+import { ErrorBoundaryTryAgain } from "../../ErrorBoundary";
 import AntTable, { ColumnType } from "antd/es/table";
-import { FooterButton } from "../Input/FooterButton";
+import { FooterButton } from "../../Input/FooterButton";
 import { ReactElement, useState } from "react";
-import { rowClassName } from "../Table/Table";
-import { Button } from "../Input/Manipulator";
-import { ContentPortal } from "../Content";
+import { rowClassName } from "../../Table/Table";
+import { Button } from "../../Input/Manipulator";
+import { ContentPortal } from "../../Content";
 import classNames from "classnames";
-import { Popup } from "../Popup";
-import {
-  LocationSelectProps,
-  LocationSelect,
-} from "../Appraisal/LocationSelect";
-import {
-  AppraisalTablePartialAppraisal,
-  AppraisalTable,
-} from "../Appraisal/Table/Table";
+import { Popup } from "../../Popup";
+import { LocationSelectProps, LocationSelect } from "../LocationSelect";
+import { AppraisalTablePartialAppraisal, AppraisalTable } from "../Table/Table";
 import {
   useSearchableMarketGroupColumn,
   useSearchableCategoryColumn,
@@ -31,7 +25,7 @@ import {
   DescriptionColumn,
   QuantityColumn,
   CartColumn,
-} from "../Table/Column";
+} from "../../Table/Column";
 import { ValidShopItem } from "@/server-actions/grpc/other";
 
 interface CartInfo {

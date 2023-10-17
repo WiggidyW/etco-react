@@ -6,14 +6,17 @@ import { ReactElement, ReactNode, Suspense, useState } from "react";
 import {
   ShopAppraisalContainer,
   ShopAppraisalContainerProps,
-} from "../Appraisal/ShopAppraisalContainer";
-import { useAppraisalCodeURIEffect } from "../Appraisal/useAppraisalCode";
-import { Loading } from "../Loading";
-import { ContentPortal } from "../Content";
+} from "../ShopAppraisalContainer";
+import { useAppraisalCodeURIEffect } from "../useAppraisalCode";
+import { Loading } from "../../Loading";
+import { ContentPortal } from "../../Content";
 import { useServerAction } from "@/server-actions/util";
-import { ErrorBoundaryGoBack, ErrorBoundaryTryAgain } from "../ErrorBoundary";
+import {
+  ErrorBoundaryGoBack,
+  ErrorBoundaryTryAgain,
+} from "../../ErrorBoundary";
 import { ParsedJSONError } from "@/error/error";
-import { newAppraisalContainerChildren } from "../Appraisal/ContainerChildren";
+import { newAppraisalContainerChildren } from "../ContainerChildren";
 import { Appraisal } from "@/server-actions/grpc/appraisal";
 import { ShopInventory } from "./Inventory";
 import { ValidShopItem } from "@/server-actions/grpc/other";
@@ -22,7 +25,7 @@ import {
   resultShopMakePurchase,
   shopMakePurchase,
 } from "@/server-actions/grpc/appraisalNew";
-import { Result } from "../todo";
+import { Result } from "../../todo";
 
 export interface PurchaseContainerProps
   extends Omit<ShopAppraisalContainerProps, "containerChildren"> {

@@ -1,13 +1,13 @@
 import { ICharacter } from "@/browser/character";
 import { ReactElement } from "react";
 import { PurchaseContainer } from "./Container";
-import { ShopAppraisalContainerProps } from "../Appraisal/ShopAppraisalContainer";
+import { ShopAppraisalContainerProps } from "../ShopAppraisalContainer";
 import {
   ShopInventory,
   resultShopInventory,
 } from "@/server-actions/grpc/other";
-import { ErrorThrower } from "../ErrorThrower";
-import { Result } from "../todo";
+import { ErrorThrower } from "../../ErrorThrower";
+import { Result } from "../../todo";
 
 export interface PurchaseContainerLoaderProps
   extends Omit<ShopAppraisalContainerProps, "containerChildren"> {
