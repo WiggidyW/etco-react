@@ -73,6 +73,11 @@ textarea {
   @apply bg-primary-faded text-primary-text border-primary-border;
 }
 
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
 button,
 [type="button"],
 [type="reset"],
