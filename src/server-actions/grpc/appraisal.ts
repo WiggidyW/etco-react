@@ -22,6 +22,7 @@ const {
 
 export const TAX_TYPE_ID = -100;
 export const FEE_TYPE_ID = -101;
+export const UNKNOWN_TYPE_ID = -102;
 
 export type NotBoolean<T> = T extends boolean ? never : T;
 
@@ -398,6 +399,7 @@ function iterAppraisalItems(
 
     // yield all unknown items
     for (const unknownItem of unknownItems) {
+      unknownItem.typeId = UNKNOWN_TYPE_ID;
       yield { oldItem: null, newItem: null, contractItem: null, unknownItem };
     }
 
