@@ -11,13 +11,40 @@ export const AppraisalDiffInfoTable = ({
   appraisal: { price, newPrice, time, newTime, version, newVersion, items },
 }: AppraisalTableProps): ReactElement => (
   <div
-    className={classNames(
-      "diff-info-table",
-      "flex",
-      "flex-wrap-reverse",
-      className
-    )}
+    className={classNames("diff-info-table", "flex", "flex-wrap", className)}
   >
+    <AppraisalDiffInfoTablePair
+      headVals={["Cached", "Live"]}
+      oldT={time}
+      newT={newTime}
+      fmt={formatTime}
+      locale
+      flexWrapped
+      startChildren={
+        <CopyButton
+          svgClassName={classNames("mr-auto")}
+          className={classNames(
+            "flex-grow",
+            "basis-0",
+            "self-start",
+            "m-1",
+            "mb-0"
+          )}
+          items={items}
+        />
+      }
+      endChildren={<span className={classNames("flex-grow", "basis-0")} />}
+    >
+      Time
+    </AppraisalDiffInfoTablePair>
+    <AppraisalDiffInfoTablePair
+      headVals={["Cached", "Live"]}
+      oldT={version}
+      newT={newVersion}
+      flexWrapped
+    >
+      Version
+    </AppraisalDiffInfoTablePair>
     <AppraisalDiffInfoTablePair
       headVals={["Cached", "Live"]}
       tdClassName="text-xl"
@@ -28,40 +55,6 @@ export const AppraisalDiffInfoTable = ({
       cmp
     >
       Price
-    </AppraisalDiffInfoTablePair>
-    <AppraisalDiffInfoTablePair
-      headVals={["Cached", "Live"]}
-      oldT={time}
-      newT={newTime}
-      fmt={formatTime}
-      locale
-      flexWrapped
-    >
-      Time
-    </AppraisalDiffInfoTablePair>
-    <AppraisalDiffInfoTablePair
-      headVals={["Cached", "Live"]}
-      oldT={version}
-      newT={newVersion}
-      flexWrapped
-      startChildren={<span className={classNames("flex-grow", "basis-0")} />}
-      endChildren={
-        <CopyButton
-          svgClassName={classNames("ml-auto")}
-          className={classNames(
-            "flex-grow",
-            "basis-0",
-            "text-right",
-            "self-start",
-            "m-1",
-            "mb-0",
-            "place-self-end"
-          )}
-          items={items}
-        />
-      }
-    >
-      Version
     </AppraisalDiffInfoTablePair>
   </div>
 );
