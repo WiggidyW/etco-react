@@ -15,11 +15,13 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
     height={undefined}
     className={classNames("flex", "items-center")}
   >
-    <div className={classNames("ml-2")}>
+    <div className={classNames("ml-2", "pt-1", "pb-1")}>
       <NavLink href="/">Home</NavLink>
       <NavLink href="/buyback">Buyback</NavLink>
       <NavLink href="/shop">Shop</NavLink>
-      <NavLink href="/history">History</NavLink>
+      <NavLink href="/history" disabled={!character}>
+        History
+      </NavLink>
       {character?.admin && (
         <NavDropdown
           items={[
@@ -94,11 +96,13 @@ interface NavLinkProps extends PropsWithChildren {
   className?: string;
   href: string;
   nested?: boolean;
+  disabled?: boolean;
 }
 const NavLink = ({
   className,
   href,
   nested,
+  disabled,
   children,
 }: NavLinkProps): ReactElement => (
   <Link
@@ -109,6 +113,13 @@ const NavLink = ({
       "font-bold",
       "hover:text-light-blue-base",
       { [classNames("text-xl", "mr-3")]: !nested },
+      {
+        [classNames(
+          "brightness-50",
+          "pointer-events-none",
+          "cursor-not-allowed"
+        )]: disabled,
+      },
       className
     )}
   >
