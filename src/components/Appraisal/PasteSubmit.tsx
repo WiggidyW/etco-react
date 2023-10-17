@@ -7,7 +7,7 @@ import {
   TextArea,
 } from "../Input/Manipulator";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
-import { PropsWithChildren, ReactElement, useState } from "react";
+import { ReactElement, useState } from "react";
 import { Loading } from "../Loading";
 import classNames from "classnames";
 
@@ -34,6 +34,11 @@ export const PasteSubmit = ({
 
     return (
       <>
+        {pending && (
+          <div className={classNames("absolute", "inset-0", "z-30")}>
+            <Loading scale="75%" />
+          </div>
+        )}
         <div className={classNames("flex-grow", "w-full")}>
           <TextArea
             value={text}
@@ -75,7 +80,7 @@ export const PasteSubmit = ({
               className={classNames("relative", "h-10", "p-0", "px-2")}
               onClick={reset}
             >
-              <ButtonContent pending={pending}>Reset</ButtonContent>
+              Reset
             </Button>
           </span>
           <span
@@ -92,7 +97,7 @@ export const PasteSubmit = ({
               disabled={pending}
               className={classNames("relative", "h-10", "p-0", "px-2")}
             >
-              <ButtonContent pending={pending}>Submit</ButtonContent>
+              Submit
             </Button>
           </span>
         </div>
@@ -113,18 +118,3 @@ export const PasteSubmit = ({
     </form>
   );
 };
-
-interface ButtonContentProps extends PropsWithChildren {
-  pending: boolean;
-}
-const ButtonContent = ({
-  children,
-  pending,
-}: ButtonContentProps): ReactElement => (
-  <>
-    <span className={classNames({ "opacity-0": pending })}>{children}</span>
-    <div className={classNames("absolute", "inset-0")}>
-      {pending && <Loading scale="75%" />}
-    </div>
-  </>
-);
