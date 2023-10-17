@@ -19,6 +19,7 @@ import {
 } from "@/server-actions/grpc/appraisal";
 import { TypeImage } from "@/components/TypeImage";
 import { AppraisalTableProps } from "./Table";
+import { VectorDown, VectorUp } from "@/components/SVG";
 
 const sortItems = (items: AppraisalItem[]): AppraisalItem[] =>
   items.sort((a, b) => {
@@ -431,25 +432,12 @@ interface DropdownButtonProps {
 const DropdownButton = ({
   clicked,
   onClick,
-}: DropdownButtonProps): ReactElement => {
-  const ClickedIcon = (
-    <path d="M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
-    // <path d="M6.81 16.01L12 10.83l5.19 5.18L18.5 14l-6.5-6.5-6.5 6.5 1.81 1.81z" />
-  );
-  const NotClickedIcon = (
-    <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
-    // <path d="M6.81 7.99L12 13.17l5.19-5.18L18.5 10l-6.5 6.5-6.5-6.5 1.81-1.81z" />
-  );
-  return (
-    <button onClick={onClick} className={classNames("bg-transparent", "block")}>
-      <svg
-        className={classNames("w-6", "h-6")}
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-      >
-        {clicked ? ClickedIcon : NotClickedIcon}
-      </svg>
-    </button>
-  );
-};
+}: DropdownButtonProps): ReactElement => (
+  <button onClick={onClick} className={classNames("bg-transparent", "block")}>
+    {clicked ? (
+      <VectorUp fill="currentColor" className={classNames("w-6", "h-6")} />
+    ) : (
+      <VectorDown fill="currentColor" className={classNames("w-6", "h-6")} />
+    )}
+  </button>
+);
