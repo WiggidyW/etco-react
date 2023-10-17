@@ -1,26 +1,34 @@
-import { PropsWithChildren, ReactElement } from "react";
+import { PropsWithChildren, ReactElement, ReactNode } from "react";
 import classNames from "classnames";
 import { formatPrice, formatTime } from "../Util";
 import { SameOrNewContent, SameOrNewContentProps } from "../SameOrNewContent";
 import { ParabolaEnumerate } from "../ParabolaEnumerate";
-import { SameOrNew } from "@/server-actions/grpc/appraisal";
 import { AppraisalTableProps } from "./Table";
+import { CopyButton } from "./CopyButton";
 
 export const AppraisalDiffInfoTable = ({
   className,
-  appraisal: { price, newPrice, time, newTime, version, newVersion },
+  appraisal: { price, newPrice, time, newTime, version, newVersion, items },
 }: AppraisalTableProps): ReactElement => (
   <div
     className={classNames(
       "diff-info-table",
       "flex",
-      "flex-wrap",
-      // "border-b",
-      // "mb-px",
-      // "border-primary-border",
+      "flex-wrap-reverse",
       className
     )}
   >
+    <AppraisalDiffInfoTablePair
+      headVals={["Cached", "Live"]}
+      tdClassName="text-xl"
+      oldT={price}
+      newT={newPrice}
+      fmt={formatPrice}
+      locale
+      cmp
+    >
+      Price
+    </AppraisalDiffInfoTablePair>
     <AppraisalDiffInfoTablePair
       headVals={["Cached", "Live"]}
       oldT={time}
@@ -36,19 +44,24 @@ export const AppraisalDiffInfoTable = ({
       oldT={version}
       newT={newVersion}
       flexWrapped
+      startChildren={<span className={classNames("flex-grow", "basis-0")} />}
+      endChildren={
+        <CopyButton
+          svgClassName={classNames("ml-auto")}
+          className={classNames(
+            "flex-grow",
+            "basis-0",
+            "text-right",
+            "self-start",
+            "m-1",
+            "mb-0",
+            "place-self-end"
+          )}
+          items={items}
+        />
+      }
     >
       Version
-    </AppraisalDiffInfoTablePair>
-    <AppraisalDiffInfoTablePair
-      headVals={["Cached", "Live"]}
-      tdClassName="text-xl"
-      oldT={price}
-      newT={newPrice}
-      fmt={formatPrice}
-      locale
-      cmp
-    >
-      Price
     </AppraisalDiffInfoTablePair>
   </div>
 );
@@ -60,9 +73,13 @@ interface AppraisalDiffInfoTablePairProps
   tdClassName?: string;
   className?: string;
   flexWrapped?: boolean;
+  startChildren?: ReactNode;
+  endChildren?: ReactNode;
 }
 const AppraisalDiffInfoTablePair = ({
   children,
+  endChildren,
+  startChildren,
   headVals,
   tdClassName = "text-sm",
   className,
@@ -85,6 +102,7 @@ const AppraisalDiffInfoTablePair = ({
       className
     )}
   >
+    {startChildren}
     <table className={classNames("diff-info-table-pair", "whitespace-nowrap")}>
       <tbody>
         <tr>
@@ -104,5 +122,6 @@ const AppraisalDiffInfoTablePair = ({
         </tr>
       </tbody>
     </table>
+    {endChildren}
   </div>
 );
