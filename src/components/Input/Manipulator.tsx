@@ -185,7 +185,11 @@ export const SelectInput = <V extends InputValue>({
             ),
           }}
           listboxOptionProps={{
-            className: classNames("whitespace-nowrap"),
+            className: classNames(
+              "whitespace-nowrap",
+              "cursor-pointer",
+              "hover:text-light-blue-base"
+            ),
           }}
           highlightProps={{
             className: classNames("bg-light-blue-base"),
