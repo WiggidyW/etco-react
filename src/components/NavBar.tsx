@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { VerticalBookend } from "./Bookend";
 import { CharacterPortrait } from "./Character/Portrait";
 import Link from "next/link";
-import Image from "next/image";
 import { Character, ICharacter } from "@/browser/character";
 import LoginImagePNG from "@/../public/eve-sso-login-black-large.png";
 
@@ -13,14 +12,14 @@ export interface NavBarProps {
 }
 export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
   <VerticalBookend
-    height="calc(64px + 0.5rem)"
+    height={undefined}
     className={classNames("flex", "items-center")}
   >
-    {/* <div className={classNames("h-full", "flex", "items-center")}> */}
-    <div className={classNames("flex-shrink-0", "ml-2")}>
+    <div className={classNames("ml-2")}>
       <NavLink href="/">Home</NavLink>
       <NavLink href="/buyback">Buyback</NavLink>
       <NavLink href="/shop">Shop</NavLink>
+      <NavLink href="/history">History</NavLink>
       {character?.admin && (
         <NavDropdown
           items={[
@@ -78,7 +77,13 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
 const LoginImage = ({ path, character }: NavBarProps): ReactElement => (
   <Link href={`${path === "/" ? "" : path}/login`}>
     {character === null || character === undefined ? (
-      <img src={LoginImagePNG.src} alt="Login" width={270} height={45} />
+      <img
+        src={LoginImagePNG.src}
+        alt="Login"
+        width={161}
+        height={45}
+        className={classNames("pt-1", "pb-1")}
+      />
     ) : (
       <CharacterPortrait character={character} size="md" rounded />
     )}
@@ -99,6 +104,7 @@ const NavLink = ({
   <Link
     href={href}
     className={classNames(
+      "inline-block",
       "whitespace-nowrap",
       "font-bold",
       "hover:text-light-blue-base",
