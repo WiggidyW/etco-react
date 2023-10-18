@@ -94,7 +94,7 @@ export const PasteSubmit = ({
           >
             <Button
               type="submit"
-              disabled={pending}
+              disabled={pending || !system || !text}
               className={classNames("relative", "h-10", "p-0", "px-2")}
             >
               Submit
