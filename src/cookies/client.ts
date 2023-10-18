@@ -20,22 +20,6 @@ const newCookieSetOpts = (opts: CookieSetOptions = {}): CookieSetOptions => ({
   sameSite: getCookieSetOptOrDefault(opts, "sameSite", "lax"),
 });
 
-export const clientCookiesSetCurrentCharacter = (
-  character: Character | ICharacter
-): void =>
-  new Cookies().set(
-    "currentCharacter",
-    JSON.stringify(character),
-    newCookieSetOpts({ maxAge: 60 * 60 * 24 * 30 }) // 30 days
-  );
-
-export const clientCookiesDelCurrentCharacter = (): void =>
-  new Cookies().set(
-    "currentCharacter",
-    "",
-    newCookieSetOpts({ expires: new Date(0) })
-  );
-
 // // Login Callback Redirect Path
 
 export const clientCookiesSetLoginCallbackRedirect = (

@@ -20,13 +20,15 @@ import {
 } from "@/browser/storage";
 import {
   clientCookiesDelCheckIsAdmin,
-  clientCookiesDelCurrentCharacter,
   clientCookiesSetCheckIsAdmin,
-  clientCookiesSetCurrentCharacter,
   clientCookiesSetLoginCallbackRedirect,
 } from "@/cookies/client";
 import { iterIndexed } from "../todo";
 import { Tab } from "../Tab";
+import {
+  serverCookiesDelCurrentCharacter,
+  serverCookiesSetCurrentCharacter,
+} from "@/cookies/server";
 
 export interface CharacterSelectionProps {
   charactersKey: string;
@@ -110,7 +112,7 @@ export const LoginCharacterSelection = ({
 
   useEffect(() => {
     if (browserCtx !== null) {
-      clientCookiesDelCurrentCharacter(); // logout current character
+      serverCookiesDelCurrentCharacter(); // logout current character
       clientCookiesSetLoginCallbackRedirect(redirectAfterLoginCallbackPath); // set redirect
       checkIsAdmin // set check admin or delete check admin
         ? clientCookiesSetCheckIsAdmin(true)
@@ -132,7 +134,7 @@ export const LoginCharacterSelection = ({
   const onSelect = (e: ReactMouseEvent, character: Character): void => {
     if (forbidSelect.current) return e.preventDefault();
     console.log("select " + character.name);
-    clientCookiesSetCurrentCharacter(character);
+    serverCookiesSetCurrentCharacter(character);
   };
 
   const onLogin = (e: ReactMouseEvent): void => {
