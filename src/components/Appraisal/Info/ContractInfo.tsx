@@ -1,9 +1,8 @@
-import { ReactElement } from "react";
+import { ReactNode } from "react";
 import { ContractStatus } from "@/proto/etco";
 import { LocaleText, formatPrice, formatTime } from "../Util";
 import { Appraisal } from "@/server-actions/grpc/appraisal";
 import { InfoRow, InfoTable, PortraitRow } from "./Shared";
-import { Entity } from "@/browser/entity";
 
 export interface AppraisalProps {
   className?: string;
@@ -13,30 +12,23 @@ export interface AppraisalProps {
 export const AppraisalContractInfo = ({
   className,
   appraisal,
-}: AppraisalProps): ReactElement => {
+}: AppraisalProps): ReactNode => {
   if (appraisal.status === null || appraisal.status === "inPurchaseQueue") {
-    return (
-      <InfoTable>
-        <tr>
-          <td>No Contract</td>
-        </tr>
-      </InfoTable>
-    );
+    if (appraisal.character === undefined) {
+      return null;
+    } else {
+      return (
+        <InfoTable>
+          <tr>
+            <td>No Contract</td>
+          </tr>
+        </InfoTable>
+      );
+    }
   }
 
   const {
-    contract: {
-      status: pbContractStatus,
-      issued,
-      expires,
-      locationId,
-      price,
-      // hasReward,
-      // issuerCorpId,
-      // issuerCharId,
-      // assigneeId,
-      // assigneeType,
-    },
+    contract: { status: pbContractStatus, issued, expires, locationId, price },
     locationInfo: { systemId, regionId },
     entity: { entity },
   } = appraisal.status;
