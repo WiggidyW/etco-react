@@ -345,7 +345,7 @@ export const SelectionContainer = ({
         className={classNames(
           "flex",
           "w-full",
-          "h-[70%]",
+          "h-[55%]",
           // "max-h-full",
           "min-h-[64px]",
           "overflow-x-hidden",
