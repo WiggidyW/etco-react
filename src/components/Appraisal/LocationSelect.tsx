@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, SelectInput, SelectOption } from "../Input/Manipulator";
+import { ICharacter } from "@/browser/character";
 import { ReactElement, useState } from "react";
 import { usePathname } from "next/navigation";
 import classNames from "classnames";
@@ -10,16 +11,20 @@ export interface LocationSelectProps {
   className?: string;
   defaultOption?: { label: string; value: string };
   options: { label: string; value: string }[];
+  character: ICharacter | null | undefined;
 }
 export const LocationSelect = ({
   className,
   defaultOption,
   options,
+  character,
 }: LocationSelectProps): ReactElement => {
   const [location, setLocation] = useState<SelectOption<string> | null>(
     defaultOption ?? null
   );
   const pathName = usePathname();
+  const refPathName = location ? `/shop/inventory/${location.value}` : pathName;
+  const disabled = !character || refPathName === pathName;
   return (
     <div className={classNames("flex", "justify-center", className)}>
       <span className={classNames("flex-shrink")}>
@@ -51,16 +56,21 @@ export const LocationSelect = ({
         </Button>
       </span>
       <Link
-        href={location ? `/shop/inventory/${location.value}` : pathName}
+        href={disabled ? pathName : refPathName}
         className={classNames(
+          "self-end",
+          "ml-2",
           "border",
           "border-light-blue-base",
-          "hover:border-light-blue-active",
-          "self-end",
-          "ml-2"
+          { "hover:border-light-blue-active": !disabled },
+          { "hover:border-light-blue-faded": disabled }
         )}
       >
-        <Button type="submit" className={classNames("h-10", "p-0", "px-2")}>
+        <Button
+          type="submit"
+          className={classNames("h-10", "p-0", "px-2")}
+          disabled={disabled}
+        >
           Shop
         </Button>
       </Link>

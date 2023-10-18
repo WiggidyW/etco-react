@@ -8,11 +8,14 @@ import { ReactElement } from "react";
 const PATH = "/shop";
 
 export default function Page(): ReactElement {
-  const character = serverCookiesGetCurrentCharacter();
+  const character = serverCookiesGetCurrentCharacter()?.toObject();
   return (
     <Main path={PATH} character={character}>
       <ErrorBoundaryTryAgain>
-        <ShopAppraisalContainer options={getLocations()} />
+        <ShopAppraisalContainer
+          character={character}
+          options={getLocations()}
+        />
       </ErrorBoundaryTryAgain>
     </Main>
   );

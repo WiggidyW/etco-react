@@ -70,6 +70,7 @@ export const PurchaseContainer = ({
             {({ rep: { appraisal, makePurchaseStatus: status } }) => (
               <ErrorBoundaryGoBack href={`/shop/inventory/${locationId}`}>
                 <PurchaseResult
+                  character={character}
                   appraisal={appraisal}
                   status={status}
                   {...appraisalProps}
@@ -83,6 +84,7 @@ export const PurchaseContainer = ({
   } else {
     return (
       <ShopInventory
+        character={character}
         items={items}
         typeNamingLists={typeNamingLists}
         onCheckout={(items) => setCheckout({ checkingOut: true, items })}
