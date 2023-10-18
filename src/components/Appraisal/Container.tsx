@@ -33,6 +33,7 @@ const BasisDiv = ({ children }: PropsWithChildren): ReactElement => (
     className={classNames(
       "basis-0",
       "flex-grow",
+      "empty:hidden",
       "flex",
       "items-center",
       "justify-center"
