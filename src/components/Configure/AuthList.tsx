@@ -35,7 +35,7 @@ export const ConfigureAuthList = ({
 }: ConfigureAuthListProps): ReactElement => (
   <ConfigureBase
     initial={{
-      bannedCharacterIds: [0], // AAAAAAHHHHHHHH
+      bannedCharacterIds: [0], // AAAAAAHHHHHHHH (hack to force initial update)
       permitCharacterIds: [],
       bannedCorporationIds: [],
       permitCorporationIds: [],
@@ -72,11 +72,7 @@ const deepCloneAuthList = ({
 });
 
 const mergeAuthLists = (authList: AuthList, updates: AuthList): void => {
-  authList.bannedCharacterIds = updates.bannedCharacterIds;
-  authList.permitCharacterIds = updates.permitCharacterIds;
-  authList.bannedCorporationIds = updates.bannedCorporationIds;
-  authList.permitCorporationIds = updates.permitCorporationIds;
-  authList.permitAllianceIds = updates.permitAllianceIds;
+  Object.assign(authList, updates);
 };
 
 const newAuthList = (): AuthList => ({
@@ -297,6 +293,7 @@ const Configure = ({
   );
 
   // AAAAAAHHHHHHHH
+  // Update current state to match original state
   useEffect(() => {
     if (
       newAuthList.bannedCharacterIds.length === 1 &&
