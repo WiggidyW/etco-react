@@ -330,7 +330,10 @@ const Manipulator = ({
     <>
       {selectingCharacter && (
         <ContentPortal>
-          <Popup onClickOutside={() => setSelectingCharacter(false)}>
+          <Popup
+            percentage="80"
+            onClickOutside={() => setSelectingCharacter(false)}
+          >
             <CharacterSelection
               charactersKey={marketCharactersKey}
               onSelect={(character) => {
