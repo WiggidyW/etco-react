@@ -2129,6 +2129,83 @@ export interface CfgGetMarketNamesResponse {
     error?: ErrorResponse;
 }
 /**
+ * @generated from protobuf message eve_trading_co_proto.ConstData
+ */
+export interface ConstData {
+    /**
+     * @generated from protobuf field: int32 purchase_max_active = 1;
+     */
+    purchaseMaxActive: number;
+    /**
+     * @generated from protobuf field: int32 make_purchase_cooldown = 2;
+     */
+    makePurchaseCooldown: number;
+    /**
+     * @generated from protobuf field: int32 cancel_purchase_cooldown = 3;
+     */
+    cancelPurchaseCooldown: number;
+    /**
+     * @generated from protobuf field: string corporation_web_refresh_token = 4;
+     */
+    corporationWebRefreshToken: string;
+    /**
+     * @generated from protobuf field: string structure_info_web_refresh_token = 5;
+     */
+    structureInfoWebRefreshToken: string;
+}
+/**
+ * @generated from protobuf message eve_trading_co_proto.CfgGetConstDataRequest
+ */
+export interface CfgGetConstDataRequest {
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 1;
+     */
+    auth?: AuthRequest;
+}
+/**
+ * @generated from protobuf message eve_trading_co_proto.CfgGetConstDataResponse
+ */
+export interface CfgGetConstDataResponse {
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.ConstData const_data = 1;
+     */
+    constData?: ConstData;
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 2;
+     */
+    auth?: AuthResponse;
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 3;
+     */
+    error?: ErrorResponse;
+}
+/**
+ * @generated from protobuf message eve_trading_co_proto.CfgSetConstDataRequest
+ */
+export interface CfgSetConstDataRequest {
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.ConstData const_data = 1;
+     */
+    constData?: ConstData;
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 2;
+     */
+    auth?: AuthRequest;
+}
+/**
+ * @generated from protobuf message eve_trading_co_proto.CfgSetConstDataResponse
+ */
+export interface CfgSetConstDataResponse {
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 1;
+     */
+    auth?: AuthResponse;
+    /**
+     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 2;
+     */
+    error?: ErrorResponse;
+}
+/**
  * @generated from protobuf message eve_trading_co_proto.IsAdminRequest
  */
 export interface IsAdminRequest {
@@ -2271,7 +2348,11 @@ export enum ErrorCode {
     /**
      * @generated from protobuf enum value: INVALID_MERGE = 3;
      */
-    INVALID_MERGE = 3
+    INVALID_MERGE = 3,
+    /**
+     * @generated from protobuf enum value: BOOTSTRAP_UNSET = 4;
+     */
+    BOOTSTRAP_UNSET = 4
 }
 /**
  * @generated from protobuf enum eve_trading_co_proto.ContractStatus
@@ -9748,6 +9829,297 @@ class CfgGetMarketNamesResponse$Type extends MessageType<CfgGetMarketNamesRespon
  */
 export const CfgGetMarketNamesResponse = new CfgGetMarketNamesResponse$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class ConstData$Type extends MessageType<ConstData> {
+    constructor() {
+        super("eve_trading_co_proto.ConstData", [
+            { no: 1, name: "purchase_max_active", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "make_purchase_cooldown", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "cancel_purchase_cooldown", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "corporation_web_refresh_token", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 5, name: "structure_info_web_refresh_token", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value?: PartialMessage<ConstData>): ConstData {
+        const message = { purchaseMaxActive: 0, makePurchaseCooldown: 0, cancelPurchaseCooldown: 0, corporationWebRefreshToken: "", structureInfoWebRefreshToken: "" };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<ConstData>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ConstData): ConstData {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 purchase_max_active */ 1:
+                    message.purchaseMaxActive = reader.int32();
+                    break;
+                case /* int32 make_purchase_cooldown */ 2:
+                    message.makePurchaseCooldown = reader.int32();
+                    break;
+                case /* int32 cancel_purchase_cooldown */ 3:
+                    message.cancelPurchaseCooldown = reader.int32();
+                    break;
+                case /* string corporation_web_refresh_token */ 4:
+                    message.corporationWebRefreshToken = reader.string();
+                    break;
+                case /* string structure_info_web_refresh_token */ 5:
+                    message.structureInfoWebRefreshToken = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: ConstData, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* int32 purchase_max_active = 1; */
+        if (message.purchaseMaxActive !== 0)
+            writer.tag(1, WireType.Varint).int32(message.purchaseMaxActive);
+        /* int32 make_purchase_cooldown = 2; */
+        if (message.makePurchaseCooldown !== 0)
+            writer.tag(2, WireType.Varint).int32(message.makePurchaseCooldown);
+        /* int32 cancel_purchase_cooldown = 3; */
+        if (message.cancelPurchaseCooldown !== 0)
+            writer.tag(3, WireType.Varint).int32(message.cancelPurchaseCooldown);
+        /* string corporation_web_refresh_token = 4; */
+        if (message.corporationWebRefreshToken !== "")
+            writer.tag(4, WireType.LengthDelimited).string(message.corporationWebRefreshToken);
+        /* string structure_info_web_refresh_token = 5; */
+        if (message.structureInfoWebRefreshToken !== "")
+            writer.tag(5, WireType.LengthDelimited).string(message.structureInfoWebRefreshToken);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message eve_trading_co_proto.ConstData
+ */
+export const ConstData = new ConstData$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CfgGetConstDataRequest$Type extends MessageType<CfgGetConstDataRequest> {
+    constructor() {
+        super("eve_trading_co_proto.CfgGetConstDataRequest", [
+            { no: 1, name: "auth", kind: "message", T: () => AuthRequest }
+        ]);
+    }
+    create(value?: PartialMessage<CfgGetConstDataRequest>): CfgGetConstDataRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CfgGetConstDataRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CfgGetConstDataRequest): CfgGetConstDataRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* eve_trading_co_proto.AuthRequest auth */ 1:
+                    message.auth = AuthRequest.internalBinaryRead(reader, reader.uint32(), options, message.auth);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CfgGetConstDataRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* eve_trading_co_proto.AuthRequest auth = 1; */
+        if (message.auth)
+            AuthRequest.internalBinaryWrite(message.auth, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message eve_trading_co_proto.CfgGetConstDataRequest
+ */
+export const CfgGetConstDataRequest = new CfgGetConstDataRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CfgGetConstDataResponse$Type extends MessageType<CfgGetConstDataResponse> {
+    constructor() {
+        super("eve_trading_co_proto.CfgGetConstDataResponse", [
+            { no: 1, name: "const_data", kind: "message", T: () => ConstData },
+            { no: 2, name: "auth", kind: "message", T: () => AuthResponse },
+            { no: 3, name: "error", kind: "message", T: () => ErrorResponse }
+        ]);
+    }
+    create(value?: PartialMessage<CfgGetConstDataResponse>): CfgGetConstDataResponse {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CfgGetConstDataResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CfgGetConstDataResponse): CfgGetConstDataResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* eve_trading_co_proto.ConstData const_data */ 1:
+                    message.constData = ConstData.internalBinaryRead(reader, reader.uint32(), options, message.constData);
+                    break;
+                case /* eve_trading_co_proto.AuthResponse auth */ 2:
+                    message.auth = AuthResponse.internalBinaryRead(reader, reader.uint32(), options, message.auth);
+                    break;
+                case /* eve_trading_co_proto.ErrorResponse error */ 3:
+                    message.error = ErrorResponse.internalBinaryRead(reader, reader.uint32(), options, message.error);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CfgGetConstDataResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* eve_trading_co_proto.ConstData const_data = 1; */
+        if (message.constData)
+            ConstData.internalBinaryWrite(message.constData, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.AuthResponse auth = 2; */
+        if (message.auth)
+            AuthResponse.internalBinaryWrite(message.auth, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.ErrorResponse error = 3; */
+        if (message.error)
+            ErrorResponse.internalBinaryWrite(message.error, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message eve_trading_co_proto.CfgGetConstDataResponse
+ */
+export const CfgGetConstDataResponse = new CfgGetConstDataResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CfgSetConstDataRequest$Type extends MessageType<CfgSetConstDataRequest> {
+    constructor() {
+        super("eve_trading_co_proto.CfgSetConstDataRequest", [
+            { no: 1, name: "const_data", kind: "message", T: () => ConstData },
+            { no: 2, name: "auth", kind: "message", T: () => AuthRequest }
+        ]);
+    }
+    create(value?: PartialMessage<CfgSetConstDataRequest>): CfgSetConstDataRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CfgSetConstDataRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CfgSetConstDataRequest): CfgSetConstDataRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* eve_trading_co_proto.ConstData const_data */ 1:
+                    message.constData = ConstData.internalBinaryRead(reader, reader.uint32(), options, message.constData);
+                    break;
+                case /* eve_trading_co_proto.AuthRequest auth */ 2:
+                    message.auth = AuthRequest.internalBinaryRead(reader, reader.uint32(), options, message.auth);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CfgSetConstDataRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* eve_trading_co_proto.ConstData const_data = 1; */
+        if (message.constData)
+            ConstData.internalBinaryWrite(message.constData, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.AuthRequest auth = 2; */
+        if (message.auth)
+            AuthRequest.internalBinaryWrite(message.auth, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message eve_trading_co_proto.CfgSetConstDataRequest
+ */
+export const CfgSetConstDataRequest = new CfgSetConstDataRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CfgSetConstDataResponse$Type extends MessageType<CfgSetConstDataResponse> {
+    constructor() {
+        super("eve_trading_co_proto.CfgSetConstDataResponse", [
+            { no: 1, name: "auth", kind: "message", T: () => AuthResponse },
+            { no: 2, name: "error", kind: "message", T: () => ErrorResponse }
+        ]);
+    }
+    create(value?: PartialMessage<CfgSetConstDataResponse>): CfgSetConstDataResponse {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CfgSetConstDataResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CfgSetConstDataResponse): CfgSetConstDataResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* eve_trading_co_proto.AuthResponse auth */ 1:
+                    message.auth = AuthResponse.internalBinaryRead(reader, reader.uint32(), options, message.auth);
+                    break;
+                case /* eve_trading_co_proto.ErrorResponse error */ 2:
+                    message.error = ErrorResponse.internalBinaryRead(reader, reader.uint32(), options, message.error);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CfgSetConstDataResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* eve_trading_co_proto.AuthResponse auth = 1; */
+        if (message.auth)
+            AuthResponse.internalBinaryWrite(message.auth, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.ErrorResponse error = 2; */
+        if (message.error)
+            ErrorResponse.internalBinaryWrite(message.error, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message eve_trading_co_proto.CfgSetConstDataResponse
+ */
+export const CfgSetConstDataResponse = new CfgSetConstDataResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class IsAdminRequest$Type extends MessageType<IsAdminRequest> {
     constructor() {
         super("eve_trading_co_proto.IsAdminRequest", [
@@ -10236,7 +10608,9 @@ export const EveTradingCo = new ServiceType("eve_trading_co_proto.EveTradingCo",
     { name: "CfgGetMarketNames", options: {}, I: CfgGetMarketNamesRequest, O: CfgGetMarketNamesResponse },
     { name: "CfgGetBuybackBundleKeys", options: {}, I: CfgGetBuybackBundleKeysRequest, O: CfgGetBuybackBundleKeysResponse },
     { name: "CfgGetShopBundleKeys", options: {}, I: CfgGetShopBundleKeysRequest, O: CfgGetShopBundleKeysResponse },
+    { name: "CfgGetConstData", options: {}, I: CfgGetConstDataRequest, O: CfgGetConstDataResponse },
     { name: "CfgSetAuthList", options: {}, I: CfgSetAuthListRequest, O: CfgSetAuthListResponse },
+    { name: "CfgSetConstData", options: {}, I: CfgSetConstDataRequest, O: CfgSetConstDataResponse },
     { name: "CfgMergeBuybackSystemTypeMapsBuilder", options: {}, I: CfgMergeBuybackSystemTypeMapsBuilderRequest, O: CfgMergeBuybackSystemTypeMapsBuilderResponse },
     { name: "CfgMergeShopLocationTypeMapsBuilder", options: {}, I: CfgMergeShopLocationTypeMapsBuilderRequest, O: CfgMergeShopLocationTypeMapsBuilderResponse },
     { name: "CfgMergeBuybackSystems", options: {}, I: CfgMergeBuybackSystemsRequest, O: CfgMergeBuybackSystemsResponse },

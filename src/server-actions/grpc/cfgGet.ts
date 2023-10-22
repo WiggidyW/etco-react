@@ -15,6 +15,21 @@ import { IAlliance } from "@/browser/alliance";
 import { allianceInfo, characterInfo, corporationInfo } from "./other";
 import { withCatchResult } from "../withResult";
 
+export const cfgGetConstDataLoad = async (
+  token: string,
+  throwKind?: ThrowKind
+): Promise<pb.ConstData> =>
+  dispatchAuthenticated(
+    pbClient.prototype.cfgGetConstData,
+    { auth: { token } },
+    ({ constData }) =>
+      constData === undefined
+        ? throwInvalid("ConstData is undefined", throwKind)
+        : constData,
+    throwKind
+  );
+export const resultCfgGetConstDataLoad = withCatchResult(cfgGetConstDataLoad);
+
 export interface CfgGetAuthListLoadRep {
   bannedCharacters: Map<number, ICharacter>;
   permitCharacters: Map<number, ICharacter>;

@@ -6,6 +6,19 @@ import { ThrowKind } from "../throw";
 import { asIs, dispatchAuthenticated } from "./grpc";
 import { withCatchResult } from "../withResult";
 
+export const cfgSetConstData = async (
+  token: string,
+  constData: pb.ConstData,
+  throwKind?: ThrowKind
+): Promise<pb.CfgSetConstDataResponse & { modified: boolean }> =>
+  dispatchAuthenticated(
+    pbClient.prototype.cfgSetConstData,
+    { constData, auth: { token } },
+    (rep) => ({ ...rep, modified: true }),
+    throwKind
+  );
+export const resultCfgSetConstData = withCatchResult(cfgSetConstData);
+
 export const cfgSetAuthList = async (
   token: string,
   domainKey: string,

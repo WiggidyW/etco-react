@@ -47,8 +47,12 @@ import type { CfgMergeShopLocationTypeMapsBuilderResponse } from "./etco";
 import type { CfgMergeShopLocationTypeMapsBuilderRequest } from "./etco";
 import type { CfgMergeBuybackSystemTypeMapsBuilderResponse } from "./etco";
 import type { CfgMergeBuybackSystemTypeMapsBuilderRequest } from "./etco";
+import type { CfgSetConstDataResponse } from "./etco";
+import type { CfgSetConstDataRequest } from "./etco";
 import type { CfgSetAuthListResponse } from "./etco";
 import type { CfgSetAuthListRequest } from "./etco";
+import type { CfgGetConstDataResponse } from "./etco";
+import type { CfgGetConstDataRequest } from "./etco";
 import type { CfgGetShopBundleKeysResponse } from "./etco";
 import type { CfgGetShopBundleKeysRequest } from "./etco";
 import type { CfgGetBuybackBundleKeysResponse } from "./etco";
@@ -189,11 +193,19 @@ export interface IEveTradingCoClient {
      */
     cfgGetShopBundleKeys(input: CfgGetShopBundleKeysRequest, options?: RpcOptions): UnaryCall<CfgGetShopBundleKeysRequest, CfgGetShopBundleKeysResponse>;
     /**
+     * @generated from protobuf rpc: CfgGetConstData(eve_trading_co_proto.CfgGetConstDataRequest) returns (eve_trading_co_proto.CfgGetConstDataResponse);
+     */
+    cfgGetConstData(input: CfgGetConstDataRequest, options?: RpcOptions): UnaryCall<CfgGetConstDataRequest, CfgGetConstDataResponse>;
+    /**
      * replaces the existing config data with the given config data
      *
      * @generated from protobuf rpc: CfgSetAuthList(eve_trading_co_proto.CfgSetAuthListRequest) returns (eve_trading_co_proto.CfgSetAuthListResponse);
      */
     cfgSetAuthList(input: CfgSetAuthListRequest, options?: RpcOptions): UnaryCall<CfgSetAuthListRequest, CfgSetAuthListResponse>;
+    /**
+     * @generated from protobuf rpc: CfgSetConstData(eve_trading_co_proto.CfgSetConstDataRequest) returns (eve_trading_co_proto.CfgSetConstDataResponse);
+     */
+    cfgSetConstData(input: CfgSetConstDataRequest, options?: RpcOptions): UnaryCall<CfgSetConstDataRequest, CfgSetConstDataResponse>;
     /**
      * merges the given config data into the existing config data
      *
@@ -470,13 +482,27 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
         return stackIntercept<CfgGetShopBundleKeysRequest, CfgGetShopBundleKeysResponse>("unary", this._transport, method, opt, input);
     }
     /**
+     * @generated from protobuf rpc: CfgGetConstData(eve_trading_co_proto.CfgGetConstDataRequest) returns (eve_trading_co_proto.CfgGetConstDataResponse);
+     */
+    cfgGetConstData(input: CfgGetConstDataRequest, options?: RpcOptions): UnaryCall<CfgGetConstDataRequest, CfgGetConstDataResponse> {
+        const method = this.methods[18], opt = this._transport.mergeOptions(options);
+        return stackIntercept<CfgGetConstDataRequest, CfgGetConstDataResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
      * replaces the existing config data with the given config data
      *
      * @generated from protobuf rpc: CfgSetAuthList(eve_trading_co_proto.CfgSetAuthListRequest) returns (eve_trading_co_proto.CfgSetAuthListResponse);
      */
     cfgSetAuthList(input: CfgSetAuthListRequest, options?: RpcOptions): UnaryCall<CfgSetAuthListRequest, CfgSetAuthListResponse> {
-        const method = this.methods[18], opt = this._transport.mergeOptions(options);
+        const method = this.methods[19], opt = this._transport.mergeOptions(options);
         return stackIntercept<CfgSetAuthListRequest, CfgSetAuthListResponse>("unary", this._transport, method, opt, input);
+    }
+    /**
+     * @generated from protobuf rpc: CfgSetConstData(eve_trading_co_proto.CfgSetConstDataRequest) returns (eve_trading_co_proto.CfgSetConstDataResponse);
+     */
+    cfgSetConstData(input: CfgSetConstDataRequest, options?: RpcOptions): UnaryCall<CfgSetConstDataRequest, CfgSetConstDataResponse> {
+        const method = this.methods[20], opt = this._transport.mergeOptions(options);
+        return stackIntercept<CfgSetConstDataRequest, CfgSetConstDataResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * merges the given config data into the existing config data
@@ -484,35 +510,35 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: CfgMergeBuybackSystemTypeMapsBuilder(eve_trading_co_proto.CfgMergeBuybackSystemTypeMapsBuilderRequest) returns (eve_trading_co_proto.CfgMergeBuybackSystemTypeMapsBuilderResponse);
      */
     cfgMergeBuybackSystemTypeMapsBuilder(input: CfgMergeBuybackSystemTypeMapsBuilderRequest, options?: RpcOptions): UnaryCall<CfgMergeBuybackSystemTypeMapsBuilderRequest, CfgMergeBuybackSystemTypeMapsBuilderResponse> {
-        const method = this.methods[19], opt = this._transport.mergeOptions(options);
+        const method = this.methods[21], opt = this._transport.mergeOptions(options);
         return stackIntercept<CfgMergeBuybackSystemTypeMapsBuilderRequest, CfgMergeBuybackSystemTypeMapsBuilderResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: CfgMergeShopLocationTypeMapsBuilder(eve_trading_co_proto.CfgMergeShopLocationTypeMapsBuilderRequest) returns (eve_trading_co_proto.CfgMergeShopLocationTypeMapsBuilderResponse);
      */
     cfgMergeShopLocationTypeMapsBuilder(input: CfgMergeShopLocationTypeMapsBuilderRequest, options?: RpcOptions): UnaryCall<CfgMergeShopLocationTypeMapsBuilderRequest, CfgMergeShopLocationTypeMapsBuilderResponse> {
-        const method = this.methods[20], opt = this._transport.mergeOptions(options);
+        const method = this.methods[22], opt = this._transport.mergeOptions(options);
         return stackIntercept<CfgMergeShopLocationTypeMapsBuilderRequest, CfgMergeShopLocationTypeMapsBuilderResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: CfgMergeBuybackSystems(eve_trading_co_proto.CfgMergeBuybackSystemsRequest) returns (eve_trading_co_proto.CfgMergeBuybackSystemsResponse);
      */
     cfgMergeBuybackSystems(input: CfgMergeBuybackSystemsRequest, options?: RpcOptions): UnaryCall<CfgMergeBuybackSystemsRequest, CfgMergeBuybackSystemsResponse> {
-        const method = this.methods[21], opt = this._transport.mergeOptions(options);
+        const method = this.methods[23], opt = this._transport.mergeOptions(options);
         return stackIntercept<CfgMergeBuybackSystemsRequest, CfgMergeBuybackSystemsResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: CfgMergeShopLocations(eve_trading_co_proto.CfgMergeShopLocationsRequest) returns (eve_trading_co_proto.CfgMergeShopLocationsResponse);
      */
     cfgMergeShopLocations(input: CfgMergeShopLocationsRequest, options?: RpcOptions): UnaryCall<CfgMergeShopLocationsRequest, CfgMergeShopLocationsResponse> {
-        const method = this.methods[22], opt = this._transport.mergeOptions(options);
+        const method = this.methods[24], opt = this._transport.mergeOptions(options);
         return stackIntercept<CfgMergeShopLocationsRequest, CfgMergeShopLocationsResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: CfgMergeMarkets(eve_trading_co_proto.CfgMergeMarketsRequest) returns (eve_trading_co_proto.CfgMergeMarketsResponse);
      */
     cfgMergeMarkets(input: CfgMergeMarketsRequest, options?: RpcOptions): UnaryCall<CfgMergeMarketsRequest, CfgMergeMarketsResponse> {
-        const method = this.methods[23], opt = this._transport.mergeOptions(options);
+        const method = this.methods[25], opt = this._transport.mergeOptions(options);
         return stackIntercept<CfgMergeMarketsRequest, CfgMergeMarketsResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -521,7 +547,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: ShopDeletePurchases(eve_trading_co_proto.ShopDeletePurchasesRequest) returns (eve_trading_co_proto.ShopDeletePurchasesResponse);
      */
     shopDeletePurchases(input: ShopDeletePurchasesRequest, options?: RpcOptions): UnaryCall<ShopDeletePurchasesRequest, ShopDeletePurchasesResponse> {
-        const method = this.methods[24], opt = this._transport.mergeOptions(options);
+        const method = this.methods[26], opt = this._transport.mergeOptions(options);
         return stackIntercept<ShopDeletePurchasesRequest, ShopDeletePurchasesResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -530,7 +556,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: EsiAppLogin(eve_trading_co_proto.EsiAppLoginRequest) returns (eve_trading_co_proto.EsiAppLoginResponse);
      */
     esiAppLogin(input: EsiAppLoginRequest, options?: RpcOptions): UnaryCall<EsiAppLoginRequest, EsiAppLoginResponse> {
-        const method = this.methods[25], opt = this._transport.mergeOptions(options);
+        const method = this.methods[27], opt = this._transport.mergeOptions(options);
         return stackIntercept<EsiAppLoginRequest, EsiAppLoginResponse>("unary", this._transport, method, opt, input);
     }
     // // USER ENDPOINTS // //
@@ -541,21 +567,21 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: CharacterInfo(eve_trading_co_proto.CharacterInfoRequest) returns (eve_trading_co_proto.CharacterInfoResponse);
      */
     characterInfo(input: CharacterInfoRequest, options?: RpcOptions): UnaryCall<CharacterInfoRequest, CharacterInfoResponse> {
-        const method = this.methods[26], opt = this._transport.mergeOptions(options);
+        const method = this.methods[28], opt = this._transport.mergeOptions(options);
         return stackIntercept<CharacterInfoRequest, CharacterInfoResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: CorporationInfo(eve_trading_co_proto.CorporationInfoRequest) returns (eve_trading_co_proto.CorporationInfoResponse);
      */
     corporationInfo(input: CorporationInfoRequest, options?: RpcOptions): UnaryCall<CorporationInfoRequest, CorporationInfoResponse> {
-        const method = this.methods[27], opt = this._transport.mergeOptions(options);
+        const method = this.methods[29], opt = this._transport.mergeOptions(options);
         return stackIntercept<CorporationInfoRequest, CorporationInfoResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: AllianceInfo(eve_trading_co_proto.AllianceInfoRequest) returns (eve_trading_co_proto.AllianceInfoResponse);
      */
     allianceInfo(input: AllianceInfoRequest, options?: RpcOptions): UnaryCall<AllianceInfoRequest, AllianceInfoResponse> {
-        const method = this.methods[28], opt = this._transport.mergeOptions(options);
+        const method = this.methods[30], opt = this._transport.mergeOptions(options);
         return stackIntercept<AllianceInfoRequest, AllianceInfoResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -564,7 +590,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: Parse(eve_trading_co_proto.ParseRequest) returns (eve_trading_co_proto.ParseResponse);
      */
     parse(input: ParseRequest, options?: RpcOptions): UnaryCall<ParseRequest, ParseResponse> {
-        const method = this.methods[29], opt = this._transport.mergeOptions(options);
+        const method = this.methods[31], opt = this._transport.mergeOptions(options);
         return stackIntercept<ParseRequest, ParseResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -573,7 +599,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: NewBuybackAppraisal(eve_trading_co_proto.NewBuybackAppraisalRequest) returns (eve_trading_co_proto.NewBuybackAppraisalResponse);
      */
     newBuybackAppraisal(input: NewBuybackAppraisalRequest, options?: RpcOptions): UnaryCall<NewBuybackAppraisalRequest, NewBuybackAppraisalResponse> {
-        const method = this.methods[30], opt = this._transport.mergeOptions(options);
+        const method = this.methods[32], opt = this._transport.mergeOptions(options);
         return stackIntercept<NewBuybackAppraisalRequest, NewBuybackAppraisalResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -582,7 +608,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: NewShopAppraisal(eve_trading_co_proto.NewShopAppraisalRequest) returns (eve_trading_co_proto.NewShopAppraisalResponse);
      */
     newShopAppraisal(input: NewShopAppraisalRequest, options?: RpcOptions): UnaryCall<NewShopAppraisalRequest, NewShopAppraisalResponse> {
-        const method = this.methods[31], opt = this._transport.mergeOptions(options);
+        const method = this.methods[33], opt = this._transport.mergeOptions(options);
         return stackIntercept<NewShopAppraisalRequest, NewShopAppraisalResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -591,7 +617,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: UserData(eve_trading_co_proto.UserDataRequest) returns (eve_trading_co_proto.UserDataResponse);
      */
     userData(input: UserDataRequest, options?: RpcOptions): UnaryCall<UserDataRequest, UserDataResponse> {
-        const method = this.methods[32], opt = this._transport.mergeOptions(options);
+        const method = this.methods[34], opt = this._transport.mergeOptions(options);
         return stackIntercept<UserDataRequest, UserDataResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -600,7 +626,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: ShopInventory(eve_trading_co_proto.ShopInventoryRequest) returns (eve_trading_co_proto.ShopInventoryResponse);
      */
     shopInventory(input: ShopInventoryRequest, options?: RpcOptions): UnaryCall<ShopInventoryRequest, ShopInventoryResponse> {
-        const method = this.methods[33], opt = this._transport.mergeOptions(options);
+        const method = this.methods[35], opt = this._transport.mergeOptions(options);
         return stackIntercept<ShopInventoryRequest, ShopInventoryResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -609,7 +635,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: ShopMakePurchase(eve_trading_co_proto.ShopMakePurchaseRequest) returns (eve_trading_co_proto.ShopMakePurchaseResponse);
      */
     shopMakePurchase(input: ShopMakePurchaseRequest, options?: RpcOptions): UnaryCall<ShopMakePurchaseRequest, ShopMakePurchaseResponse> {
-        const method = this.methods[34], opt = this._transport.mergeOptions(options);
+        const method = this.methods[36], opt = this._transport.mergeOptions(options);
         return stackIntercept<ShopMakePurchaseRequest, ShopMakePurchaseResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -618,7 +644,7 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: ShopCancelPurchase(eve_trading_co_proto.ShopCancelPurchaseRequest) returns (eve_trading_co_proto.ShopCancelPurchaseResponse);
      */
     shopCancelPurchase(input: ShopCancelPurchaseRequest, options?: RpcOptions): UnaryCall<ShopCancelPurchaseRequest, ShopCancelPurchaseResponse> {
-        const method = this.methods[35], opt = this._transport.mergeOptions(options);
+        const method = this.methods[37], opt = this._transport.mergeOptions(options);
         return stackIntercept<ShopCancelPurchaseRequest, ShopCancelPurchaseResponse>("unary", this._transport, method, opt, input);
     }
     // // ADMIN / USER ENDPOINTS // // (override via parameters)
@@ -629,14 +655,14 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: GetBuybackAppraisal(eve_trading_co_proto.GetBuybackAppraisalRequest) returns (eve_trading_co_proto.GetBuybackAppraisalResponse);
      */
     getBuybackAppraisal(input: GetBuybackAppraisalRequest, options?: RpcOptions): UnaryCall<GetBuybackAppraisalRequest, GetBuybackAppraisalResponse> {
-        const method = this.methods[36], opt = this._transport.mergeOptions(options);
+        const method = this.methods[38], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetBuybackAppraisalRequest, GetBuybackAppraisalResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: GetShopAppraisal(eve_trading_co_proto.GetShopAppraisalRequest) returns (eve_trading_co_proto.GetShopAppraisalResponse);
      */
     getShopAppraisal(input: GetShopAppraisalRequest, options?: RpcOptions): UnaryCall<GetShopAppraisalRequest, GetShopAppraisalResponse> {
-        const method = this.methods[37], opt = this._transport.mergeOptions(options);
+        const method = this.methods[39], opt = this._transport.mergeOptions(options);
         return stackIntercept<GetShopAppraisalRequest, GetShopAppraisalResponse>("unary", this._transport, method, opt, input);
     }
     /**
@@ -646,14 +672,14 @@ export class EveTradingCoClient implements IEveTradingCoClient, ServiceInfo {
      * @generated from protobuf rpc: StatusBuybackAppraisal(eve_trading_co_proto.StatusBuybackAppraisalRequest) returns (eve_trading_co_proto.StatusBuybackAppraisalResponse);
      */
     statusBuybackAppraisal(input: StatusBuybackAppraisalRequest, options?: RpcOptions): UnaryCall<StatusBuybackAppraisalRequest, StatusBuybackAppraisalResponse> {
-        const method = this.methods[38], opt = this._transport.mergeOptions(options);
+        const method = this.methods[40], opt = this._transport.mergeOptions(options);
         return stackIntercept<StatusBuybackAppraisalRequest, StatusBuybackAppraisalResponse>("unary", this._transport, method, opt, input);
     }
     /**
      * @generated from protobuf rpc: StatusShopAppraisal(eve_trading_co_proto.StatusShopAppraisalRequest) returns (eve_trading_co_proto.StatusShopAppraisalResponse);
      */
     statusShopAppraisal(input: StatusShopAppraisalRequest, options?: RpcOptions): UnaryCall<StatusShopAppraisalRequest, StatusShopAppraisalResponse> {
-        const method = this.methods[39], opt = this._transport.mergeOptions(options);
+        const method = this.methods[41], opt = this._transport.mergeOptions(options);
         return stackIntercept<StatusShopAppraisalRequest, StatusShopAppraisalResponse>("unary", this._transport, method, opt, input);
     }
 }

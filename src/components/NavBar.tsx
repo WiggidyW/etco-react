@@ -56,6 +56,9 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
             <NavLink href="/admin/configure/buyback-systems" key="bs" nested>
               Configure Buyback Systems
             </NavLink>,
+            <NavLink href="/admin/configure/parameters" key="cp" nested>
+              Configure Parameters
+            </NavLink>,
             <NavLink href="/admin/configure/user-auth" key="cua" nested>
               Configure User Auth
             </NavLink>,
