@@ -6,5 +6,9 @@ const PATH = "/admin";
 
 export default function Page(): ReactElement {
   const character = serverCookiesGetCurrentCharacter();
-  return <AdminMain path={PATH} character={character} />;
+  return (
+    <AdminMain path={PATH} character={character}>
+      Test
+    </AdminMain>
+  );
 }
