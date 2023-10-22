@@ -340,12 +340,22 @@ export const NumberInput = ({
   addMaxButton,
   ...props
 }: NumberInputProps): ReactElement => {
+  const [valueCopy, setValueCopy] = useState<number | null>(value);
   const [localValue, setLocalValue] = useState<number | null>(value);
   const strValue = localValue?.toString() ?? "";
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (value !== valueCopy) {
+      // value changed from outside, update local to reflect that
+      setValueCopy(value);
+      setLocalValue(value);
+    }
+  }, [value, valueCopy]);
+
   const setGlobalValue = (newValue: number | null) => {
     setValue(newValue);
+    setValueCopy(value);
     setLocalValue(newValue);
   };
 
