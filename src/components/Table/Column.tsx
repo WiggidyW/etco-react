@@ -1,6 +1,4 @@
-import { FilterDropdownProps, Key } from "antd/es/table/interface";
 import { ColumnType } from "antd/es/table";
-import { useRef, useState } from "react";
 import { PricingDesc, ReprocessingDesc } from "../Configure/description";
 import { LocaleText, formatPrice, formatQuantity } from "../Appraisal/Util";
 import { TypeImage } from "../TypeImage";
@@ -8,6 +6,7 @@ import { NumberInput } from "../Input/Manipulator";
 import classNames from "classnames";
 import { Entity } from "@/browser/entity";
 import { CharacterPortrait } from "../Character/Portrait";
+import { useWithTextSearch } from "./useWithTextSearch";
 
 // TODO: title parameters, className parameters
 
@@ -623,73 +622,4 @@ const compareMarketPricing = (
   if (a.percentile !== b.percentile) return a.percentile - b.percentile;
   // 4. compare by modifier
   return a.modifier - b.modifier;
-};
-
-// apply to a column to add a search bar
-const useWithTextSearch = <C,>(
-  column: ColumnType<C>,
-  recordIncludes: (record: C, lowerCaseText: string) => boolean // true if record includes search text
-): ColumnType<C> => {
-  // stores the props from filterDropdown for use in filterIcon
-  const filterDropdownPropsRef = useRef<FilterDropdownProps | null>(null);
-
-  const FilterDropdown = (props: FilterDropdownProps) => {
-    // BLACK MAGIC STEP 1
-    // set the ref to the props so we can use it in filterIcon
-    filterDropdownPropsRef.current = props;
-    return <></>;
-  };
-
-  interface FilterIconProps {
-    filtered: boolean;
-  }
-  const FilterIcon = ({ filtered }: FilterIconProps) => {
-    const [text, setText] = useState<string>("");
-
-    // BLACK MAGIC STEP 2
-    // create a function that uses the ref to commit the search
-    const commitSearch = () => {
-      if (filterDropdownPropsRef.current === null) return;
-
-      // unpack the stuff we need from the ref
-      const { setSelectedKeys, confirm } = filterDropdownPropsRef.current;
-
-      // does the actual committing of the search
-      const selectKeysAndConfirm = (keys: Key[]) => {
-        setSelectedKeys(keys);
-        confirm();
-      };
-
-      // if the text is empty, clear the search
-      if (text === "") selectKeysAndConfirm([]);
-      else selectKeysAndConfirm([text.toLowerCase()]);
-    };
-
-    // commit the search on blur and on enter
-    return (
-      <input
-        type="text"
-        placeholder="search"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onBlur={commitSearch}
-        onKeyDown={(e) => e.key === "Enter" && commitSearch()}
-        className={classNames("w-28", "px-2", "py-1", "rounded", {
-          "border-light-blue-base": filtered,
-        })}
-      />
-    );
-  };
-
-  return {
-    // unpack the column first so we can overwrite instead of getting overwritten
-    ...column,
-    // called when the search bar is clicked
-    filterDropdown: (filterDropdownProps) => (
-      <FilterDropdown {...filterDropdownProps} />
-    ),
-    // the search bar
-    filterIcon: (filtered: boolean) => <FilterIcon filtered={filtered} />,
-    onFilter: (value, record) => recordIncludes(record, value as string),
-  };
 };
