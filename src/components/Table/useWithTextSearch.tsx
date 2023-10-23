@@ -55,7 +55,7 @@ export const useWithTextSearch = <C,>(
           className={classNames(
             "w-6",
             "bg-transparent",
-            // "text-primary-text",
+            "hover:text-light-blue-base",
             "brightness-150"
           )}
         >
