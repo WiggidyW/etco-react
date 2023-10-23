@@ -30,6 +30,7 @@ export const BuybackAppraisalContainer = ({
   useAppraisalCodeURIEffect("/buyback", code);
 
   const actionParseNewAppraisal = async (text: string, systemId: number) => {
+    // This is the only place where we use a server action without the "useServerAction" hook.
     const appraisal = await resultParseNewBuybackAppraisal(
       systemId,
       text,
