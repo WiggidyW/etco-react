@@ -1,7 +1,7 @@
 import { serverCookiesGetCurrentCharacter } from "@/cookies/server";
 import { AdminMain } from "@/components/Main";
 import { ReactElement } from "react";
-//
+
 const PATH = "/admin";
 
 export default function Page(): ReactElement {
