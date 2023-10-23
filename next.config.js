@@ -2,8 +2,9 @@
 const nextConfig = {
   experimental: {
     serverActions: true,
+    serverActionsBodySizeLimit: '10mb',
   },
-  output: "standalone"
+  output: "standalone",
 }
 
 const validate = require('./src/env/validate')
