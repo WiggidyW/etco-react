@@ -11,6 +11,7 @@ import {
   UserCodeEntries,
 } from "./CodeEntries";
 import {
+  ContractStatusTabs,
   FlattenedUserQueueEntry,
   GroupedContractQueue,
   getGroupEntries,
@@ -18,16 +19,6 @@ import {
 import { StoreKind } from "@/server-actions/grpc/grpc";
 import { InfoRow, InfoTable } from "../Appraisal/Info/Shared";
 import { LocaleText, formatTime } from "../Appraisal/Util";
-
-const Tabs = [
-  "Outstanding",
-  "Outstanding (Hidden)",
-  "Cancelled by User",
-  "Cancelled by Corp",
-  "Completed",
-  "Timed Out",
-  "Other",
-] as const;
 
 export interface PurchaseQueueViewerProps {
   queue: string[];
@@ -53,7 +44,7 @@ export const ContractQueueViewer = ({
   return (
     <div className={classNames("flex", "flex-col", "justify-center")}>
       <div className={classNames("flex", "justify-center", "space-x-1")}>
-        {Tabs.map((tabName, i) => (
+        {ContractStatusTabs.map((tabName, i) => (
           <Tab
             key={i}
             active={i === tab}
@@ -71,7 +62,7 @@ export const ContractQueueViewer = ({
       </div>
       <ContractCodeEntries
         kind={kind}
-        entries={getGroupEntries(queue, Tabs[tab])}
+        entries={getGroupEntries(queue, ContractStatusTabs[tab])}
         locationNamingMaps={locationNamingMaps}
         className={classNames("mt-2")}
       />
