@@ -2,11 +2,8 @@
 
 import { StoreKind, dispatchAuthenticated, throwInvalid } from "./grpc";
 import {
-  BuybackAppraisalStatus,
   ContractStatus,
-  ShopAppraisalStatus,
   UserAppraisalStatus,
-  UserBuybackAppraisalStatus,
   newContractStatus,
 } from "./appraisalStatus";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
@@ -67,11 +64,7 @@ export const purchaseQueue = async (
 ): Promise<PurchaseQueue> =>
   dispatchAuthenticated(
     pbClient.prototype.shopPurchaseQueue,
-    {
-      includeCodeAppraisal: false,
-      includeNewAppraisal: false,
-      auth: { token },
-    },
+    { auth: { token } },
     (rep) => rep.queue.map((entry) => entry.code),
     throwKind
   );
@@ -132,9 +125,6 @@ function newContractQueueRequest(
   token: string
 ): pb.BuybackContractQueueRequest | pb.ShopContractQueueRequest {
   return {
-    includeItems: false,
-    includeCodeAppraisal: false,
-    includeNewAppraisal: false,
     includeLocationInfo: true,
     includeLocationNaming: LocationNamesAll,
     auth: { token },
@@ -143,7 +133,7 @@ function newContractQueueRequest(
 
 const newContractQueueEntry = (
   kind: StoreKind,
-  entry: pb.BuybackContractQueueEntry | pb.ShopContractQueueEntry,
+  entry: pb.ContractQueueEntry,
   locationNamingMaps: pb.LocationNamingMaps,
   throwKind?: ThrowKind
 ): Promise<ContractQueueEntry> => {

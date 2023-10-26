@@ -12,6 +12,7 @@ export const ContractStatusTabs = [
   "Cancelled by Corp",
   "Completed",
   "Timed Out",
+  "Deleted",
   "Other",
 ] as const;
 
@@ -28,6 +29,7 @@ export interface GroupedContractQueue {
   cancelledByCorp: ContractQueueEntry[];
   completed: ContractQueueEntry[];
   timedOut: ContractQueueEntry[];
+  deleted: ContractQueueEntry[];
   other: ContractQueueEntry[];
 }
 
@@ -54,6 +56,8 @@ export const getGroupEntries = (
       return queue.completed;
     case "Timed Out":
       return queue.timedOut;
+    case "Deleted":
+      return queue.deleted;
     case "Other":
       return queue.other;
   }
@@ -70,6 +74,7 @@ export const newGroupedContractQueue = (
     cancelledByCorp: [],
     completed: [],
     timedOut: [],
+    deleted: [],
     other: [],
   };
   for (const entry of entries) {
@@ -118,12 +123,13 @@ const getStatusTab = (
       return kind === "shop" ? "Cancelled by User" : "Cancelled by Corp";
     case PBContractStatus.failed:
       return "Timed Out";
-    // case ContractStatus.unknown_status:
-    // case ContractStatus.in_progress:
-    // case ContractStatus.finished_issuer:
-    // case ContractStatus.finished_contractor:
-    // case ContractStatus.deleted:
-    // case ContractStatus.reversed:
+    case PBContractStatus.deleted:
+      return "Deleted";
+    // case PBContractStatus.unknown_status:
+    // case PBContractStatus.in_progress:
+    // case PBContractStatus.finished_issuer:
+    // case PBContractStatus.finished_contractor:
+    // case PBContractStatus.reversed:
     default:
       return "Other";
   }
