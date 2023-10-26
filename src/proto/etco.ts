@@ -605,9 +605,9 @@ export interface Contract {
     assigneeType: ContractAssigneeType;
 }
 /**
- * @generated from protobuf message eve_trading_co_proto.BuybackContractQueueEntry
+ * @generated from protobuf message eve_trading_co_proto.ContractQueueEntry
  */
-export interface BuybackContractQueueEntry {
+export interface ContractQueueEntry {
     /**
      * @generated from protobuf field: string code = 1;
      */
@@ -617,58 +617,13 @@ export interface BuybackContractQueueEntry {
      */
     contract?: Contract;
     /**
-     * @generated from protobuf field: repeated eve_trading_co_proto.ContractItem contract_items = 3;
-     */
-    contractItems: ContractItem[]; // null unless include_items
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.LocationInfo contract_location_info = 4;
+     * @generated from protobuf field: eve_trading_co_proto.LocationInfo contract_location_info = 3;
      */
     contractLocationInfo?: LocationInfo; // null unless include_location_info
     /**
-     * @generated from protobuf field: eve_trading_co_proto.BuybackAppraisal code_appraisal = 5;
-     */
-    codeAppraisal?: BuybackAppraisal; // null unless include_code_appraisal
-    /**
-     * @generated from protobuf field: int32 appraisal_character_id = 6;
+     * @generated from protobuf field: int32 appraisal_character_id = 4;
      */
     appraisalCharacterId: number; // 0 unless include_code_appraisal + non-anonymous appraisal
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.BuybackAppraisal new_appraisal = 7;
-     */
-    newAppraisal?: BuybackAppraisal; // null unless include_new_appraisal + include_code_appraisal + include_items
-}
-/**
- * @generated from protobuf message eve_trading_co_proto.ShopContractQueueEntry
- */
-export interface ShopContractQueueEntry {
-    /**
-     * @generated from protobuf field: string code = 1;
-     */
-    code: string; // AppraisalCode
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.Contract contract = 2;
-     */
-    contract?: Contract;
-    /**
-     * @generated from protobuf field: repeated eve_trading_co_proto.ContractItem contract_items = 3;
-     */
-    contractItems: ContractItem[]; // null unless include_items
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.LocationInfo contract_location_info = 4;
-     */
-    contractLocationInfo?: LocationInfo; // null unless include_location_info
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.ShopAppraisal code_appraisal = 5;
-     */
-    codeAppraisal?: ShopAppraisal; // null unless include_code_appraisal
-    /**
-     * @generated from protobuf field: int32 appraisal_character_id = 6;
-     */
-    appraisalCharacterId: number; // 0 unless include_code_appraisal + non-anonymous appraisal
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.ShopAppraisal new_appraisal = 7;
-     */
-    newAppraisal?: ShopAppraisal; // null unless include_new_appraisal + include_code_appraisal + include_items
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.PurchaseQueueEntry
@@ -678,18 +633,6 @@ export interface PurchaseQueueEntry {
      * @generated from protobuf field: string code = 1;
      */
     code: string; // AppraisalCode
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.ShopAppraisal code_appraisal = 2;
-     */
-    codeAppraisal?: ShopAppraisal; // null unless include_code_appraisal
-    /**
-     * @generated from protobuf field: int32 appraisal_character_id = 3;
-     */
-    appraisalCharacterId: number; // 0 unless include_code_appraisal
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.ShopAppraisal new_appraisal = 4;
-     */
-    newAppraisal?: ShopAppraisal; // null unless include_new_appraisal + include_code_appraisal
 }
 /**
  * @generated from protobuf message eve_trading_co_proto.BuybackAppraisalStatus
@@ -1614,31 +1557,15 @@ export interface UserDataResponse {
  */
 export interface ShopContractQueueRequest {
     /**
-     * @generated from protobuf field: bool include_items = 1;
-     */
-    includeItems: boolean;
-    /**
-     * @generated from protobuf field: bool include_code_appraisal = 2;
-     */
-    includeCodeAppraisal: boolean;
-    /**
-     * @generated from protobuf field: bool include_new_appraisal = 3;
-     */
-    includeNewAppraisal: boolean; // requires 2 to be true
-    /**
-     * @generated from protobuf field: bool include_location_info = 4;
+     * @generated from protobuf field: bool include_location_info = 1;
      */
     includeLocationInfo: boolean;
     /**
-     * @generated from protobuf field: eve_trading_co_proto.IncludeTypeNaming include_type_naming = 5;
-     */
-    includeTypeNaming?: IncludeTypeNaming;
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.IncludeLocationNaming include_location_naming = 6;
+     * @generated from protobuf field: eve_trading_co_proto.IncludeLocationNaming include_location_naming = 2;
      */
     includeLocationNaming?: IncludeLocationNaming; // ignored if 4 is false
     /**
-     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 7;
+     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 3;
      */
     auth?: AuthRequest;
 }
@@ -1647,23 +1574,19 @@ export interface ShopContractQueueRequest {
  */
 export interface ShopContractQueueResponse {
     /**
-     * @generated from protobuf field: repeated eve_trading_co_proto.ShopContractQueueEntry queue = 1;
+     * @generated from protobuf field: repeated eve_trading_co_proto.ContractQueueEntry queue = 1;
      */
-    queue: ShopContractQueueEntry[];
+    queue: ContractQueueEntry[];
     /**
-     * @generated from protobuf field: eve_trading_co_proto.TypeNamingLists type_naming_lists = 2;
-     */
-    typeNamingLists?: TypeNamingLists; // null if not requested, empty if no entries
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.LocationNamingMaps location_naming_maps = 3;
+     * @generated from protobuf field: eve_trading_co_proto.LocationNamingMaps location_naming_maps = 2;
      */
     locationNamingMaps?: LocationNamingMaps; // null if not requested, empty if no entries
     /**
-     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 4;
+     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 3;
      */
     auth?: AuthResponse;
     /**
-     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 5;
+     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 4;
      */
     error?: ErrorResponse;
 }
@@ -1672,31 +1595,15 @@ export interface ShopContractQueueResponse {
  */
 export interface BuybackContractQueueRequest {
     /**
-     * @generated from protobuf field: bool include_items = 1;
-     */
-    includeItems: boolean;
-    /**
-     * @generated from protobuf field: bool include_code_appraisal = 2;
-     */
-    includeCodeAppraisal: boolean;
-    /**
-     * @generated from protobuf field: bool include_new_appraisal = 3;
-     */
-    includeNewAppraisal: boolean; // requires 2 to be true
-    /**
-     * @generated from protobuf field: bool include_location_info = 4;
+     * @generated from protobuf field: bool include_location_info = 1;
      */
     includeLocationInfo: boolean;
     /**
-     * @generated from protobuf field: eve_trading_co_proto.IncludeTypeNaming include_type_naming = 5;
-     */
-    includeTypeNaming?: IncludeTypeNaming;
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.IncludeLocationNaming include_location_naming = 6;
+     * @generated from protobuf field: eve_trading_co_proto.IncludeLocationNaming include_location_naming = 2;
      */
     includeLocationNaming?: IncludeLocationNaming; // ignored if 4 is false
     /**
-     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 7;
+     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 3;
      */
     auth?: AuthRequest;
 }
@@ -1705,23 +1612,19 @@ export interface BuybackContractQueueRequest {
  */
 export interface BuybackContractQueueResponse {
     /**
-     * @generated from protobuf field: repeated eve_trading_co_proto.BuybackContractQueueEntry queue = 1;
+     * @generated from protobuf field: repeated eve_trading_co_proto.ContractQueueEntry queue = 1;
      */
-    queue: BuybackContractQueueEntry[];
+    queue: ContractQueueEntry[];
     /**
-     * @generated from protobuf field: eve_trading_co_proto.TypeNamingLists type_naming_lists = 2;
-     */
-    typeNamingLists?: TypeNamingLists; // null if not requested, empty if no entries
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.LocationNamingMaps location_naming_maps = 3;
+     * @generated from protobuf field: eve_trading_co_proto.LocationNamingMaps location_naming_maps = 2;
      */
     locationNamingMaps?: LocationNamingMaps; // null if not requested, empty if no entries
     /**
-     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 4;
+     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 3;
      */
     auth?: AuthResponse;
     /**
-     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 5;
+     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 4;
      */
     error?: ErrorResponse;
 }
@@ -1936,19 +1839,7 @@ export interface BuybackSystemsResponse {
  */
 export interface ShopPurchaseQueueRequest {
     /**
-     * @generated from protobuf field: bool include_code_appraisal = 1;
-     */
-    includeCodeAppraisal: boolean;
-    /**
-     * @generated from protobuf field: bool include_new_appraisal = 2;
-     */
-    includeNewAppraisal: boolean; // requires 1 to be true
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.IncludeTypeNaming include_type_naming = 3;
-     */
-    includeTypeNaming?: IncludeTypeNaming;
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 4;
+     * @generated from protobuf field: eve_trading_co_proto.AuthRequest auth = 1;
      */
     auth?: AuthRequest;
 }
@@ -1961,15 +1852,11 @@ export interface ShopPurchaseQueueResponse {
      */
     queue: PurchaseQueueEntry[];
     /**
-     * @generated from protobuf field: eve_trading_co_proto.TypeNamingLists type_naming_lists = 2;
-     */
-    typeNamingLists?: TypeNamingLists; // null if not requested, empty if no entries
-    /**
-     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 3;
+     * @generated from protobuf field: eve_trading_co_proto.AuthResponse auth = 2;
      */
     auth?: AuthResponse;
     /**
-     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 4;
+     * @generated from protobuf field: eve_trading_co_proto.ErrorResponse error = 3;
      */
     error?: ErrorResponse;
 }
@@ -4538,26 +4425,23 @@ class Contract$Type extends MessageType<Contract> {
  */
 export const Contract = new Contract$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class BuybackContractQueueEntry$Type extends MessageType<BuybackContractQueueEntry> {
+class ContractQueueEntry$Type extends MessageType<ContractQueueEntry> {
     constructor() {
-        super("eve_trading_co_proto.BuybackContractQueueEntry", [
+        super("eve_trading_co_proto.ContractQueueEntry", [
             { no: 1, name: "code", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "contract", kind: "message", T: () => Contract },
-            { no: 3, name: "contract_items", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ContractItem },
-            { no: 4, name: "contract_location_info", kind: "message", T: () => LocationInfo },
-            { no: 5, name: "code_appraisal", kind: "message", T: () => BuybackAppraisal },
-            { no: 6, name: "appraisal_character_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "new_appraisal", kind: "message", T: () => BuybackAppraisal }
+            { no: 3, name: "contract_location_info", kind: "message", T: () => LocationInfo },
+            { no: 4, name: "appraisal_character_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
-    create(value?: PartialMessage<BuybackContractQueueEntry>): BuybackContractQueueEntry {
-        const message = { code: "", contractItems: [], appraisalCharacterId: 0 };
+    create(value?: PartialMessage<ContractQueueEntry>): ContractQueueEntry {
+        const message = { code: "", appraisalCharacterId: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<BuybackContractQueueEntry>(this, message, value);
+            reflectionMergePartial<ContractQueueEntry>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BuybackContractQueueEntry): BuybackContractQueueEntry {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ContractQueueEntry): ContractQueueEntry {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -4568,20 +4452,11 @@ class BuybackContractQueueEntry$Type extends MessageType<BuybackContractQueueEnt
                 case /* eve_trading_co_proto.Contract contract */ 2:
                     message.contract = Contract.internalBinaryRead(reader, reader.uint32(), options, message.contract);
                     break;
-                case /* repeated eve_trading_co_proto.ContractItem contract_items */ 3:
-                    message.contractItems.push(ContractItem.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                case /* eve_trading_co_proto.LocationInfo contract_location_info */ 4:
+                case /* eve_trading_co_proto.LocationInfo contract_location_info */ 3:
                     message.contractLocationInfo = LocationInfo.internalBinaryRead(reader, reader.uint32(), options, message.contractLocationInfo);
                     break;
-                case /* eve_trading_co_proto.BuybackAppraisal code_appraisal */ 5:
-                    message.codeAppraisal = BuybackAppraisal.internalBinaryRead(reader, reader.uint32(), options, message.codeAppraisal);
-                    break;
-                case /* int32 appraisal_character_id */ 6:
+                case /* int32 appraisal_character_id */ 4:
                     message.appraisalCharacterId = reader.int32();
-                    break;
-                case /* eve_trading_co_proto.BuybackAppraisal new_appraisal */ 7:
-                    message.newAppraisal = BuybackAppraisal.internalBinaryRead(reader, reader.uint32(), options, message.newAppraisal);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -4594,28 +4469,19 @@ class BuybackContractQueueEntry$Type extends MessageType<BuybackContractQueueEnt
         }
         return message;
     }
-    internalBinaryWrite(message: BuybackContractQueueEntry, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: ContractQueueEntry, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string code = 1; */
         if (message.code !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.code);
         /* eve_trading_co_proto.Contract contract = 2; */
         if (message.contract)
             Contract.internalBinaryWrite(message.contract, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* repeated eve_trading_co_proto.ContractItem contract_items = 3; */
-        for (let i = 0; i < message.contractItems.length; i++)
-            ContractItem.internalBinaryWrite(message.contractItems[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.LocationInfo contract_location_info = 4; */
+        /* eve_trading_co_proto.LocationInfo contract_location_info = 3; */
         if (message.contractLocationInfo)
-            LocationInfo.internalBinaryWrite(message.contractLocationInfo, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.BuybackAppraisal code_appraisal = 5; */
-        if (message.codeAppraisal)
-            BuybackAppraisal.internalBinaryWrite(message.codeAppraisal, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* int32 appraisal_character_id = 6; */
+            LocationInfo.internalBinaryWrite(message.contractLocationInfo, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* int32 appraisal_character_id = 4; */
         if (message.appraisalCharacterId !== 0)
-            writer.tag(6, WireType.Varint).int32(message.appraisalCharacterId);
-        /* eve_trading_co_proto.BuybackAppraisal new_appraisal = 7; */
-        if (message.newAppraisal)
-            BuybackAppraisal.internalBinaryWrite(message.newAppraisal, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+            writer.tag(4, WireType.Varint).int32(message.appraisalCharacterId);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -4623,110 +4489,18 @@ class BuybackContractQueueEntry$Type extends MessageType<BuybackContractQueueEnt
     }
 }
 /**
- * @generated MessageType for protobuf message eve_trading_co_proto.BuybackContractQueueEntry
+ * @generated MessageType for protobuf message eve_trading_co_proto.ContractQueueEntry
  */
-export const BuybackContractQueueEntry = new BuybackContractQueueEntry$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ShopContractQueueEntry$Type extends MessageType<ShopContractQueueEntry> {
-    constructor() {
-        super("eve_trading_co_proto.ShopContractQueueEntry", [
-            { no: 1, name: "code", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "contract", kind: "message", T: () => Contract },
-            { no: 3, name: "contract_items", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ContractItem },
-            { no: 4, name: "contract_location_info", kind: "message", T: () => LocationInfo },
-            { no: 5, name: "code_appraisal", kind: "message", T: () => ShopAppraisal },
-            { no: 6, name: "appraisal_character_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "new_appraisal", kind: "message", T: () => ShopAppraisal }
-        ]);
-    }
-    create(value?: PartialMessage<ShopContractQueueEntry>): ShopContractQueueEntry {
-        const message = { code: "", contractItems: [], appraisalCharacterId: 0 };
-        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial<ShopContractQueueEntry>(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ShopContractQueueEntry): ShopContractQueueEntry {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* string code */ 1:
-                    message.code = reader.string();
-                    break;
-                case /* eve_trading_co_proto.Contract contract */ 2:
-                    message.contract = Contract.internalBinaryRead(reader, reader.uint32(), options, message.contract);
-                    break;
-                case /* repeated eve_trading_co_proto.ContractItem contract_items */ 3:
-                    message.contractItems.push(ContractItem.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                case /* eve_trading_co_proto.LocationInfo contract_location_info */ 4:
-                    message.contractLocationInfo = LocationInfo.internalBinaryRead(reader, reader.uint32(), options, message.contractLocationInfo);
-                    break;
-                case /* eve_trading_co_proto.ShopAppraisal code_appraisal */ 5:
-                    message.codeAppraisal = ShopAppraisal.internalBinaryRead(reader, reader.uint32(), options, message.codeAppraisal);
-                    break;
-                case /* int32 appraisal_character_id */ 6:
-                    message.appraisalCharacterId = reader.int32();
-                    break;
-                case /* eve_trading_co_proto.ShopAppraisal new_appraisal */ 7:
-                    message.newAppraisal = ShopAppraisal.internalBinaryRead(reader, reader.uint32(), options, message.newAppraisal);
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message: ShopContractQueueEntry, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* string code = 1; */
-        if (message.code !== "")
-            writer.tag(1, WireType.LengthDelimited).string(message.code);
-        /* eve_trading_co_proto.Contract contract = 2; */
-        if (message.contract)
-            Contract.internalBinaryWrite(message.contract, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* repeated eve_trading_co_proto.ContractItem contract_items = 3; */
-        for (let i = 0; i < message.contractItems.length; i++)
-            ContractItem.internalBinaryWrite(message.contractItems[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.LocationInfo contract_location_info = 4; */
-        if (message.contractLocationInfo)
-            LocationInfo.internalBinaryWrite(message.contractLocationInfo, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.ShopAppraisal code_appraisal = 5; */
-        if (message.codeAppraisal)
-            ShopAppraisal.internalBinaryWrite(message.codeAppraisal, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* int32 appraisal_character_id = 6; */
-        if (message.appraisalCharacterId !== 0)
-            writer.tag(6, WireType.Varint).int32(message.appraisalCharacterId);
-        /* eve_trading_co_proto.ShopAppraisal new_appraisal = 7; */
-        if (message.newAppraisal)
-            ShopAppraisal.internalBinaryWrite(message.newAppraisal, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message eve_trading_co_proto.ShopContractQueueEntry
- */
-export const ShopContractQueueEntry = new ShopContractQueueEntry$Type();
+export const ContractQueueEntry = new ContractQueueEntry$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PurchaseQueueEntry$Type extends MessageType<PurchaseQueueEntry> {
     constructor() {
         super("eve_trading_co_proto.PurchaseQueueEntry", [
-            { no: 1, name: "code", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 2, name: "code_appraisal", kind: "message", T: () => ShopAppraisal },
-            { no: 3, name: "appraisal_character_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "new_appraisal", kind: "message", T: () => ShopAppraisal }
+            { no: 1, name: "code", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value?: PartialMessage<PurchaseQueueEntry>): PurchaseQueueEntry {
-        const message = { code: "", appraisalCharacterId: 0 };
+        const message = { code: "" };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<PurchaseQueueEntry>(this, message, value);
@@ -4739,15 +4513,6 @@ class PurchaseQueueEntry$Type extends MessageType<PurchaseQueueEntry> {
             switch (fieldNo) {
                 case /* string code */ 1:
                     message.code = reader.string();
-                    break;
-                case /* eve_trading_co_proto.ShopAppraisal code_appraisal */ 2:
-                    message.codeAppraisal = ShopAppraisal.internalBinaryRead(reader, reader.uint32(), options, message.codeAppraisal);
-                    break;
-                case /* int32 appraisal_character_id */ 3:
-                    message.appraisalCharacterId = reader.int32();
-                    break;
-                case /* eve_trading_co_proto.ShopAppraisal new_appraisal */ 4:
-                    message.newAppraisal = ShopAppraisal.internalBinaryRead(reader, reader.uint32(), options, message.newAppraisal);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -4764,15 +4529,6 @@ class PurchaseQueueEntry$Type extends MessageType<PurchaseQueueEntry> {
         /* string code = 1; */
         if (message.code !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.code);
-        /* eve_trading_co_proto.ShopAppraisal code_appraisal = 2; */
-        if (message.codeAppraisal)
-            ShopAppraisal.internalBinaryWrite(message.codeAppraisal, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* int32 appraisal_character_id = 3; */
-        if (message.appraisalCharacterId !== 0)
-            writer.tag(3, WireType.Varint).int32(message.appraisalCharacterId);
-        /* eve_trading_co_proto.ShopAppraisal new_appraisal = 4; */
-        if (message.newAppraisal)
-            ShopAppraisal.internalBinaryWrite(message.newAppraisal, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -7916,17 +7672,13 @@ export const UserDataResponse = new UserDataResponse$Type();
 class ShopContractQueueRequest$Type extends MessageType<ShopContractQueueRequest> {
     constructor() {
         super("eve_trading_co_proto.ShopContractQueueRequest", [
-            { no: 1, name: "include_items", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "include_code_appraisal", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "include_new_appraisal", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "include_location_info", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "include_type_naming", kind: "message", T: () => IncludeTypeNaming },
-            { no: 6, name: "include_location_naming", kind: "message", T: () => IncludeLocationNaming },
-            { no: 7, name: "auth", kind: "message", T: () => AuthRequest }
+            { no: 1, name: "include_location_info", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "include_location_naming", kind: "message", T: () => IncludeLocationNaming },
+            { no: 3, name: "auth", kind: "message", T: () => AuthRequest }
         ]);
     }
     create(value?: PartialMessage<ShopContractQueueRequest>): ShopContractQueueRequest {
-        const message = { includeItems: false, includeCodeAppraisal: false, includeNewAppraisal: false, includeLocationInfo: false };
+        const message = { includeLocationInfo: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<ShopContractQueueRequest>(this, message, value);
@@ -7937,25 +7689,13 @@ class ShopContractQueueRequest$Type extends MessageType<ShopContractQueueRequest
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bool include_items */ 1:
-                    message.includeItems = reader.bool();
-                    break;
-                case /* bool include_code_appraisal */ 2:
-                    message.includeCodeAppraisal = reader.bool();
-                    break;
-                case /* bool include_new_appraisal */ 3:
-                    message.includeNewAppraisal = reader.bool();
-                    break;
-                case /* bool include_location_info */ 4:
+                case /* bool include_location_info */ 1:
                     message.includeLocationInfo = reader.bool();
                     break;
-                case /* eve_trading_co_proto.IncludeTypeNaming include_type_naming */ 5:
-                    message.includeTypeNaming = IncludeTypeNaming.internalBinaryRead(reader, reader.uint32(), options, message.includeTypeNaming);
-                    break;
-                case /* eve_trading_co_proto.IncludeLocationNaming include_location_naming */ 6:
+                case /* eve_trading_co_proto.IncludeLocationNaming include_location_naming */ 2:
                     message.includeLocationNaming = IncludeLocationNaming.internalBinaryRead(reader, reader.uint32(), options, message.includeLocationNaming);
                     break;
-                case /* eve_trading_co_proto.AuthRequest auth */ 7:
+                case /* eve_trading_co_proto.AuthRequest auth */ 3:
                     message.auth = AuthRequest.internalBinaryRead(reader, reader.uint32(), options, message.auth);
                     break;
                 default:
@@ -7970,27 +7710,15 @@ class ShopContractQueueRequest$Type extends MessageType<ShopContractQueueRequest
         return message;
     }
     internalBinaryWrite(message: ShopContractQueueRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bool include_items = 1; */
-        if (message.includeItems !== false)
-            writer.tag(1, WireType.Varint).bool(message.includeItems);
-        /* bool include_code_appraisal = 2; */
-        if (message.includeCodeAppraisal !== false)
-            writer.tag(2, WireType.Varint).bool(message.includeCodeAppraisal);
-        /* bool include_new_appraisal = 3; */
-        if (message.includeNewAppraisal !== false)
-            writer.tag(3, WireType.Varint).bool(message.includeNewAppraisal);
-        /* bool include_location_info = 4; */
+        /* bool include_location_info = 1; */
         if (message.includeLocationInfo !== false)
-            writer.tag(4, WireType.Varint).bool(message.includeLocationInfo);
-        /* eve_trading_co_proto.IncludeTypeNaming include_type_naming = 5; */
-        if (message.includeTypeNaming)
-            IncludeTypeNaming.internalBinaryWrite(message.includeTypeNaming, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.IncludeLocationNaming include_location_naming = 6; */
+            writer.tag(1, WireType.Varint).bool(message.includeLocationInfo);
+        /* eve_trading_co_proto.IncludeLocationNaming include_location_naming = 2; */
         if (message.includeLocationNaming)
-            IncludeLocationNaming.internalBinaryWrite(message.includeLocationNaming, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.AuthRequest auth = 7; */
+            IncludeLocationNaming.internalBinaryWrite(message.includeLocationNaming, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.AuthRequest auth = 3; */
         if (message.auth)
-            AuthRequest.internalBinaryWrite(message.auth, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+            AuthRequest.internalBinaryWrite(message.auth, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -8005,11 +7733,10 @@ export const ShopContractQueueRequest = new ShopContractQueueRequest$Type();
 class ShopContractQueueResponse$Type extends MessageType<ShopContractQueueResponse> {
     constructor() {
         super("eve_trading_co_proto.ShopContractQueueResponse", [
-            { no: 1, name: "queue", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ShopContractQueueEntry },
-            { no: 2, name: "type_naming_lists", kind: "message", T: () => TypeNamingLists },
-            { no: 3, name: "location_naming_maps", kind: "message", T: () => LocationNamingMaps },
-            { no: 4, name: "auth", kind: "message", T: () => AuthResponse },
-            { no: 5, name: "error", kind: "message", T: () => ErrorResponse }
+            { no: 1, name: "queue", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ContractQueueEntry },
+            { no: 2, name: "location_naming_maps", kind: "message", T: () => LocationNamingMaps },
+            { no: 3, name: "auth", kind: "message", T: () => AuthResponse },
+            { no: 4, name: "error", kind: "message", T: () => ErrorResponse }
         ]);
     }
     create(value?: PartialMessage<ShopContractQueueResponse>): ShopContractQueueResponse {
@@ -8024,19 +7751,16 @@ class ShopContractQueueResponse$Type extends MessageType<ShopContractQueueRespon
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated eve_trading_co_proto.ShopContractQueueEntry queue */ 1:
-                    message.queue.push(ShopContractQueueEntry.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated eve_trading_co_proto.ContractQueueEntry queue */ 1:
+                    message.queue.push(ContractQueueEntry.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* eve_trading_co_proto.TypeNamingLists type_naming_lists */ 2:
-                    message.typeNamingLists = TypeNamingLists.internalBinaryRead(reader, reader.uint32(), options, message.typeNamingLists);
-                    break;
-                case /* eve_trading_co_proto.LocationNamingMaps location_naming_maps */ 3:
+                case /* eve_trading_co_proto.LocationNamingMaps location_naming_maps */ 2:
                     message.locationNamingMaps = LocationNamingMaps.internalBinaryRead(reader, reader.uint32(), options, message.locationNamingMaps);
                     break;
-                case /* eve_trading_co_proto.AuthResponse auth */ 4:
+                case /* eve_trading_co_proto.AuthResponse auth */ 3:
                     message.auth = AuthResponse.internalBinaryRead(reader, reader.uint32(), options, message.auth);
                     break;
-                case /* eve_trading_co_proto.ErrorResponse error */ 5:
+                case /* eve_trading_co_proto.ErrorResponse error */ 4:
                     message.error = ErrorResponse.internalBinaryRead(reader, reader.uint32(), options, message.error);
                     break;
                 default:
@@ -8051,21 +7775,18 @@ class ShopContractQueueResponse$Type extends MessageType<ShopContractQueueRespon
         return message;
     }
     internalBinaryWrite(message: ShopContractQueueResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated eve_trading_co_proto.ShopContractQueueEntry queue = 1; */
+        /* repeated eve_trading_co_proto.ContractQueueEntry queue = 1; */
         for (let i = 0; i < message.queue.length; i++)
-            ShopContractQueueEntry.internalBinaryWrite(message.queue[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.TypeNamingLists type_naming_lists = 2; */
-        if (message.typeNamingLists)
-            TypeNamingLists.internalBinaryWrite(message.typeNamingLists, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.LocationNamingMaps location_naming_maps = 3; */
+            ContractQueueEntry.internalBinaryWrite(message.queue[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.LocationNamingMaps location_naming_maps = 2; */
         if (message.locationNamingMaps)
-            LocationNamingMaps.internalBinaryWrite(message.locationNamingMaps, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.AuthResponse auth = 4; */
+            LocationNamingMaps.internalBinaryWrite(message.locationNamingMaps, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.AuthResponse auth = 3; */
         if (message.auth)
-            AuthResponse.internalBinaryWrite(message.auth, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.ErrorResponse error = 5; */
+            AuthResponse.internalBinaryWrite(message.auth, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.ErrorResponse error = 4; */
         if (message.error)
-            ErrorResponse.internalBinaryWrite(message.error, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+            ErrorResponse.internalBinaryWrite(message.error, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -8080,17 +7801,13 @@ export const ShopContractQueueResponse = new ShopContractQueueResponse$Type();
 class BuybackContractQueueRequest$Type extends MessageType<BuybackContractQueueRequest> {
     constructor() {
         super("eve_trading_co_proto.BuybackContractQueueRequest", [
-            { no: 1, name: "include_items", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "include_code_appraisal", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "include_new_appraisal", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "include_location_info", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "include_type_naming", kind: "message", T: () => IncludeTypeNaming },
-            { no: 6, name: "include_location_naming", kind: "message", T: () => IncludeLocationNaming },
-            { no: 7, name: "auth", kind: "message", T: () => AuthRequest }
+            { no: 1, name: "include_location_info", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "include_location_naming", kind: "message", T: () => IncludeLocationNaming },
+            { no: 3, name: "auth", kind: "message", T: () => AuthRequest }
         ]);
     }
     create(value?: PartialMessage<BuybackContractQueueRequest>): BuybackContractQueueRequest {
-        const message = { includeItems: false, includeCodeAppraisal: false, includeNewAppraisal: false, includeLocationInfo: false };
+        const message = { includeLocationInfo: false };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<BuybackContractQueueRequest>(this, message, value);
@@ -8101,25 +7818,13 @@ class BuybackContractQueueRequest$Type extends MessageType<BuybackContractQueueR
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bool include_items */ 1:
-                    message.includeItems = reader.bool();
-                    break;
-                case /* bool include_code_appraisal */ 2:
-                    message.includeCodeAppraisal = reader.bool();
-                    break;
-                case /* bool include_new_appraisal */ 3:
-                    message.includeNewAppraisal = reader.bool();
-                    break;
-                case /* bool include_location_info */ 4:
+                case /* bool include_location_info */ 1:
                     message.includeLocationInfo = reader.bool();
                     break;
-                case /* eve_trading_co_proto.IncludeTypeNaming include_type_naming */ 5:
-                    message.includeTypeNaming = IncludeTypeNaming.internalBinaryRead(reader, reader.uint32(), options, message.includeTypeNaming);
-                    break;
-                case /* eve_trading_co_proto.IncludeLocationNaming include_location_naming */ 6:
+                case /* eve_trading_co_proto.IncludeLocationNaming include_location_naming */ 2:
                     message.includeLocationNaming = IncludeLocationNaming.internalBinaryRead(reader, reader.uint32(), options, message.includeLocationNaming);
                     break;
-                case /* eve_trading_co_proto.AuthRequest auth */ 7:
+                case /* eve_trading_co_proto.AuthRequest auth */ 3:
                     message.auth = AuthRequest.internalBinaryRead(reader, reader.uint32(), options, message.auth);
                     break;
                 default:
@@ -8134,27 +7839,15 @@ class BuybackContractQueueRequest$Type extends MessageType<BuybackContractQueueR
         return message;
     }
     internalBinaryWrite(message: BuybackContractQueueRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bool include_items = 1; */
-        if (message.includeItems !== false)
-            writer.tag(1, WireType.Varint).bool(message.includeItems);
-        /* bool include_code_appraisal = 2; */
-        if (message.includeCodeAppraisal !== false)
-            writer.tag(2, WireType.Varint).bool(message.includeCodeAppraisal);
-        /* bool include_new_appraisal = 3; */
-        if (message.includeNewAppraisal !== false)
-            writer.tag(3, WireType.Varint).bool(message.includeNewAppraisal);
-        /* bool include_location_info = 4; */
+        /* bool include_location_info = 1; */
         if (message.includeLocationInfo !== false)
-            writer.tag(4, WireType.Varint).bool(message.includeLocationInfo);
-        /* eve_trading_co_proto.IncludeTypeNaming include_type_naming = 5; */
-        if (message.includeTypeNaming)
-            IncludeTypeNaming.internalBinaryWrite(message.includeTypeNaming, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.IncludeLocationNaming include_location_naming = 6; */
+            writer.tag(1, WireType.Varint).bool(message.includeLocationInfo);
+        /* eve_trading_co_proto.IncludeLocationNaming include_location_naming = 2; */
         if (message.includeLocationNaming)
-            IncludeLocationNaming.internalBinaryWrite(message.includeLocationNaming, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.AuthRequest auth = 7; */
+            IncludeLocationNaming.internalBinaryWrite(message.includeLocationNaming, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.AuthRequest auth = 3; */
         if (message.auth)
-            AuthRequest.internalBinaryWrite(message.auth, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+            AuthRequest.internalBinaryWrite(message.auth, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -8169,11 +7862,10 @@ export const BuybackContractQueueRequest = new BuybackContractQueueRequest$Type(
 class BuybackContractQueueResponse$Type extends MessageType<BuybackContractQueueResponse> {
     constructor() {
         super("eve_trading_co_proto.BuybackContractQueueResponse", [
-            { no: 1, name: "queue", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BuybackContractQueueEntry },
-            { no: 2, name: "type_naming_lists", kind: "message", T: () => TypeNamingLists },
-            { no: 3, name: "location_naming_maps", kind: "message", T: () => LocationNamingMaps },
-            { no: 4, name: "auth", kind: "message", T: () => AuthResponse },
-            { no: 5, name: "error", kind: "message", T: () => ErrorResponse }
+            { no: 1, name: "queue", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ContractQueueEntry },
+            { no: 2, name: "location_naming_maps", kind: "message", T: () => LocationNamingMaps },
+            { no: 3, name: "auth", kind: "message", T: () => AuthResponse },
+            { no: 4, name: "error", kind: "message", T: () => ErrorResponse }
         ]);
     }
     create(value?: PartialMessage<BuybackContractQueueResponse>): BuybackContractQueueResponse {
@@ -8188,19 +7880,16 @@ class BuybackContractQueueResponse$Type extends MessageType<BuybackContractQueue
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated eve_trading_co_proto.BuybackContractQueueEntry queue */ 1:
-                    message.queue.push(BuybackContractQueueEntry.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated eve_trading_co_proto.ContractQueueEntry queue */ 1:
+                    message.queue.push(ContractQueueEntry.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* eve_trading_co_proto.TypeNamingLists type_naming_lists */ 2:
-                    message.typeNamingLists = TypeNamingLists.internalBinaryRead(reader, reader.uint32(), options, message.typeNamingLists);
-                    break;
-                case /* eve_trading_co_proto.LocationNamingMaps location_naming_maps */ 3:
+                case /* eve_trading_co_proto.LocationNamingMaps location_naming_maps */ 2:
                     message.locationNamingMaps = LocationNamingMaps.internalBinaryRead(reader, reader.uint32(), options, message.locationNamingMaps);
                     break;
-                case /* eve_trading_co_proto.AuthResponse auth */ 4:
+                case /* eve_trading_co_proto.AuthResponse auth */ 3:
                     message.auth = AuthResponse.internalBinaryRead(reader, reader.uint32(), options, message.auth);
                     break;
-                case /* eve_trading_co_proto.ErrorResponse error */ 5:
+                case /* eve_trading_co_proto.ErrorResponse error */ 4:
                     message.error = ErrorResponse.internalBinaryRead(reader, reader.uint32(), options, message.error);
                     break;
                 default:
@@ -8215,21 +7904,18 @@ class BuybackContractQueueResponse$Type extends MessageType<BuybackContractQueue
         return message;
     }
     internalBinaryWrite(message: BuybackContractQueueResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* repeated eve_trading_co_proto.BuybackContractQueueEntry queue = 1; */
+        /* repeated eve_trading_co_proto.ContractQueueEntry queue = 1; */
         for (let i = 0; i < message.queue.length; i++)
-            BuybackContractQueueEntry.internalBinaryWrite(message.queue[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.TypeNamingLists type_naming_lists = 2; */
-        if (message.typeNamingLists)
-            TypeNamingLists.internalBinaryWrite(message.typeNamingLists, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.LocationNamingMaps location_naming_maps = 3; */
+            ContractQueueEntry.internalBinaryWrite(message.queue[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.LocationNamingMaps location_naming_maps = 2; */
         if (message.locationNamingMaps)
-            LocationNamingMaps.internalBinaryWrite(message.locationNamingMaps, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.AuthResponse auth = 4; */
+            LocationNamingMaps.internalBinaryWrite(message.locationNamingMaps, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.AuthResponse auth = 3; */
         if (message.auth)
-            AuthResponse.internalBinaryWrite(message.auth, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.ErrorResponse error = 5; */
+            AuthResponse.internalBinaryWrite(message.auth, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.ErrorResponse error = 4; */
         if (message.error)
-            ErrorResponse.internalBinaryWrite(message.error, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+            ErrorResponse.internalBinaryWrite(message.error, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -9081,14 +8767,11 @@ export const BuybackSystemsResponse = new BuybackSystemsResponse$Type();
 class ShopPurchaseQueueRequest$Type extends MessageType<ShopPurchaseQueueRequest> {
     constructor() {
         super("eve_trading_co_proto.ShopPurchaseQueueRequest", [
-            { no: 1, name: "include_code_appraisal", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "include_new_appraisal", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "include_type_naming", kind: "message", T: () => IncludeTypeNaming },
-            { no: 4, name: "auth", kind: "message", T: () => AuthRequest }
+            { no: 1, name: "auth", kind: "message", T: () => AuthRequest }
         ]);
     }
     create(value?: PartialMessage<ShopPurchaseQueueRequest>): ShopPurchaseQueueRequest {
-        const message = { includeCodeAppraisal: false, includeNewAppraisal: false };
+        const message = {};
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<ShopPurchaseQueueRequest>(this, message, value);
@@ -9099,16 +8782,7 @@ class ShopPurchaseQueueRequest$Type extends MessageType<ShopPurchaseQueueRequest
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bool include_code_appraisal */ 1:
-                    message.includeCodeAppraisal = reader.bool();
-                    break;
-                case /* bool include_new_appraisal */ 2:
-                    message.includeNewAppraisal = reader.bool();
-                    break;
-                case /* eve_trading_co_proto.IncludeTypeNaming include_type_naming */ 3:
-                    message.includeTypeNaming = IncludeTypeNaming.internalBinaryRead(reader, reader.uint32(), options, message.includeTypeNaming);
-                    break;
-                case /* eve_trading_co_proto.AuthRequest auth */ 4:
+                case /* eve_trading_co_proto.AuthRequest auth */ 1:
                     message.auth = AuthRequest.internalBinaryRead(reader, reader.uint32(), options, message.auth);
                     break;
                 default:
@@ -9123,18 +8797,9 @@ class ShopPurchaseQueueRequest$Type extends MessageType<ShopPurchaseQueueRequest
         return message;
     }
     internalBinaryWrite(message: ShopPurchaseQueueRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
-        /* bool include_code_appraisal = 1; */
-        if (message.includeCodeAppraisal !== false)
-            writer.tag(1, WireType.Varint).bool(message.includeCodeAppraisal);
-        /* bool include_new_appraisal = 2; */
-        if (message.includeNewAppraisal !== false)
-            writer.tag(2, WireType.Varint).bool(message.includeNewAppraisal);
-        /* eve_trading_co_proto.IncludeTypeNaming include_type_naming = 3; */
-        if (message.includeTypeNaming)
-            IncludeTypeNaming.internalBinaryWrite(message.includeTypeNaming, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.AuthRequest auth = 4; */
+        /* eve_trading_co_proto.AuthRequest auth = 1; */
         if (message.auth)
-            AuthRequest.internalBinaryWrite(message.auth, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+            AuthRequest.internalBinaryWrite(message.auth, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -9150,9 +8815,8 @@ class ShopPurchaseQueueResponse$Type extends MessageType<ShopPurchaseQueueRespon
     constructor() {
         super("eve_trading_co_proto.ShopPurchaseQueueResponse", [
             { no: 1, name: "queue", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PurchaseQueueEntry },
-            { no: 2, name: "type_naming_lists", kind: "message", T: () => TypeNamingLists },
-            { no: 3, name: "auth", kind: "message", T: () => AuthResponse },
-            { no: 4, name: "error", kind: "message", T: () => ErrorResponse }
+            { no: 2, name: "auth", kind: "message", T: () => AuthResponse },
+            { no: 3, name: "error", kind: "message", T: () => ErrorResponse }
         ]);
     }
     create(value?: PartialMessage<ShopPurchaseQueueResponse>): ShopPurchaseQueueResponse {
@@ -9170,13 +8834,10 @@ class ShopPurchaseQueueResponse$Type extends MessageType<ShopPurchaseQueueRespon
                 case /* repeated eve_trading_co_proto.PurchaseQueueEntry queue */ 1:
                     message.queue.push(PurchaseQueueEntry.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* eve_trading_co_proto.TypeNamingLists type_naming_lists */ 2:
-                    message.typeNamingLists = TypeNamingLists.internalBinaryRead(reader, reader.uint32(), options, message.typeNamingLists);
-                    break;
-                case /* eve_trading_co_proto.AuthResponse auth */ 3:
+                case /* eve_trading_co_proto.AuthResponse auth */ 2:
                     message.auth = AuthResponse.internalBinaryRead(reader, reader.uint32(), options, message.auth);
                     break;
-                case /* eve_trading_co_proto.ErrorResponse error */ 4:
+                case /* eve_trading_co_proto.ErrorResponse error */ 3:
                     message.error = ErrorResponse.internalBinaryRead(reader, reader.uint32(), options, message.error);
                     break;
                 default:
@@ -9194,15 +8855,12 @@ class ShopPurchaseQueueResponse$Type extends MessageType<ShopPurchaseQueueRespon
         /* repeated eve_trading_co_proto.PurchaseQueueEntry queue = 1; */
         for (let i = 0; i < message.queue.length; i++)
             PurchaseQueueEntry.internalBinaryWrite(message.queue[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.TypeNamingLists type_naming_lists = 2; */
-        if (message.typeNamingLists)
-            TypeNamingLists.internalBinaryWrite(message.typeNamingLists, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.AuthResponse auth = 3; */
+        /* eve_trading_co_proto.AuthResponse auth = 2; */
         if (message.auth)
-            AuthResponse.internalBinaryWrite(message.auth, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* eve_trading_co_proto.ErrorResponse error = 4; */
+            AuthResponse.internalBinaryWrite(message.auth, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* eve_trading_co_proto.ErrorResponse error = 3; */
         if (message.error)
-            ErrorResponse.internalBinaryWrite(message.error, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+            ErrorResponse.internalBinaryWrite(message.error, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
