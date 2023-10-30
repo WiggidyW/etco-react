@@ -37,9 +37,8 @@ export interface ContractQueueViewerProps {
 export const ContractQueueViewer = ({
   kind,
   locationNamingMaps,
-  queue: initialQueue,
+  queue,
 }: ContractQueueViewerProps): ReactElement => {
-  const [queue, setQueue] = useState<GroupedContractQueue>(initialQueue);
   const [tab, setTab] = useState(0);
   return (
     <div className={classNames("flex", "flex-col", "justify-center")}>
