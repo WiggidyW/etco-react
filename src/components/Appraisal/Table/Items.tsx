@@ -95,7 +95,7 @@ interface CellProps extends PropsWithChildren {
   rowSpan?: number;
   th?: boolean;
   wrap?: boolean;
-  alignBottom?: boolean;
+  align?: "top" | "bottom";
 }
 const Cell = ({
   children,
@@ -106,7 +106,7 @@ const Cell = ({
   rowSpan,
   th,
   wrap,
-  alignBottom,
+  align,
 }: CellProps): ReactElement => {
   const InnerCell = ({
     children,
@@ -119,11 +119,12 @@ const Cell = ({
         "p-0",
         "text-left",
         {
+          "align-top": align === "top",
+          "align-bottom": align === "bottom",
           "whitespace-nowrap": !wrap,
           "border-primary-base": borderT || borderB,
           "border-t": borderT,
           "border-b": borderB,
-          "align-bottom": alignBottom,
           [classNames("pl-1", "pr-1")]: pad,
         },
         className
@@ -148,10 +149,10 @@ const HeadCells = ({
   cellClassName,
 }: HeadCellsProps): ReactElement => (
   <>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       Item
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       Quantity
       {hasNewQuantity && (
         <ParabolaEnumerate
@@ -163,15 +164,15 @@ const HeadCells = ({
         />
       )}
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       PricePer
       {hasNewPrice && <ParabolaEnumerate strs={["Cached", "Live"]} />}
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       PriceTotal
       {hasNewPrice && <ParabolaEnumerate strs={["Cached", "Live"]} />}
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       Description
       {hasNewDescription && <ParabolaEnumerate strs={["Cached", "Live"]} />}
     </Cell>
@@ -213,13 +214,14 @@ const ItemCells = ({
       pad
       borderT
       wrap
+      align="top"
     >
       <div className={classNames("flex", "items-center", "w-full")}>
         {!unknown && <TypeImage typeId={typeId} />}
         <h1>{name}</h1>
       </div>
     </Cell>
-    <Cell className={cellClassName} pad borderT>
+    <Cell className={cellClassName} pad borderT align="top">
       <SameOrNewContent
         fmt={formatQuantity}
         oldT={quantity}
@@ -228,7 +230,7 @@ const ItemCells = ({
         locale
       />
     </Cell>
-    <Cell className={cellClassName} pad borderT>
+    <Cell className={cellClassName} pad borderT align="top">
       <SameOrNewContent
         fmt={formatPrice}
         oldT={pricePer}
@@ -237,7 +239,7 @@ const ItemCells = ({
         locale
       />
     </Cell>
-    <Cell className={cellClassName} pad borderT>
+    <Cell className={cellClassName} pad borderT align="top">
       <SameOrNewContent
         fmt={formatPrice}
         oldT={priceTotal}
@@ -246,7 +248,7 @@ const ItemCells = ({
         locale
       />
     </Cell>
-    <Cell className={cellClassName} pad borderT wrap>
+    <Cell className={cellClassName} pad borderT wrap align="top">
       <SameOrNewContent
         oldT={unknown && description === "" ? "Unknown Item" : description}
         newT={newDescription}
