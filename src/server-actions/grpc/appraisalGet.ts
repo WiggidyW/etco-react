@@ -188,13 +188,15 @@ function newAppraisal(
     // newAppraisalPromise
     if (isSameCharacter) {
       appraisalCharacterPromise = Promise.resolve(character);
-    } /* if (admin) */ else {
+    } else if (adminOnlyCharacterId !== 0) {
       appraisalCharacterPromise = characterInfo(
         adminOnlyCharacterId,
         undefined,
         undefined,
         throwKind
       );
+    } else {
+      appraisalCharacterPromise = Promise.resolve(null);
     }
   } /* if (isAnonymous || not admin and not same character) */ else {
     appraisalCharacterPromise = Promise.resolve(null);
