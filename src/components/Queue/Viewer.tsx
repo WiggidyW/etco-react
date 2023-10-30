@@ -56,7 +56,7 @@ export const ContractQueueViewer = ({
                 getGroupEntries(queue, tabName).length === 0,
             })}
           >
-            {tabName}
+            {`${tabName} (${getGroupEntries(queue, tabName).length})`}
           </Tab>
         ))}
       </div>
