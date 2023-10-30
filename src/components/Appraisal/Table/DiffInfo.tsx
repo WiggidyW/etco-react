@@ -15,11 +15,13 @@ export const AppraisalDiffInfoTable = ({
   >
     <AppraisalDiffInfoTablePair
       headVals={["Cached", "Live"]}
-      oldT={time}
-      newT={newTime}
-      fmt={formatTime}
-      locale
+      tdClassName="text-xl"
+      oldT={price}
+      newT={newPrice}
+      fmt={formatPrice}
       flexWrapped
+      locale
+      cmp
       startChildren={
         <CopyButton
           svgClassName={classNames("mr-auto")}
@@ -35,6 +37,16 @@ export const AppraisalDiffInfoTable = ({
       }
       endChildren={<span className={classNames("flex-grow", "basis-0")} />}
     >
+      Price
+    </AppraisalDiffInfoTablePair>
+    <AppraisalDiffInfoTablePair
+      headVals={["Cached", "Live"]}
+      oldT={time}
+      newT={newTime}
+      fmt={formatTime}
+      locale
+      flexWrapped
+    >
       Time
     </AppraisalDiffInfoTablePair>
     <AppraisalDiffInfoTablePair
@@ -44,17 +56,6 @@ export const AppraisalDiffInfoTable = ({
       flexWrapped
     >
       Version
-    </AppraisalDiffInfoTablePair>
-    <AppraisalDiffInfoTablePair
-      headVals={["Cached", "Live"]}
-      tdClassName="text-xl"
-      oldT={price}
-      newT={newPrice}
-      fmt={formatPrice}
-      locale
-      cmp
-    >
-      Price
     </AppraisalDiffInfoTablePair>
   </div>
 );
