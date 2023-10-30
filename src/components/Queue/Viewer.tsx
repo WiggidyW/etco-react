@@ -42,7 +42,7 @@ export const ContractQueueViewer = ({
   const [tab, setTab] = useState(0);
   return (
     <div className={classNames("flex", "flex-col", "justify-center")}>
-      <div className={classNames("flex", "justify-center", "space-x-1")}>
+      <div className={classNames("flex", "space-x-1")}>
         {ContractStatusTabs.map((tabName, i) => (
           <Tab
             key={i}
