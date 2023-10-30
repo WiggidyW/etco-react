@@ -22,7 +22,7 @@ export const Tab = ({
   <div
     className={classNames(
       "cursor-pointer",
-      "px-4",
+      "px-3",
       "font-medium",
       "border-l",
       "border-r",
