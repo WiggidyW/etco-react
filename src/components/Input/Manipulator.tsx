@@ -217,9 +217,11 @@ export const FormTextArea = (props: FormTextAreaProps): ReactElement => {
   return <TextArea {...props} value={value} setValue={setValue} />;
 };
 
+export type IntrinsicTextAreaProps = JSX.IntrinsicElements["textarea"];
 export interface TextAreaProps extends FormTextAreaProps {
   value: string | null;
   setValue: (value: string | null) => void;
+  intrinsicProps?: IntrinsicTextAreaProps;
 }
 export const TextArea = ({
   title,
@@ -231,6 +233,7 @@ export const TextArea = ({
   hFull = false,
   wFull = false,
   rows = 8,
+  intrinsicProps,
 }: // rows,
 TextAreaProps): ReactElement => {
   const strValue = value ?? "";
@@ -248,6 +251,7 @@ TextAreaProps): ReactElement => {
       hFull={hFull}
     >
       <textarea
+        {...intrinsicProps}
         rows={rows}
         name={name}
         className={classNames("border", "p-2", {
