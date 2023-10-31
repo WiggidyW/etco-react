@@ -1,6 +1,5 @@
 "use client";
 
-import { Character, ICharacter } from "@/browser/character";
 import Cookies, { CookieSetOptions } from "universal-cookie";
 import { PUBLIC_ENV } from "@/env/public";
 
@@ -62,6 +61,26 @@ export const clientCookiesSetCheckIsAdmin = (isAdmin: boolean): void =>
 export const clientCookiesDelCheckIsAdmin = (): void =>
   new Cookies().set(
     "checkIsAdmin",
+    "",
+    newCookieSetOpts({ expires: new Date(0) })
+  );
+
+// // Shop Parse Key
+
+export const clientCookiesGetShopParseKey = (): string | null =>
+  new Cookies().get("shopParseKey", { doNotParse: true, doNotUpdate: true }) ||
+  null;
+
+export const clientCookiesSetShopParseKey = (key: string): void =>
+  new Cookies().set(
+    "shopParseKey",
+    key,
+    newCookieSetOpts({ maxAge: 60 * 30 }) // 30 minutes
+  );
+
+export const clientCookiesDelShopParseKey = (): void =>
+  new Cookies().set(
+    "shopParseKey",
     "",
     newCookieSetOpts({ expires: new Date(0) })
   );
