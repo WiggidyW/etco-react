@@ -39,8 +39,6 @@ export const newSameOrNew = <T>(
   }
 };
 
-export const typeVerify = <T>(t: T): T => t;
-
 export interface AppraisalItemBase {
   typeId: number;
   name: string;
@@ -61,10 +59,6 @@ export interface AppraisalItem extends AppraisalItemBase {
   children: AppraisalChildItem[];
   unknown?: boolean;
 }
-
-type AppraisalItemMapped = Omit<AppraisalItem, "children"> & {
-  children: Map<number, AppraisalChildItem>;
-};
 
 export interface BaseAppraisal {
   code: string;
