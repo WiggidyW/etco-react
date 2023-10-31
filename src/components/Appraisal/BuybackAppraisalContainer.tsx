@@ -3,7 +3,7 @@
 import { resultParseNewBuybackAppraisal } from "@/server-actions/grpc/appraisalNew";
 import { ReactElement, useCallback, useState } from "react";
 import { AppraisalContainer } from "./Container";
-import { PasteSubmit } from "./PasteSubmit";
+import { PasteSubmit } from "./Paste";
 import classNames from "classnames";
 import {
   AppraisalContainerChildren,
