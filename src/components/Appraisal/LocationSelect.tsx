@@ -62,8 +62,9 @@ export const LocationSelect = ({
           "ml-2",
           "border",
           "border-light-blue-base",
-          { "hover:border-light-blue-active": !disabled },
-          { "hover:border-light-blue-faded": disabled }
+          disabled
+            ? "hover:border-light-blue-faded"
+            : "hover:border-light-blue-active"
         )}
       >
         <Button
