@@ -15,6 +15,7 @@ interface PasteBaseProps {
   options: { label: string; value: string }[];
   text: string | null;
   setText: (text: string | null) => void;
+  submitButtonTitle?: string;
 }
 
 export interface PasteParseProps extends PasteBaseProps {
@@ -101,6 +102,7 @@ const PasteFormContent = ({
   text,
   setText,
   systemProps,
+  submitButtonTitle = systemProps ? "Appraise" : "Add",
 }: PasteFormContentProps): ReactElement => {
   const { pending } = useFormStatus();
   const submitDisabled =
@@ -179,7 +181,7 @@ const PasteFormContent = ({
             disabled={submitDisabled}
             className={classNames("relative", "h-10", "p-0", "px-2")}
           >
-            Submit
+            {submitButtonTitle}
           </Button>
         </span>
       </div>
