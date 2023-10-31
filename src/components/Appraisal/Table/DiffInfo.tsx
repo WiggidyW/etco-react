@@ -10,9 +10,7 @@ export const AppraisalDiffInfoTable = ({
   className,
   appraisal: { price, newPrice, time, newTime, version, newVersion, items },
 }: AppraisalTableProps): ReactElement => (
-  <div
-    className={classNames("diff-info-table", "flex", "flex-wrap", className)}
-  >
+  <div className={classNames("flex", "flex-wrap", className)}>
     <AppraisalDiffInfoTablePair
       headVals={["Cached", "Live"]}
       tdClassName="text-xl"
