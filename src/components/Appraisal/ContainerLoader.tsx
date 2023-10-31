@@ -32,28 +32,39 @@ export const AppraisalContainerLoader = async ({
   if (!appraisalResult.ok) {
     return <ErrorThrower error={appraisalResult.error} />; // throw error on client
   }
+
   const appraisal = appraisalResult.value;
+  let defaultOption: { label: string; value: string } | undefined = undefined;
 
   if (appraisal === null) {
     return notFound();
   } else if (kind === "shop") {
+    if (appraisal.locationId) {
+      defaultOption = options.find(
+        (option) => option.value === appraisal.locationId!.toString()
+      );
+    }
     return (
       <ErrorBoundaryTryAgain>
         <ShopAppraisalContainer
           options={options}
           character={character}
           containerChildren={newAppraisalContainerChildren(appraisal)}
+          defaultOption={defaultOption}
         />
       </ErrorBoundaryTryAgain>
     );
-  } else {
-    // props.kind === "buyback"
+  } /* else if (kind === "buyback") */ else {
+    defaultOption = options.find(
+      (option) => option.value === appraisal.systemId.toString()
+    );
     return (
       <ErrorBoundaryTryAgain>
         <BuybackAppraisalContainer
           options={options}
           character={character}
           containerChildren={newAppraisalContainerChildren(appraisal)}
+          defaultOption={defaultOption}
         />
       </ErrorBoundaryTryAgain>
     );
