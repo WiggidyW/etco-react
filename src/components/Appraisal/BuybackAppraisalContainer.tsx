@@ -18,13 +18,17 @@ export interface BuybackAppraisalContainerProps {
   character?: ICharacter;
   containerChildren?: AppraisalContainerChildren;
   options: { label: string; value: string }[];
+  defaultOption?: { label: string; value: string };
 }
 export const BuybackAppraisalContainer = ({
   options,
   character,
+  defaultOption,
   containerChildren: serverContainerChildren,
 }: BuybackAppraisalContainerProps): ReactElement => {
-  const [system, setSystem] = useState<SelectOption<string> | null>(null);
+  const [system, setSystem] = useState<SelectOption<string> | null>(
+    defaultOption ?? null
+  );
   const [text, setText] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
   const [containerChildren, setContainerChildren] = useState<
