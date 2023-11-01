@@ -3,16 +3,36 @@ import classNames from "classnames";
 import { formatPrice, formatTime } from "../Util";
 import { SameOrNewContent, SameOrNewContentProps } from "../SameOrNewContent";
 import { ParabolaEnumerate } from "../ParabolaEnumerate";
-import { AppraisalTableProps } from "./Table";
+import { BaseAppraisalTableProps } from "./Table";
 import { CopyButton } from "./CopyButton";
 
+export interface AppraisalDiffInfoTableProps extends BaseAppraisalTableProps {
+  priceHeadVals?: [string, string];
+  time?: boolean;
+  timeHeadVals?: [string, string];
+  version?: boolean;
+  versionHeadVals?: [string, string];
+}
 export const AppraisalDiffInfoTable = ({
   className,
-  appraisal: { price, newPrice, time, newTime, version, newVersion, items },
-}: AppraisalTableProps): ReactElement => (
+  appraisal: {
+    price,
+    newPrice,
+    time: appraisalTime,
+    newTime,
+    version: appraisalVersion,
+    newVersion,
+    items,
+  },
+  priceHeadVals = ["Cached", "Live"],
+  timeHeadVals = ["Cached", "Live"],
+  versionHeadVals = ["Cached", "Live"],
+  time = true,
+  version = true,
+}: AppraisalDiffInfoTableProps): ReactElement => (
   <div className={classNames("flex", "flex-wrap", className)}>
     <AppraisalDiffInfoTablePair
-      headVals={["Cached", "Live"]}
+      headVals={priceHeadVals}
       tdClassName="text-xl"
       oldT={price}
       newT={newPrice}
@@ -37,24 +57,28 @@ export const AppraisalDiffInfoTable = ({
     >
       Price
     </AppraisalDiffInfoTablePair>
-    <AppraisalDiffInfoTablePair
-      headVals={["Cached", "Live"]}
-      oldT={time}
-      newT={newTime}
-      fmt={formatTime}
-      locale
-      flexWrapped
-    >
-      Time
-    </AppraisalDiffInfoTablePair>
-    <AppraisalDiffInfoTablePair
-      headVals={["Cached", "Live"]}
-      oldT={version}
-      newT={newVersion}
-      flexWrapped
-    >
-      Version
-    </AppraisalDiffInfoTablePair>
+    {time && (
+      <AppraisalDiffInfoTablePair
+        headVals={timeHeadVals}
+        oldT={appraisalTime}
+        newT={newTime}
+        fmt={formatTime}
+        locale
+        flexWrapped
+      >
+        Time
+      </AppraisalDiffInfoTablePair>
+    )}
+    {version && (
+      <AppraisalDiffInfoTablePair
+        headVals={versionHeadVals}
+        oldT={appraisalVersion}
+        newT={newVersion}
+        flexWrapped
+      >
+        Version
+      </AppraisalDiffInfoTablePair>
+    )}
   </div>
 );
 
