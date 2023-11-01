@@ -1,7 +1,6 @@
+import { SameOrNew } from "../todo";
 import { LocaleText } from "./Util";
 import { ReactElement } from "react";
-import classNames from "classnames";
-import { SameOrNew } from "@/server-actions/grpc/appraisal";
 
 interface SameOrNewFormattedValueProps {
   v: any;

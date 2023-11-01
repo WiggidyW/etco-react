@@ -48,7 +48,6 @@ export const AppraisalContainerLoader = async ({
       <ErrorBoundaryTryAgain>
         <ShopAppraisalContainer
           options={options}
-          character={character}
           containerChildren={newAppraisalContainerChildren(appraisal)}
           defaultOption={defaultOption}
         />
