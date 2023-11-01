@@ -1,33 +1,86 @@
+"use client";
+
 import { LocationSelect, LocationSelectProps } from "./LocationSelect";
 import { AppraisalContainer } from "./Container";
-import { ReactElement } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import classNames from "classnames";
 import { AppraisalContainerChildren } from "./ContainerChildren";
+import { SelectOption } from "../Input/Manipulator";
+import { PasteLink, PasteLinkProps } from "./Paste";
+import { usePathname } from "next/navigation";
+import { useBrowserContext } from "@/browser/context";
+import { clientSetShopParseText } from "@/browser/shopparsetext";
 
-export interface ShopAppraisalContainerProps
-  extends Omit<LocationSelectProps, "className"> {
+export interface ShopAppraisalContainerProps {
   containerChildren?: AppraisalContainerChildren;
+  options: { label: string; value: string }[];
+  defaultOption?: { label: string; value: string };
 }
 export const ShopAppraisalContainer = ({
   containerChildren,
-  ...locationSelectProps
+  options,
+  defaultOption,
 }: ShopAppraisalContainerProps): ReactElement => {
+  const [territory, setTerritory] = useState<SelectOption<string> | null>(
+    defaultOption ?? null
+  );
+  const [text, setText] = useState<string | null>(null);
+  const ctx = useBrowserContext();
+  const pathName = usePathname();
+
+  const setShopParseText = useCallback(
+    () =>
+      ctx && territory && clientSetShopParseText(ctx, territory.value, text),
+    [ctx, text, territory]
+  );
+
+  useEffect(() => {
+    if (ctx === null) return;
+    window.addEventListener("blur", setShopParseText);
+    return () => window.removeEventListener("blur", setShopParseText);
+  }, [ctx, setShopParseText]);
+
+  const pasteLinkProps: Omit<PasteLinkProps, "className"> = {
+    text,
+    setText,
+    territory,
+    setTerritory,
+    options,
+    textRequired: false,
+    territoryTitle: "Location",
+    submitTitle: "Shop",
+    pasteTitle: "(OPTIONAL) Paste Items",
+    linkProps: {
+      href: territory ? `/shop/inventory/${territory.value}` : pathName,
+      onClick: setShopParseText,
+      onContextMenu: setShopParseText,
+    },
+    intrinsicTextAreaProps: {
+      onBlur: setShopParseText,
+    },
+  };
+
   if (containerChildren === undefined) {
     return (
       <>
         <div className={classNames("h-[5%]")} />
-        <LocationSelect
-          className={classNames("ml-auto", "mr-auto")}
-          {...locationSelectProps}
+        <PasteLink
+          {...pasteLinkProps}
+          className={classNames(
+            "min-w-[24rem]",
+            "w-[30%]",
+            "ml-auto",
+            "mr-auto"
+          )}
         />
       </>
     );
   } else {
     return (
       <AppraisalContainer containerChildren={containerChildren}>
-        <LocationSelect
+        <PasteLink
+          {...pasteLinkProps}
           className={classNames("w-96", "justify-self-start")}
-          {...locationSelectProps}
         />
       </AppraisalContainer>
     );
