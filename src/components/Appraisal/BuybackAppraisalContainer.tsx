@@ -1,18 +1,18 @@
 "use client";
 
 import { resultParseNewBuybackAppraisal } from "@/server-actions/grpc/appraisalNew";
+import { useAppraisalCodeURIEffect } from "./useAppraisalCode";
 import { ReactElement, useCallback, useState } from "react";
+import { SelectOption } from "../Input/Manipulator";
 import { AppraisalContainer } from "./Container";
-import { PasteSubmit } from "./Paste";
+import { ICharacter } from "@/browser/character";
+import { PasteForm, PasteFormProps } from "./Paste";
+import { ResultThrow } from "../todo";
 import classNames from "classnames";
 import {
   AppraisalContainerChildren,
   newAppraisalContainerChildren,
 } from "./ContainerChildren";
-import { ICharacter } from "@/browser/character";
-import { useAppraisalCodeURIEffect } from "./useAppraisalCode";
-import { ResultThrow } from "../todo";
-import { SelectOption } from "../Input/Manipulator";
 
 export interface BuybackAppraisalContainerProps {
   character?: ICharacter;
@@ -21,12 +21,12 @@ export interface BuybackAppraisalContainerProps {
   defaultOption?: { label: string; value: string };
 }
 export const BuybackAppraisalContainer = ({
-  options,
   character,
-  defaultOption,
   containerChildren: serverContainerChildren,
+  options,
+  defaultOption,
 }: BuybackAppraisalContainerProps): ReactElement => {
-  const [system, setSystem] = useState<SelectOption<string> | null>(
+  const [territory, setTerritory] = useState<SelectOption<string> | null>(
     defaultOption ?? null
   );
   const [text, setText] = useState<string | null>(null);
@@ -51,37 +51,40 @@ export const BuybackAppraisalContainer = ({
     [character]
   );
 
+  const pasteFormProps: Omit<PasteFormProps, "className"> = {
+    text,
+    setText,
+    territory,
+    setTerritory,
+    options,
+    textRequired: true,
+    territoryTitle: "System",
+    submitTitle: "Appraise",
+    pasteTitle: "Paste Items",
+    action: actionParseNewAppraisal,
+  };
+
   if (containerChildren === undefined) {
     return (
       <>
         <div className={classNames("h-[5%]")} />
-        <PasteSubmit
-          system={system}
-          setSystem={setSystem}
-          text={text}
-          setText={setText}
+        <PasteForm
+          {...pasteFormProps}
           className={classNames(
             "min-w-[24rem]",
             "w-[30%]",
             "ml-auto",
             "mr-auto"
           )}
-          action={actionParseNewAppraisal}
-          options={options}
         />
       </>
     );
   } else {
     return (
       <AppraisalContainer containerChildren={containerChildren}>
-        <PasteSubmit
-          system={system}
-          setSystem={setSystem}
-          text={text}
-          setText={setText}
+        <PasteForm
+          {...pasteFormProps}
           className={classNames("w-96", "justify-self-start")}
-          action={actionParseNewAppraisal}
-          options={options}
         />
       </AppraisalContainer>
     );
