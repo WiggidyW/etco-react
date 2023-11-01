@@ -10,6 +10,9 @@ export const withCatchResult =
   async (...args: A) =>
     fn(...args).then(
       (ok) => ResultOk(ok),
-      (err) =>
-        ResultErr(unknownToParsedJSONError(err).toErrorMinified().message)
+      (err) => {
+        const errStr = unknownToParsedJSONError(err).toErrorMinified().message;
+        if (errStr) console.error(errStr);
+        return ResultErr(errStr);
+      }
     );
