@@ -69,4 +69,7 @@ export class Record {
     // console.log(value);
     this._cartQuantity = value;
   }
+  get availableQuantity(): number {
+    return this.quantity - (this._cartQuantity ?? 0);
+  }
 }
