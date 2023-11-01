@@ -8,38 +8,40 @@ import {
   useState,
 } from "react";
 import classNames from "classnames";
-import { AppraisalProps } from "../Info/ContractInfo";
 import { formatPrice, formatQuantity } from "../Util";
 import { SameOrNewContent } from "../SameOrNewContent";
 import { ParabolaEnumerate } from "../ParabolaEnumerate";
 import {
   AppraisalChildItem,
   AppraisalItem,
-  SameOrNew,
 } from "@/server-actions/grpc/appraisal";
 import { TypeImage } from "@/components/TypeImage";
-import { AppraisalTableProps } from "./Table";
+import { BaseAppraisalTableProps } from "./Table";
 import { VectorDown, VectorUp } from "@/components/SVG";
+import { SameOrNew, newSameOrNew, sameOrNewValue } from "@/components/todo";
 
-const sortItems = (items: AppraisalItem[]): AppraisalItem[] =>
-  items.sort((a, b) => {
-    if (a.pricePerUnit === 0 && b.pricePerUnit === 0) {
-      if (a.unknown && !b.unknown) {
-        return 1;
-      } else if (!a.unknown && b.unknown) {
-        return -1;
-      } else {
-        return a.name.localeCompare(b.name);
-      }
-    } else {
-      return b.pricePerUnit * b.quantity - a.pricePerUnit * a.quantity;
-    }
-  });
+export interface ItemHeadValsProps {
+  contractQuantityHeadVals?: [string, string];
+  appraisalQuantityHeadVals?: [string, string];
+  pricePerHeadVals?: [string, string];
+  priceTotalHeadVals?: [string, string];
+  descriptionHeadVals?: [string, string];
+}
+
+export interface AppraisalItemsTableProps
+  extends BaseAppraisalTableProps,
+    ItemHeadValsProps {
+  forceNewQuantityCheck?: boolean;
+  useNewQuantityPrice?: boolean;
+}
 
 export const AppraisalItemsTable = ({
   className,
   appraisal: { items: unsortedItems, status },
-}: AppraisalTableProps): ReactElement => {
+  forceNewQuantityCheck = false,
+  useNewQuantityPrice = false,
+  ...headValsProps
+}: AppraisalItemsTableProps): ReactElement => {
   const [childrenVisible, setChildrenVisible] = useState<boolean[]>(() =>
     new Array(unsortedItems.length).fill(false)
   );
@@ -53,10 +55,19 @@ export const AppraisalItemsTable = ({
   const hasContract = status !== null && status !== "inPurchaseQueue";
   let hasNewPrice = false;
   let hasNewDescription = false;
-  for (const { newPricePerUnit, newDescription } of items) {
+  let hasNewQuantity = false;
+  for (const { newPricePerUnit, newDescription, contractQuantity } of items) {
     hasNewPrice = hasNewPrice || newPricePerUnit !== true;
     hasNewDescription = hasNewDescription || newDescription !== true;
-    if (hasNewPrice && hasNewDescription) break;
+    if (hasContract || forceNewQuantityCheck) {
+      hasNewQuantity = hasNewQuantity || contractQuantity !== true;
+    }
+    if (
+      hasNewPrice &&
+      hasNewDescription &&
+      (hasNewQuantity || (!hasContract && !forceNewQuantityCheck))
+    )
+      break;
   }
 
   return (
@@ -66,9 +77,11 @@ export const AppraisalItemsTable = ({
           <Cell th />
           <HeadCells
             cellClassName={classNames("text-lg")}
-            hasNewQuantity={hasContract ? "contract" : undefined}
+            hasNewQuantity={hasNewQuantity ? "contract" : undefined}
             hasNewPrice={hasNewPrice}
             hasNewDescription={hasNewDescription}
+            useNewQuantityPrice={useNewQuantityPrice}
+            {...headValsProps}
           />
         </tr>
       </thead>
@@ -79,7 +92,9 @@ export const AppraisalItemsTable = ({
             item={item}
             childrenVisible={childrenVisible[i]}
             setChildrenVisible={() => onChildDropdown(i)}
-            hasContract={hasContract}
+            hasContract={hasContract || hasNewQuantity}
+            useNewQuantityPrice={useNewQuantityPrice}
+            {...headValsProps}
           />
         ))}
       </tbody>
@@ -95,7 +110,7 @@ interface CellProps extends PropsWithChildren {
   rowSpan?: number;
   th?: boolean;
   wrap?: boolean;
-  alignBottom?: boolean;
+  align?: "top" | "bottom";
 }
 const Cell = ({
   children,
@@ -106,7 +121,7 @@ const Cell = ({
   rowSpan,
   th,
   wrap,
-  alignBottom,
+  align,
 }: CellProps): ReactElement => {
   const InnerCell = ({
     children,
@@ -119,11 +134,12 @@ const Cell = ({
         "p-0",
         "text-left",
         {
+          "align-top": align === "top",
+          "align-bottom": align === "bottom",
           "whitespace-nowrap": !wrap,
           "border-primary-base": borderT || borderB,
           "border-t": borderT,
           "border-b": borderB,
-          "align-bottom": alignBottom,
           [classNames("pl-1", "pr-1")]: pad,
         },
         className
@@ -135,45 +151,55 @@ const Cell = ({
   );
 };
 
-interface HeadCellsProps {
+interface HeadCellsProps extends ItemHeadValsProps {
   hasNewQuantity?: "contract" | "appraisal";
   hasNewPrice?: boolean;
   hasNewDescription?: boolean;
   cellClassName?: string;
+  useNewQuantityPrice: boolean;
 }
 const HeadCells = ({
   hasNewQuantity,
   hasNewPrice,
   hasNewDescription,
   cellClassName,
+  useNewQuantityPrice,
+  contractQuantityHeadVals = ["Appraisal", "Contract"],
+  appraisalQuantityHeadVals = ["Cached", "Live"],
+  pricePerHeadVals = ["Cached", "Live"],
+  priceTotalHeadVals = ["Cached", "Live"],
+  descriptionHeadVals = ["Cached", "Live"],
 }: HeadCellsProps): ReactElement => (
   <>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       Item
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       Quantity
       {hasNewQuantity && (
         <ParabolaEnumerate
           strs={
             hasNewQuantity === "contract"
-              ? ["Appraisal", "Contract"]
-              : ["Cached", "Live"] // hasNewQuantity === "appraisal"
+              ? contractQuantityHeadVals
+              : appraisalQuantityHeadVals // hasNewQuantity === "appraisal"
           }
         />
       )}
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       PricePer
-      {hasNewPrice && <ParabolaEnumerate strs={["Cached", "Live"]} />}
+      {hasNewPrice && <ParabolaEnumerate strs={pricePerHeadVals} />}
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       PriceTotal
-      {hasNewPrice && <ParabolaEnumerate strs={["Cached", "Live"]} />}
+      {hasNewPrice ||
+        (useNewQuantityPrice && hasNewQuantity && (
+          <ParabolaEnumerate strs={priceTotalHeadVals} />
+        ))}
     </Cell>
-    <Cell className={cellClassName} pad th wrap alignBottom>
+    <Cell className={cellClassName} pad th wrap align="bottom">
       Description
-      {hasNewDescription && <ParabolaEnumerate strs={["Cached", "Live"]} />}
+      {hasNewDescription && <ParabolaEnumerate strs={descriptionHeadVals} />}
     </Cell>
   </>
 );
@@ -213,13 +239,14 @@ const ItemCells = ({
       pad
       borderT
       wrap
+      align="top"
     >
       <div className={classNames("flex", "items-center", "w-full")}>
         {!unknown && <TypeImage typeId={typeId} />}
         <h1>{name}</h1>
       </div>
     </Cell>
-    <Cell className={cellClassName} pad borderT>
+    <Cell className={cellClassName} pad borderT align="top">
       <SameOrNewContent
         fmt={formatQuantity}
         oldT={quantity}
@@ -228,7 +255,7 @@ const ItemCells = ({
         locale
       />
     </Cell>
-    <Cell className={cellClassName} pad borderT>
+    <Cell className={cellClassName} pad borderT align="top">
       <SameOrNewContent
         fmt={formatPrice}
         oldT={pricePer}
@@ -237,7 +264,7 @@ const ItemCells = ({
         locale
       />
     </Cell>
-    <Cell className={cellClassName} pad borderT>
+    <Cell className={cellClassName} pad borderT align="top">
       <SameOrNewContent
         fmt={formatPrice}
         oldT={priceTotal}
@@ -246,7 +273,7 @@ const ItemCells = ({
         locale
       />
     </Cell>
-    <Cell className={cellClassName} pad borderT wrap>
+    <Cell className={cellClassName} pad borderT wrap align="top">
       <SameOrNewContent
         oldT={unknown && description === "" ? "Unknown Item" : description}
         newT={newDescription}
@@ -255,11 +282,12 @@ const ItemCells = ({
   </>
 );
 
-interface ItemRowProps {
+interface ItemRowProps extends ItemHeadValsProps {
   item: AppraisalItem;
   childrenVisible?: boolean;
   setChildrenVisible: () => void;
   hasContract?: boolean;
+  useNewQuantityPrice: boolean;
 }
 const ItemRow = ({
   childrenVisible,
@@ -277,12 +305,21 @@ const ItemRow = ({
     unknown,
   },
   hasContract,
+  useNewQuantityPrice,
+  ...headValsProps
 }: ItemRowProps): ReactElement => {
   const newQuantity = hasContract ? contractQuantity : undefined;
   const priceTotal = pricePerUnit * quantity;
-  const newPriceTotal =
-    newPricePerUnit === true ? true : newPricePerUnit * quantity;
   const hasChildren = children.length > 0;
+
+  const newPriceTotalQuantMultiplier = useNewQuantityPrice
+    ? sameOrNewValue(quantity, contractQuantity) // use contractQuantity
+    : quantity; // only use quantity no matter what (contractQuantity of 0 with no contract)
+  const newPriceTotal = newSameOrNew(
+    priceTotal,
+    sameOrNewValue(pricePerUnit, newPricePerUnit) * newPriceTotalQuantMultiplier
+  );
+
   return (
     <>
       <tr
@@ -322,7 +359,11 @@ const ItemRow = ({
         />
       </tr>
       {childrenVisible && (
-        <ChildItemRows items={children} parentQuantity={quantity} />
+        <ChildItemRows
+          {...headValsProps}
+          items={children}
+          parentQuantity={quantity}
+        />
       )}
     </>
   );
@@ -387,13 +428,14 @@ const ChildItemRow = ({
   );
 };
 
-interface ChildItemRowsProps {
+interface ChildItemRowsProps extends ItemHeadValsProps {
   items: AppraisalChildItem[];
   parentQuantity: number;
 }
 const ChildItemRows = ({
   items,
   parentQuantity,
+  ...headValsProps
 }: ChildItemRowsProps): ReactElement => {
   let hasNewPrice = false;
   let hasNewDescription = false;
@@ -413,9 +455,11 @@ const ChildItemRows = ({
     <>
       <tr className={classNames("bg-primary-base")}>
         <HeadCells
+          {...headValsProps}
           hasNewQuantity={hasNewQuantity ? "appraisal" : undefined}
           hasNewPrice={hasNewPrice}
           hasNewDescription={hasNewDescription}
+          useNewQuantityPrice
         />
       </tr>
       {items.map((item, i) => (
@@ -441,3 +485,18 @@ const DropdownButton = ({
     )}
   </button>
 );
+
+const sortItems = (items: AppraisalItem[]): AppraisalItem[] =>
+  items.sort((a, b) => {
+    if (a.pricePerUnit === 0 && b.pricePerUnit === 0) {
+      if (a.unknown && !b.unknown) {
+        return 1;
+      } else if (!a.unknown && b.unknown) {
+        return -1;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    } else {
+      return b.pricePerUnit * b.quantity - a.pricePerUnit * a.quantity;
+    }
+  });

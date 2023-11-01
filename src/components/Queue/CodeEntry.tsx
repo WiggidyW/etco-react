@@ -3,7 +3,7 @@ import { LoginCharacterPortrait } from "../Character/Portrait";
 import { StoreKind } from "@/server-actions/grpc/grpc";
 import { FlexWrapMaxChildStyle } from "../FlexWrapMax";
 import { FlattenedUserQueueEntry } from "./status";
-import { LocationNamingMaps } from "@/proto/etco";
+import { ContractStatus, LocationNamingMaps } from "@/proto/etco";
 import { Remaining } from "./Remaining";
 import classNames from "classnames";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import {
   ReactElement,
   forwardRef,
 } from "react";
+import { LocaleText, formatTime } from "../Appraisal/Util";
 
 export interface UserCodeEntryProps extends FlexWrapMaxChildStyle {
   className?: string;
@@ -79,7 +80,7 @@ export const ContractCodeEntry = forwardRef(
   (
     {
       entry: {
-        contract: { expires, locationId },
+        contract: { issued, expires, locationId, status },
         locationInfo: { systemId, regionId },
         code,
         entity: { entity },
@@ -113,7 +114,13 @@ export const ContractCodeEntry = forwardRef(
         <div
           className={classNames("inline-flex", "flex-col", "justify-evenly")}
         >
-          <EntryInfo>{<Remaining expiresUnix={expires} />}</EntryInfo>
+          <EntryInfo>
+            {status === ContractStatus.outstanding ? (
+              <Remaining expiresUnix={expires} />
+            ) : (
+              <LocaleText fmt={formatTime} v={issued} />
+            )}
+          </EntryInfo>
           <EntryInfo>{locationNames[locationId]}</EntryInfo>
           <EntryInfo>{systemNames[systemId]}</EntryInfo>
           <EntryInfo>{regionNames[regionId]}</EntryInfo>

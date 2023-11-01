@@ -10,6 +10,42 @@ import { parse } from "./other";
 import { EmptyPbBuybackAppraisal, ItemNamesOnly } from "./util";
 import { withCatchResult } from "../withResult";
 
+export const parseAsAppraisal = async (
+  text: string,
+  throwKind?: ThrowKind
+): Promise<ShopAppraisal> => {
+  const { knownItems, unknownItems } = await parse(text, throwKind);
+  return toNewAppraisal(
+    {
+      kind: "shop",
+      appraisal: {
+        items: knownItems.map(({ typeId, quantity, name }) => ({
+          typeId,
+          quantity,
+          pricePerUnit: 0,
+          description: "",
+          typeNamingIndexes: {
+            name,
+            groupIndex: -1,
+            categoryIndex: -1,
+            marketGroupIndexes: [],
+          },
+        })),
+        code: "",
+        price: 0,
+        time: Math.floor(Date.now() / 1000),
+        version: "parse",
+        locationId: 0,
+        taxRate: 0,
+        tax: 0,
+      },
+    },
+    undefined,
+    unknownItems
+  );
+};
+export const resultParseAsAppraisal = withCatchResult(parseAsAppraisal);
+
 export interface ParsedBuybackAppraisal {
   unknownItems: pb.NamedBasicItem[];
   appraisal: pb.BuybackAppraisal | null;

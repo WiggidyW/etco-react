@@ -235,13 +235,7 @@ export const SelectionTabContainer = <LEN extends number>({
       )}
     >
       <div
-        className={classNames(
-          "flex-shrink-0",
-          "w-full",
-          "flex",
-          "justify-center",
-          "space-x-1"
-        )}
+        className={classNames("flex-shrink-0", "w-full", "flex", "space-x-1")}
       >
         {titles.map((title, i) => (
           <Tab

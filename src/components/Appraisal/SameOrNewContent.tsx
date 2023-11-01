@@ -51,7 +51,7 @@ export const SameOrNewContent = ({
 }: SameOrNewContentProps): ReactElement => {
   if (newT === true || newT === undefined) {
     return (
-      <h1 className="unchanged">
+      <h1>
         <SameOrNewFormattedValue v={oldT} fmt={fmt} locale={locale} />
       </h1>
     );
@@ -67,20 +67,10 @@ export const SameOrNewContent = ({
     }
     return (
       <>
-        <h1
-          className={classNames("changed", "changed-old", {
-            "changed-greater": newGreater === false,
-            "changed-lesser": newGreater === true,
-          })}
-        >
+        <h1>
           <SameOrNewFormattedValue v={oldT} fmt={fmt} locale={locale} />
         </h1>
-        <h1
-          className={classNames("changed", "changed-new", {
-            "changed-greater": newGreater === true,
-            "changed-lesser": newGreater === false,
-          })}
-        >
+        <h1>
           <SameOrNewFormattedValue
             v={newT}
             fmt={fmt}

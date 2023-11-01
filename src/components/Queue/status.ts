@@ -7,12 +7,10 @@ import {
 
 export const ContractStatusTabs = [
   "Outstanding",
-  "Outstanding (Hidden)",
   "Cancelled by User",
   "Cancelled by Corp",
   "Completed",
   "Timed Out",
-  "Deleted",
   "Other",
 ] as const;
 
@@ -24,12 +22,10 @@ export type AppraisalStatusTab =
 
 export interface GroupedContractQueue {
   outstanding: ContractQueueEntry[];
-  outstandingHidden: ContractQueueEntry[];
   cancelledByUser: ContractQueueEntry[];
   cancelledByCorp: ContractQueueEntry[];
   completed: ContractQueueEntry[];
   timedOut: ContractQueueEntry[];
-  deleted: ContractQueueEntry[];
   other: ContractQueueEntry[];
 }
 
@@ -46,8 +42,6 @@ export const getGroupEntries = (
   switch (tab) {
     case "Outstanding":
       return queue.outstanding;
-    case "Outstanding (Hidden)":
-      return queue.outstandingHidden;
     case "Cancelled by User":
       return queue.cancelledByUser;
     case "Cancelled by Corp":
@@ -56,8 +50,6 @@ export const getGroupEntries = (
       return queue.completed;
     case "Timed Out":
       return queue.timedOut;
-    case "Deleted":
-      return queue.deleted;
     case "Other":
       return queue.other;
   }
@@ -69,12 +61,10 @@ export const newGroupedContractQueue = (
 ): GroupedContractQueue => {
   const groupedQueue: GroupedContractQueue = {
     outstanding: [],
-    outstandingHidden: [],
     cancelledByUser: [],
     cancelledByCorp: [],
     completed: [],
     timedOut: [],
-    deleted: [],
     other: [],
   };
   for (const entry of entries) {
@@ -117,14 +107,13 @@ const getStatusTab = (
       return "Outstanding";
     case PBContractStatus.finished:
       return "Completed";
+    case PBContractStatus.deleted:
     case PBContractStatus.cancelled:
       return kind === "buyback" ? "Cancelled by User" : "Cancelled by Corp";
     case PBContractStatus.rejected:
       return kind === "shop" ? "Cancelled by User" : "Cancelled by Corp";
     case PBContractStatus.failed:
       return "Timed Out";
-    case PBContractStatus.deleted:
-      return "Deleted";
     // case PBContractStatus.unknown_status:
     // case PBContractStatus.in_progress:
     // case PBContractStatus.finished_issuer:

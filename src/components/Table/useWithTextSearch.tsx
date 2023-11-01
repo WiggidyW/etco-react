@@ -12,6 +12,16 @@ export const useWithTextSearch = <C,>(
   // stores the props from filterDropdown for use in filterIcon
   const filterDropdownPropsRef = useRef<FilterDropdownProps | null>(null);
 
+  const isMatch = (pattern: string, record: C): boolean => {
+    if (pattern === "") {
+      return true;
+    } else if (pattern[0] === "!") {
+      return !recordIncludes(record, pattern.slice(1));
+    } else {
+      return recordIncludes(record, pattern);
+    }
+  };
+
   const FilterDropdown = (props: FilterDropdownProps) => {
     // BLACK MAGIC STEP 1
     // set the ref to the props so we can use it in filterIcon
@@ -82,6 +92,6 @@ export const useWithTextSearch = <C,>(
     // the search bar
     filterIcon: (filtered: boolean) => <FilterIcon filtered={filtered} />,
     // filter the values
-    onFilter: (value, record) => recordIncludes(record, value as string),
+    onFilter: (value, record) => isMatch(value as string, record),
   };
 };

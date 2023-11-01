@@ -78,3 +78,26 @@ export const getOptFromOpt = <
   obj: O | undefined | null,
   key: PROP
 ): UnionPropType<O, PROP> | undefined => (obj ? getOpt(obj, key) : undefined);
+
+export type NotBoolean<T> = T extends boolean ? never : T;
+
+export type SameOrNew<T> = NotBoolean<T> | true;
+
+export const newSameOrNew = <T>(
+  a: NotBoolean<T>,
+  b: NotBoolean<T> | undefined
+): SameOrNew<T> => {
+  if (b === undefined || a === b) {
+    return true;
+  } else {
+    return b;
+  }
+};
+
+export const sameOrNewValue = <T>(a: NotBoolean<T>, b: SameOrNew<T>): T => {
+  if (b === true) {
+    return a;
+  } else {
+    return b;
+  }
+};

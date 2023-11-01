@@ -2,12 +2,8 @@ import { ICharacter } from "@/browser/character";
 import { ReactElement } from "react";
 import { PurchaseContainer } from "./Container";
 import { ShopAppraisalContainerProps } from "../ShopAppraisalContainer";
-import {
-  ShopInventory,
-  resultShopInventory,
-} from "@/server-actions/grpc/other";
+import { resultShopInventory } from "@/server-actions/grpc/other";
 import { ErrorThrower } from "../../ErrorThrower";
-import { Result } from "../../todo";
 
 export interface PurchaseContainerLoaderProps
   extends Omit<ShopAppraisalContainerProps, "containerChildren"> {
@@ -17,10 +13,17 @@ export interface PurchaseContainerLoaderProps
 export const PurchaseContainerLoader = async ({
   character,
   locationId,
+  options,
   ...appraisalProps
 }: PurchaseContainerLoaderProps): Promise<ReactElement> => {
-  const inventoryResult: Result<ShopInventory, unknown> =
-    await resultShopInventory(locationId, character.refreshToken);
+  const inventoryResultPromise = resultShopInventory(
+    locationId,
+    character.refreshToken
+  );
+  const defaultOption = options.find(
+    (option) => option.value === locationId.toString()
+  );
+  const inventoryResult = await inventoryResultPromise;
   if (inventoryResult.ok) {
     return (
       <PurchaseContainer
@@ -29,6 +32,8 @@ export const PurchaseContainerLoader = async ({
         typeNamingLists={inventoryResult.value.typeNamingLists}
         character={character}
         locationId={locationId}
+        defaultOption={defaultOption}
+        options={options}
       />
     );
   } else {

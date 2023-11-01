@@ -1,6 +1,7 @@
 import { Character } from "./character";
 import { ReadonlyCharacters, MutableCharacters } from "./characters";
 import { BrowserContextMarker } from "./context";
+import { ShopParseText } from "./shopparsetext";
 
 class MockStorage implements Storage {
   readonly length: number = 0;
@@ -76,7 +77,7 @@ const storageGetCharacters = (key: string): MutableCharacters => {
   }
 };
 
-// // Readonly Context
+// Readonly Context
 
 const GlobalReadonlyCharacters: { [key: string]: ReadonlyCharacters } = {};
 
@@ -91,7 +92,7 @@ export const storageGetReadonlyCharacters = (
   return GlobalReadonlyCharacters[key];
 };
 
-// // Mutable Context
+// Mutable Context
 
 export const storageSetCharacters = (
   _: BrowserContextMarker,
@@ -113,3 +114,39 @@ export const storageGetMutableCharacters = (
   assertOrSetMutable();
   return storageGetCharacters(key);
 };
+
+// // Shop Parse Storage
+
+const SHOP_PARSE_KEY = "shopParseText";
+
+export const storageGetShopParseText = (
+  _: BrowserContextMarker,
+  sessionKey: string,
+  locationId: string
+): string | null => {
+  if (!sessionKey || !locationId) return null;
+
+  const raw = localGetItem(SHOP_PARSE_KEY);
+  if (!raw) return null;
+
+  const obj: unknown = JSON.parse(raw);
+  if (
+    !obj ||
+    typeof obj !== "object" ||
+    !("sessionKey" in obj) ||
+    obj.sessionKey !== sessionKey ||
+    !("locationId" in obj) ||
+    obj.locationId !== locationId ||
+    !("text" in obj) ||
+    typeof obj.text !== "string"
+  ) {
+    return null;
+  }
+
+  return obj.text;
+};
+
+export const storageSetShopParseText = (
+  _: BrowserContextMarker,
+  shopParseText: ShopParseText
+): void => localSetItem(SHOP_PARSE_KEY, JSON.stringify(shopParseText));

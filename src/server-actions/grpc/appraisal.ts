@@ -12,6 +12,7 @@ import buyback_systems_json from "@/staticdata/buyback_systems.json";
 import { ContentBuybackSystems } from "@/staticdata/buyback_systems";
 import shop_locations_json from "@/staticdata/shop_locations.json";
 import { ContentShopLocations } from "@/staticdata/shop_locations";
+import { SameOrNew, newSameOrNew } from "@/components/todo";
 const { BUYBACK_REGION_NAMES, BUYBACK_SYSTEMS }: ContentBuybackSystems =
   buyback_systems_json;
 const {
@@ -23,23 +24,6 @@ const {
 export const TAX_TYPE_ID = -100;
 export const FEE_TYPE_ID = -101;
 export const UNKNOWN_TYPE_ID = -102;
-
-export type NotBoolean<T> = T extends boolean ? never : T;
-
-export type SameOrNew<T> = NotBoolean<T> | true;
-
-export const newSameOrNew = <T>(
-  a: NotBoolean<T>,
-  b: NotBoolean<T> | undefined
-): SameOrNew<T> => {
-  if (b === undefined || a === b) {
-    return true;
-  } else {
-    return b;
-  }
-};
-
-export const typeVerify = <T>(t: T): T => t;
 
 export interface AppraisalItemBase {
   typeId: number;
@@ -61,10 +45,6 @@ export interface AppraisalItem extends AppraisalItemBase {
   children: AppraisalChildItem[];
   unknown?: boolean;
 }
-
-type AppraisalItemMapped = Omit<AppraisalItem, "children"> & {
-  children: Map<number, AppraisalChildItem>;
-};
 
 export interface BaseAppraisal {
   code: string;

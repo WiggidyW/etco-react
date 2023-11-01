@@ -35,7 +35,7 @@ export const ContractQueueLoader = async ({
   if (queueResult.ok) {
     const { queue, locationNamingMaps } = queueResult.value;
 
-    queue.sort((a, b) => b.contract.expires - a.contract.expires);
+    queue.sort((a, b) => b.contract.issued - a.contract.issued);
 
     return (
       <ContractQueueViewer

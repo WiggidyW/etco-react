@@ -37,13 +37,12 @@ export interface ContractQueueViewerProps {
 export const ContractQueueViewer = ({
   kind,
   locationNamingMaps,
-  queue: initialQueue,
+  queue,
 }: ContractQueueViewerProps): ReactElement => {
-  const [queue, setQueue] = useState<GroupedContractQueue>(initialQueue);
   const [tab, setTab] = useState(0);
   return (
     <div className={classNames("flex", "flex-col", "justify-center")}>
-      <div className={classNames("flex", "justify-center", "space-x-1")}>
+      <div className={classNames("flex", "space-x-1")}>
         {ContractStatusTabs.map((tabName, i) => (
           <Tab
             key={i}
@@ -56,7 +55,7 @@ export const ContractQueueViewer = ({
                 getGroupEntries(queue, tabName).length === 0,
             })}
           >
-            {tabName}
+            {`${tabName} (${getGroupEntries(queue, tabName).length})`}
           </Tab>
         ))}
       </div>
