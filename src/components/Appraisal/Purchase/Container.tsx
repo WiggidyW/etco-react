@@ -27,13 +27,15 @@ import {
 } from "@/server-actions/grpc/appraisalNew";
 import { Result } from "../../todo";
 
-export interface PurchaseContainerProps
-  extends Omit<ShopAppraisalContainerProps, "containerChildren"> {
+export interface BasePurchaseContainerProps {
   typeNamingLists: TypeNamingLists;
   items: ValidShopItem[];
   character: ICharacter;
   locationId: number;
 }
+
+export type PurchaseContainerProps = BasePurchaseContainerProps &
+  Omit<ShopAppraisalContainerProps, "containerChildren">;
 export const PurchaseContainer = ({
   typeNamingLists,
   items,
@@ -70,7 +72,6 @@ export const PurchaseContainer = ({
             {({ rep: { appraisal, makePurchaseStatus: status } }) => (
               <ErrorBoundaryGoBack href={`/shop/inventory/${locationId}`}>
                 <PurchaseResult
-                  character={character}
                   appraisal={appraisal}
                   status={status}
                   {...appraisalProps}
@@ -84,9 +85,9 @@ export const PurchaseContainer = ({
   } else {
     return (
       <ShopInventory
-        character={character}
-        items={items}
         typeNamingLists={typeNamingLists}
+        items={items}
+        locationId={locationId}
         onCheckout={(items) => setCheckout({ checkingOut: true, items })}
         {...appraisalProps}
       />
