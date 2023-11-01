@@ -93,3 +93,11 @@ export const newSameOrNew = <T>(
     return b;
   }
 };
+
+export const sameOrNewValue = <T>(a: NotBoolean<T>, b: SameOrNew<T>): T => {
+  if (b === true) {
+    return a;
+  } else {
+    return b;
+  }
+};
