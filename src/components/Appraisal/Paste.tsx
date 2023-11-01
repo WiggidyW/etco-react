@@ -2,111 +2,91 @@
 
 import {
   Button,
+  IntrinsicTextAreaProps,
   SelectInput,
   SelectOption,
   TextArea,
 } from "../Input/Manipulator";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
-import { ReactElement, useCallback } from "react";
+import { PropsWithChildren, ReactElement, memo, useCallback } from "react";
 import { Loading } from "../Loading";
 import classNames from "classnames";
+import { NextLinkProps } from "../todo";
+import Link from "next/link";
 
-interface PasteBaseProps {
-  options: { label: string; value: string }[];
+export interface PasteFormProps extends Omit<PasteContentProps, "linkProps"> {
+  className?: string;
+  action: (text: string, territoryId: number) => Promise<void>;
+}
+export const PasteForm = ({
+  action,
+  className,
+  ...formContentProps
+}: PasteFormProps): ReactElement => {
+  const formAction = useCallback(
+    (formData: FormData) => {
+      const territoryId = Number(formData.get("territoryId") as string);
+      const text = formData.get("text") as string;
+      return action(text, territoryId);
+    },
+    [action]
+  );
+
+  return (
+    <form className={classNames("relative", className)} action={formAction}>
+      <PasteContent {...formContentProps} />
+    </form>
+  );
+};
+
+export interface PasteLinkProps extends Omit<PasteContentProps, "linkProps"> {
+  className?: string;
+  linkProps: NextLinkProps;
+}
+export const PasteLink = ({
+  className,
+  ...formContentProps
+}: PasteLinkProps): ReactElement => {
+  return (
+    <div className={classNames("relative", className)}>
+      <PasteContent {...formContentProps} />
+    </div>
+  );
+};
+
+interface PasteContentProps {
   text: string | null;
   setText: (text: string | null) => void;
-  submitButtonTitle?: string;
+  territory: SelectOption<string> | null;
+  setTerritory: (territory: SelectOption<string> | null) => void;
+  options: SelectOption<string>[];
+  textRequired?: boolean;
+  territoryTitle?: string;
+  submitTitle?: string;
+  pasteTitle?: string;
+  linkProps?: NextLinkProps;
+  intrinsicTextAreaProps?: IntrinsicTextAreaProps;
 }
-
-export interface PasteParseProps extends PasteBaseProps {
-  className?: string;
-  action: (text: string) => Promise<void>;
-}
-export const PasteParse = ({
-  action,
-  className,
-  setText,
-  ...formContentProps
-}: PasteParseProps): ReactElement => {
-  const resetState = useCallback(() => setText(null), [setText]);
-
-  const formAction = useCallback(
-    (formData: FormData) => {
-      const text = formData.get("text") as string;
-      return action(text);
-    },
-    [action]
-  );
-
-  return (
-    <form className={classNames("relative", className)} action={formAction}>
-      <PasteFormContent
-        {...formContentProps}
-        resetState={resetState}
-        setText={setText}
-      />
-    </form>
-  );
-};
-
-export interface PasteSubmitProps extends PasteBaseProps {
-  className?: string;
-  action: (text: string, systemId: number) => Promise<void>;
-  system: SelectOption<string> | null;
-  setSystem: (system: SelectOption<string> | null) => void;
-}
-export const PasteSubmit = ({
-  action,
-  className,
-  system,
-  setSystem,
-  setText,
-  ...formContentProps
-}: PasteSubmitProps): ReactElement => {
-  const resetState = useCallback(() => {
-    setSystem(null);
-    setText(null);
-  }, [setSystem, setText]);
-
-  const formAction = useCallback(
-    (formData: FormData) => {
-      const systemId = Number(formData.get("systemId") as string);
-      const text = formData.get("text") as string;
-      return action(text, systemId);
-    },
-    [action]
-  );
-
-  return (
-    <form className={classNames("relative", className)} action={formAction}>
-      <PasteFormContent
-        {...formContentProps}
-        resetState={resetState}
-        setText={setText}
-        systemProps={{ system, setSystem }}
-      />
-    </form>
-  );
-};
-
-interface PasteFormContentProps extends PasteBaseProps {
-  resetState: () => void;
-  systemProps?: {
-    system: SelectOption<string> | null;
-    setSystem: (system: SelectOption<string> | null) => void;
-  };
-}
-const PasteFormContent = ({
-  resetState,
-  options,
+const PasteContent = ({
   text,
   setText,
-  systemProps,
-  submitButtonTitle = systemProps ? "Appraise" : "Add",
-}: PasteFormContentProps): ReactElement => {
+  territory,
+  setTerritory,
+  options,
+  textRequired = false,
+  territoryTitle = "Territory",
+  submitTitle = "Submit",
+  pasteTitle = "Paste Items",
+  linkProps,
+  intrinsicTextAreaProps,
+}: PasteContentProps): ReactElement => {
   const { pending } = useFormStatus();
-  const submitDisabled =
-    pending || !text || (systemProps && !systemProps.system);
+  const submitDisabled = pending || !territory || (textRequired && !text);
+
+  const resetState = useCallback(() => {
+    setTerritory(null);
+    setText(null);
+  }, [setTerritory, setText]);
 
   return (
     <>
@@ -117,74 +97,90 @@ const PasteFormContent = ({
       )}
       <div className={classNames("flex-grow", "w-full")}>
         <TextArea
+          intrinsicProps={intrinsicTextAreaProps}
           value={text}
           setValue={setText}
-          title="Paste Items"
+          title={pasteTitle}
           name="text"
-          required
+          required={textRequired}
           wFull
           hFull
           disabled={pending}
         />
       </div>
-      <div
-        className={classNames("flex", "w-full", {
-          "justify-center": !systemProps,
-        })}
-      >
-        {systemProps && (
-          <>
-            <span className={classNames("flex-shrink")}>
-              <SelectInput
-                value={systemProps.system}
-                setValue={systemProps.setSystem}
-                title="System"
-                disabled={pending}
-                name="systemId"
-                options={options}
-                required
-                wFull
-              />
-            </span>
-            <span className={classNames("ml-auto")} />
-          </>
-        )}
+      <div className={classNames("flex", "w-full")}>
+        <span className={classNames("flex-shrink")}>
+          <SelectInput
+            value={territory}
+            setValue={setTerritory}
+            title={territoryTitle}
+            disabled={pending}
+            name="territoryId"
+            options={options}
+            required
+            wFull
+          />
+        </span>
+        <span className={classNames("ml-auto")} />
         <span
           className={classNames(
             "border",
             "border-light-red-base",
             "hover:border-light-red-active",
             "self-end",
-            { "ml-2": systemProps }
+            "ml-2"
           )}
         >
           <Button
             type="reset"
             disabled={pending}
-            className={classNames("relative", "h-10", "p-0", "px-2")}
+            className={classNames("h-10", "p-0", "px-2")}
             onClick={resetState}
           >
             Reset
           </Button>
         </span>
-        <span
+        <SubmitParent
           className={classNames(
             "border",
             "border-light-blue-base",
-            "hover:border-light-blue-active",
             "self-end",
-            "ml-2"
+            "ml-2",
+            submitDisabled
+              ? "hover:border-light-blue-faded"
+              : "hover:border-light-blue-active"
           )}
+          linkProps={linkProps}
         >
           <Button
             type="submit"
             disabled={submitDisabled}
-            className={classNames("relative", "h-10", "p-0", "px-2")}
+            className={classNames("h-10", "p-0", "px-2")}
           >
-            {submitButtonTitle}
+            {submitTitle}
           </Button>
-        </span>
+        </SubmitParent>
       </div>
     </>
   );
+};
+
+interface SubmitParentProps extends PropsWithChildren {
+  className?: string;
+  linkProps?: NextLinkProps;
+}
+const SubmitParent = ({
+  className,
+  linkProps,
+  children,
+}: SubmitParentProps): ReactElement => {
+  if (linkProps) {
+    return (
+      <Link {...linkProps} className={className}>
+        {children}
+      </Link>
+    );
+  } else {
+    return <span className={className}>{children}</span>;
+  }
 };
