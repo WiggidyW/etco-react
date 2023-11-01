@@ -12,7 +12,7 @@ export const withCatchResult =
       (ok) => ResultOk(ok),
       (err) => {
         const errStr = unknownToParsedJSONError(err).toErrorMinified().message;
-        if (errStr) console.error(errStr); // somehow it logs null in development if I don't check
+        console.error(errStr);
         return ResultErr(errStr);
       }
     );
