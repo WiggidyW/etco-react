@@ -12,10 +12,7 @@ export default function Page(): ReactElement {
   return (
     <Main path={PATH} character={character}>
       <ErrorBoundaryTryAgain>
-        <ShopAppraisalContainer
-          character={character}
-          options={getLocations()}
-        />
+        <ShopAppraisalContainer options={getLocations()} />
       </ErrorBoundaryTryAgain>
     </Main>
   );
