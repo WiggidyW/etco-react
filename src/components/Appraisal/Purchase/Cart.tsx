@@ -35,18 +35,28 @@ export const Cart = ({
         onClickOutside={onCancel}
         percentage={"85"}
         footer={
-          <Button
-            className={classNames("p-1")}
-            variant="success"
-            onClick={() => onCheckout(appraisal.items)}
-            noPad
-          >
-            Checkout
-          </Button>
+          <>
+            <Button
+              className={classNames("p-1", "ml-1")}
+              variant="failure"
+              onClick={onCancel}
+              noPad
+            >
+              Cancel
+            </Button>
+            <Button
+              className={classNames("p-1", "ml-auto", "mr-1")}
+              variant="success"
+              onClick={() => onCheckout(appraisal.items)}
+              noPad
+            >
+              Checkout
+            </Button>
+          </>
         }
-        footerClassName={classNames("flex", "justify-center")}
+        footerClassName={classNames("flex")}
       >
-        <AppraisalTable appraisal={appraisal} />
+        <AppraisalTable appraisal={appraisal} time={false} version={false} />
       </Popup>
     </ContentPortal>
   );
