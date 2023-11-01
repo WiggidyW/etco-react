@@ -1,76 +1,138 @@
 "use client";
 
-import { LocaleText, formatPrice, formatQuantity } from "../Util";
-import { ModificationState } from "../../Configure/modificationState";
-import { ContentBookend, VerticalBookend } from "../../Bookend";
-import { AppraisalItem } from "@/server-actions/grpc/appraisal";
-import { BasicItem, TypeNamingLists } from "@/proto/etco";
+import { ContentBookend } from "../../Bookend";
+import { ShopAppraisal } from "@/server-actions/grpc/appraisal";
+import { BasicItem } from "@/proto/etco";
 import { ErrorBoundaryTryAgain } from "../../ErrorBoundary";
-import AntTable, { ColumnType } from "antd/es/table";
-import { FooterButton } from "../../Input/FooterButton";
-import { ReactElement, useState } from "react";
-import { rowClassName } from "../../Table/Table";
-import { Button } from "../../Input/Manipulator";
-import { ContentPortal } from "../../Content";
-import classNames from "classnames";
-import { Popup } from "../../Popup";
-import { LocationSelectProps, LocationSelect } from "../LocationSelect";
-import { AppraisalTablePartialAppraisal, AppraisalTable } from "../Table/Table";
 import {
-  useSearchableMarketGroupColumn,
-  useSearchableCategoryColumn,
-  useSearchableTypeNameColumn,
-  useSearchableGroupColumn,
-  PricePerUnitColumn,
-  DescriptionColumn,
-  QuantityColumn,
-  CartColumn,
-} from "../../Table/Column";
-import { ValidShopItem } from "@/server-actions/grpc/other";
+  PropsWithChildren,
+  ReactElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import classNames from "classnames";
+import { resultParseAsAppraisal } from "@/server-actions/grpc/appraisalNew";
+import { ResultThrow, newSameOrNew, sameOrNewValue } from "@/components/todo";
+import { PasteForm } from "../Paste";
+import { useBrowserContext } from "@/browser/context";
+import { Record } from "./ItemRecord";
+import { Cart, CartInfo } from "./Cart";
+import { InventoryTable } from "./InventoryTable";
+import { Footer } from "./InventoryFooter";
+import { clientGetShopParseText } from "@/browser/shopparsetext";
+import { ShopAppraisalContainerProps } from "../ShopAppraisalContainer";
+import { BasePurchaseContainerProps } from "./Container";
+import { SelectOption } from "@/components/Input/Manipulator";
+import { ConfirmParse } from "./ConfirmParse";
 
-interface CartInfo {
-  price: number;
-  quantity: number;
-}
+const setCartQuantity = (
+  record: Record,
+  cartInfo: CartInfo,
+  newQuantity: number | null
+): void => {
+  const oldQuantity = record.cartQuantity ?? 0;
+  const quantityDiff = (newQuantity ?? 0) - oldQuantity;
+
+  // update cart info
+  cartInfo.quantity += quantityDiff;
+  if (cartInfo.quantity === 0) {
+    cartInfo.price = 0;
+  } else {
+    cartInfo.price += quantityDiff * record.pricePerUnit;
+  }
+
+  // update record
+  record.cartQuantity = newQuantity;
+};
 
 export interface ShopInventoryProps
-  extends Omit<LocationSelectProps, "className"> {
-  items: ValidShopItem[];
-  typeNamingLists: TypeNamingLists;
+  extends Omit<ShopAppraisalContainerProps, "containerChildren">,
+    Omit<BasePurchaseContainerProps, "character"> {
   onCheckout: (items: BasicItem[]) => void;
 }
 export const ShopInventory = ({
-  items,
   typeNamingLists,
+  items,
+  locationId,
   onCheckout,
-  ...locationSelectProps
+  options,
+  defaultOption,
 }: ShopInventoryProps): ReactElement => {
+  const [territory, setTerritory] = useState<SelectOption<string> | null>(
+    defaultOption ?? null
+  );
+  const [text, setText] = useState<string | null>(null);
+  const [parsed, setParsed] = useState<ShopAppraisal | null>(null);
   const [viewingCart, setViewingCart] = useState(false);
   const [cartInfo, setCartInfo] = useState<CartInfo>({ price: 0, quantity: 0 });
   const [records, setRecords] = useState<Record[]>(() =>
     items.map((item, i) => new Record(item, i, typeNamingLists))
   );
+  const ctx = useBrowserContext();
 
-  const setCartQuantity = (index: number, quantity: number | null): void => {
-    const newRecords = [...records];
-    const newCartInfo = { ...cartInfo };
-    const newRecord = newRecords[index];
-    const newQuantityDiff = (quantity ?? 0) - (newRecord.cartQuantity ?? 0);
+  const locationIdStr = locationId.toString();
 
-    // update cart info
-    newCartInfo.quantity += newQuantityDiff;
-    if (newCartInfo.quantity === 0) {
-      newCartInfo.price = 0;
-    } else {
-      newCartInfo.price += newQuantityDiff * newRecord.pricePerUnit;
+  const recordsMap: Map<number, Record> = useMemo(
+    () =>
+      new Map(
+        (function* () {
+          for (const record of records) {
+            yield [record.typeId, record];
+          }
+        })()
+      ),
+    [records]
+  );
+
+  const actionParseAdd = useCallback(
+    async (text: string) => {
+      const newParsed = await resultParseAsAppraisal(text).then((result) =>
+        ResultThrow(result)
+      );
+      mutateParsedWithInventory(newParsed, recordsMap, cartInfo.price);
+      setParsed(newParsed);
+    },
+    [recordsMap, cartInfo.price]
+  );
+
+  useEffect(() => {
+    if (ctx === null) return;
+    const savedText = clientGetShopParseText(ctx, locationIdStr, true);
+    if (savedText !== null) {
+      setText(savedText);
+      actionParseAdd(savedText);
     }
+  }, [ctx, locationIdStr, actionParseAdd]);
 
-    // update record
-    newRecord.cartQuantity = quantity;
+  const tableSetCartQuantity = useCallback(
+    (index: number, quantity: number | null): void => {
+      const record = records[index];
+      setCartQuantity(record, cartInfo, quantity);
+      setCartInfo({ ...cartInfo });
+      setRecords([...records]);
+    },
+    [records, cartInfo]
+  );
 
-    setCartInfo(newCartInfo);
-    setRecords(newRecords);
-  };
+  const parseSetCartQuantity = useCallback(
+    (parsed: ShopAppraisal): void => {
+      for (const item of parsed?.items ?? []) {
+        if (item.unknown) continue;
+        const record = recordsMap.get(item.typeId);
+        if (record === undefined) continue;
+        const newQuantity =
+          record.cartQuantity ??
+          0 + sameOrNewValue(item.quantity, item.contractQuantity);
+        setCartQuantity(record, cartInfo, newQuantity);
+      }
+      setCartInfo({ ...cartInfo });
+      setRecords([...records]);
+      setParsed(null);
+    },
+    [records, cartInfo, recordsMap]
+  );
 
   return (
     <ContentBookend
@@ -83,6 +145,13 @@ export const ShopInventory = ({
       }
     >
       <ErrorBoundaryTryAgain>
+        {parsed && (
+          <ConfirmParse
+            parsed={parsed}
+            onConfirm={parseSetCartQuantity}
+            onCancel={() => setParsed(null)}
+          />
+        )}
         {viewingCart && (
           <Cart
             records={records}
@@ -91,218 +160,63 @@ export const ShopInventory = ({
             onCancel={() => setViewingCart(false)}
           />
         )}
-        <LocationSelect
-          className={classNames("pt-2", "ml-auto", "mr-auto")}
-          {...locationSelectProps}
+        <PasteForm
+          className={classNames("w-[28rem]", "pt-2", "ml-auto", "mr-auto")}
+          text={text}
+          setText={setText}
+          territory={territory}
+          setTerritory={setTerritory}
+          options={options}
+          territoryTitle={"Location"}
+          submitTitle={territory?.value === locationIdStr ? "Add" : "Shop"}
+          pasteTitle={"(OPTIONAL) Paste Items"}
+          action={actionParseAdd}
         />
-        <div className={classNames("p-4", "w-full")}>
-          <InventoryTable records={records} setCartQuantity={setCartQuantity} />
+        <div className={classNames("w-full", "p-2")}>
+          <InventoryTable
+            records={records}
+            setCartQuantity={tableSetCartQuantity}
+          />
         </div>
       </ErrorBoundaryTryAgain>
     </ContentBookend>
   );
 };
 
-interface FooterProps {
-  cartInfo: CartInfo;
-  switchViewingCart: () => void;
-}
-const Footer = ({ cartInfo, switchViewingCart }: FooterProps): ReactElement => (
-  <VerticalBookend
-    height={undefined}
-    className={classNames("flex", "items-center")}
+const BasisDiv = ({ children }: PropsWithChildren): ReactElement => (
+  <div
+    className={classNames(
+      "basis-0",
+      "flex-grow",
+      "flex",
+      "items-center",
+      "justify-center"
+    )}
   >
-    <span
-      className={classNames(
-        "flex-grow",
-        "basis-0",
-        "ml-1",
-        "mr-1",
-        "text-right"
-      )}
-    >
-      <LocaleText fmt={formatPrice} v={cartInfo.price} />
-    </span>
-    <FooterButton canClick={cartInfo.quantity > 0} onClick={switchViewingCart}>
-      View Cart
-    </FooterButton>
-    <span className={classNames("flex-grow", "basis-0", "mr-1")} />
-  </VerticalBookend>
+    {children}
+  </div>
 );
 
-class Record {
-  private _marketGroupNames: string[] | null = null;
-  private _cartQuantity: number | null = null;
-
-  constructor(
-    readonly item: ValidShopItem,
-    readonly index: number,
-    readonly typeNamingLists: TypeNamingLists
-  ) {}
-
-  get typeId(): number {
-    return this.item.typeId;
-  }
-  get quantity(): number {
-    return this.item.quantity;
-  }
-  get pricePerUnit(): number {
-    return this.item.pricePerUnit;
-  }
-  get description(): string {
-    return this.item.description;
-  }
-  get typeName(): string {
-    return this.item.typeNamingIndexes.name;
-  }
-  get groupName(): string {
-    return this.typeNamingLists.groups[this.item.typeNamingIndexes.groupIndex];
-  }
-  get categoryName(): string {
-    return this.typeNamingLists.categories[
-      this.item.typeNamingIndexes.categoryIndex
-    ];
-  }
-  get marketGroupNames(): string[] {
-    if (this._marketGroupNames === null) {
-      this._marketGroupNames =
-        this.item.typeNamingIndexes.marketGroupIndexes.map(
-          (index) => this.typeNamingLists.marketGroups[index]
-        );
+const mutateParsedWithInventory = (
+  parsed: ShopAppraisal,
+  inventory: Map<number, Record>,
+  currentPrice: number
+): void => {
+  [parsed.price, parsed.newPrice] = [currentPrice, currentPrice];
+  for (const item of parsed.items) {
+    if (item.unknown) {
+      continue;
     }
-    return this._marketGroupNames;
-  }
-
-  get rowKey(): number {
-    return this.typeId;
-  }
-
-  getModificationState(): ModificationState {
-    if (this._cartQuantity === null) {
-      return ModificationState.Unmodified;
-    } else if (this._cartQuantity === 0) {
-      return ModificationState.Deleted;
-    } else {
-      return ModificationState.Modified;
+    const record = inventory.get(item.typeId);
+    if (!record) {
+      item.description = "Not Found";
+      continue;
     }
+    item.pricePerUnit = record?.pricePerUnit ?? 0;
+    item.description = record?.description ?? "";
+    const purchaseable = Math.min(item.quantity, record.availableQuantity);
+    item.contractQuantity = newSameOrNew(item.quantity, purchaseable);
+    parsed.newPrice += item.pricePerUnit * purchaseable;
   }
-
-  get priceTotal(): number {
-    return this.quantity ? this.quantity * this.pricePerUnit : 0;
-  }
-  get cartQuantity(): number | null {
-    return this._cartQuantity;
-  }
-  set cartQuantity(value: number | null) {
-    // console.log(value);
-    this._cartQuantity = value;
-  }
-}
-
-const newCartAppraisalItems = (records: Record[]): AppraisalItem[] => {
-  const items: AppraisalItem[] = [];
-  for (const {
-    typeId,
-    typeName,
-    pricePerUnit,
-    description,
-    cartQuantity,
-  } of records) {
-    if (cartQuantity ?? 0 > 0) {
-      items.push({
-        typeId,
-        name: typeName,
-        pricePerUnit,
-        newPricePerUnit: true,
-        description,
-        newDescription: true,
-        quantity: cartQuantity ?? 0,
-        contractQuantity: true,
-        children: [],
-      });
-    }
-  }
-  return items;
-};
-
-const newCartAppraisal = (
-  records: Record[],
-  price: number
-): AppraisalTablePartialAppraisal => ({
-  price,
-  newPrice: true,
-  time: Date.now() / 1000,
-  newTime: true,
-  version: "Cart",
-  newVersion: true,
-  items: newCartAppraisalItems(records),
-  status: null,
-});
-
-interface CartProps {
-  records: Record[];
-  price: number;
-  onCheckout: (items: BasicItem[]) => void;
-  onCancel: () => void;
-}
-const Cart = ({
-  records,
-  price,
-  onCheckout,
-  onCancel,
-}: CartProps): ReactElement => {
-  const appraisal = newCartAppraisal(records, price);
-  return (
-    <ContentPortal>
-      <Popup
-        onClickOutside={onCancel}
-        percentage={"85"}
-        footer={
-          <Button
-            className={classNames("p-1")}
-            variant="success"
-            onClick={() => onCheckout(appraisal.items)}
-            noPad
-          >
-            Checkout
-          </Button>
-        }
-        footerClassName={classNames("flex", "justify-center")}
-      >
-        <AppraisalTable appraisal={appraisal} />
-      </Popup>
-    </ContentPortal>
-  );
-};
-
-interface InventoryTableProps {
-  records: Record[];
-  setCartQuantity: (index: number, quantity: number | null) => void;
-}
-const InventoryTable = ({
-  records,
-  setCartQuantity,
-}: InventoryTableProps): ReactElement => {
-  const columns: ColumnType<Record>[] = [
-    useSearchableTypeNameColumn(undefined, true),
-    CartColumn(
-      (record, quantity) => setCartQuantity(record.index, quantity),
-      "whitespace-nowrap"
-    ),
-    QuantityColumn("whitespace-nowrap"),
-    PricePerUnitColumn("whitespace-nowrap"),
-    DescriptionColumn(),
-    useSearchableGroupColumn("text-sm"),
-    useSearchableCategoryColumn("text-sm"),
-    useSearchableMarketGroupColumn("text-sm", 2),
-  ];
-  return (
-    <AntTable
-      // className={classNames("whitespace-nowrap")}
-      dataSource={records}
-      rowKey={(record) => record.rowKey}
-      rowClassName={(record) => rowClassName(record)}
-      columns={columns}
-    />
-  );
+  parsed.newPrice = newSameOrNew(parsed.price, parsed.newPrice);
 };
