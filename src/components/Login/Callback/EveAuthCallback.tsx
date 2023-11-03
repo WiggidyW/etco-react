@@ -88,6 +88,8 @@ const EveAuthCallbackServerSide = async ({
       />
     );
   } else {
-    return <ErrorThrower error={characterResult.error} />;
+    return (
+      <ErrorThrower error={characterResult.error.toErrorMinified().message} />
+    );
   }
 };
