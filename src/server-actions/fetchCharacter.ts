@@ -195,7 +195,11 @@ class JWTDecoded implements IJWTDecoded {
     jwk: KeyLike | Uint8Array
   ): Promise<JWTDecoded> {
     const jwtVerifyOpts: JWTVerifyOptions = {
-      issuer: "login.eveonline.com",
+      issuer: [
+        "login.eveonline.com",
+        "https://login.eveonline.com",
+        "http://login.eveonline.com",
+      ],
       audience: "EVE Online",
       requiredClaims: ["name", "sub", "iss", "aud"],
     };
