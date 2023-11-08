@@ -43,26 +43,6 @@ const localGetItem = (key: string): string | null =>
 
 // // Characters Storage
 
-const CharactersStorageContext: { inner: "readonly" | "mutable" | null } = {
-  inner: null,
-};
-
-const assertOrSetReadonly = (): void => {
-  if (CharactersStorageContext.inner === null) {
-    CharactersStorageContext.inner = "readonly";
-  } else if (CharactersStorageContext.inner === "mutable") {
-    throw new Error("cannot use readonly characters in mutable context");
-  }
-};
-
-const assertOrSetMutable = (): void => {
-  if (CharactersStorageContext.inner === null) {
-    CharactersStorageContext.inner = "mutable";
-  } else if (CharactersStorageContext.inner === "readonly") {
-    throw new Error("cannot use mutable characters in readonly context");
-  }
-};
-
 const storageGetCharacters = (key: string): MutableCharacters => {
   const charactersJSON = localGetItem(key);
   if (charactersJSON === null) return MutableCharacters.newEmpty();
@@ -77,19 +57,48 @@ const storageGetCharacters = (key: string): MutableCharacters => {
   }
 };
 
-// Readonly Context
+const CharStorageCache: {
+  readonlyCharacters: { [key: string]: ReadonlyCharacters };
+  // prevents weird behavior from caching characters while mutating them
+  // not a fix, but rather a pre-emptive measure
+  context: "readonly" | "mutable" | null;
+  // NextJS does not reload the page when navigating to a new page, persisting global state
+  path: string | null;
+} = {
+  context: null,
+  path: null,
+  readonlyCharacters: {},
+};
 
-const GlobalReadonlyCharacters: { [key: string]: ReadonlyCharacters } = {};
+const charStorageCtxAssert = (
+  kind: "readonly" | "mutable",
+  path: string
+): void => {
+  if (CharStorageCache.context === null || CharStorageCache.path !== path) {
+    CharStorageCache.context = kind;
+    CharStorageCache.path = path;
+    CharStorageCache.readonlyCharacters = {};
+  } else if (CharStorageCache.context !== kind) {
+    throw new Error(
+      `cannot use ${kind} characters in ${
+        kind === "readonly" ? "mutable" : "readonly"
+      } context`
+    );
+  }
+};
+
+// Readonly Context
 
 export const storageGetReadonlyCharacters = (
   _: BrowserContextMarker,
   key: string
 ): Readonly<Readonly<Character>[]> => {
-  assertOrSetReadonly();
-  if (GlobalReadonlyCharacters[key] === undefined) {
-    GlobalReadonlyCharacters[key] = storageGetCharacters(key).characters;
+  charStorageCtxAssert("readonly", window.location.pathname);
+  if (CharStorageCache.readonlyCharacters[key] === undefined) {
+    CharStorageCache.readonlyCharacters[key] =
+      storageGetCharacters(key).characters;
   }
-  return GlobalReadonlyCharacters[key];
+  return CharStorageCache.readonlyCharacters[key];
 };
 
 // Mutable Context
@@ -99,11 +108,7 @@ export const storageSetCharacters = (
   key: string,
   characters: ReadonlyCharacters[] | Character[]
 ): void => {
-  if (CharactersStorageContext.inner === "readonly") {
-    throw new Error("cannot set characters in readonly context");
-  } else if (CharactersStorageContext.inner === null) {
-    CharactersStorageContext.inner = "mutable";
-  }
+  charStorageCtxAssert("mutable", window.location.pathname);
   localSetItem(key, JSON.stringify(characters));
 };
 
@@ -111,7 +116,7 @@ export const storageGetMutableCharacters = (
   _: BrowserContextMarker,
   key: string
 ): MutableCharacters => {
-  assertOrSetMutable();
+  charStorageCtxAssert("mutable", window.location.pathname);
   return storageGetCharacters(key);
 };
 

@@ -168,19 +168,6 @@ const Manipulator = ({
   const structureInfoWebRefreshToken =
     _structureInfoWebRefreshToken ?? prevStructureInfoWebRefreshToken;
 
-  console.log(
-    prevPurchaseMaxActive,
-    purchaseMaxActive,
-    prevMakePurchaseCooldown,
-    makePurchaseCooldown,
-    prevCancelPurchaseCooldown,
-    cancelPurchaseCooldown,
-    prevCorporationWebRefreshToken,
-    corporationWebRefreshToken,
-    prevStructureInfoWebRefreshToken,
-    structureInfoWebRefreshToken
-  );
-
   const savePossible =
     purchaseMaxActive !== prevPurchaseMaxActive ||
     makePurchaseCooldown !== prevMakePurchaseCooldown ||
