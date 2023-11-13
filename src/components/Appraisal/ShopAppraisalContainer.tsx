@@ -64,6 +64,22 @@ export const ShopAppraisalContainer = ({
     return (
       <>
         <div className={classNames("h-[5%]")} />
+        <div className={classNames("flex", "flex-col", "justify-center")}>
+          <span className={classNames("ml-auto", "mr-auto")}>
+            {
+              "1. (Optional) Paste Items you wish to purchase into the paste-box."
+            }
+          </span>
+          <br />
+          <span className={classNames("ml-auto", "mr-auto")}>
+            {"2. Select the location you wish to purchase from."}
+          </span>
+          <br />
+          <span className={classNames("ml-auto", "mr-auto")}>
+            {'3. Click the "Shop" button.'}
+          </span>
+        </div>
+        <div className={classNames("h-[5%]")} />
         <PasteLink
           {...pasteLinkProps}
           className={classNames(
