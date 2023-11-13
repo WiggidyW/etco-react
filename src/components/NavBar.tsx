@@ -18,7 +18,9 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
     <div className={classNames("ml-2", "pt-1", "pb-1")}>
       <NavLink href="/">Home</NavLink>
       <NavLink href="/buyback">Buyback</NavLink>
-      <NavLink href="/shop">Shop</NavLink>
+      <NavLink href="/shop" disabled={!character}>
+        Shop
+      </NavLink>
       <NavLink href="/history" disabled={!character}>
         History
       </NavLink>
