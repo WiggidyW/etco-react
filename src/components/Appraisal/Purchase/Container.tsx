@@ -74,6 +74,7 @@ export const PurchaseContainer = ({
                 <PurchaseResult
                   appraisal={appraisal}
                   status={status}
+                  character={character}
                   {...appraisalProps}
                 />
               </ErrorBoundaryGoBack>
@@ -114,11 +115,13 @@ const MakePurchase = ({
 interface PurchaseResultProps
   extends Omit<ShopAppraisalContainerProps, "containerChildren"> {
   appraisal?: Appraisal;
+  character: ICharacter;
   status: MakePurchaseStatus;
 }
 const PurchaseResult = ({
   appraisal,
   status,
+  character,
   ...appraisalProps
 }: PurchaseResultProps): ReactElement => {
   const appraisalOk =
@@ -161,7 +164,7 @@ const PurchaseResult = ({
   } else {
     return (
       <ShopAppraisalContainer
-        containerChildren={newAppraisalContainerChildren(appraisal)}
+        containerChildren={newAppraisalContainerChildren(appraisal, character)}
         {...appraisalProps}
       />
     );
