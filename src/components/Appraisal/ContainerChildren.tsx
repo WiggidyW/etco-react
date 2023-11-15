@@ -3,10 +3,7 @@ import { AppraisalContractInfo } from "./Info/ContractInfo";
 import { AppraisalPrimaryInfo } from "./Info/PrimaryInfo";
 import { AppraisalTable } from "./Table/Table";
 import { ReactNode } from "react";
-
-export interface AppraisalContainerChildrenProps {
-  appraisal: Appraisal;
-}
+import { ICharacter } from "@/browser/character";
 
 export interface AppraisalContainerChildren {
   primaryInfo: ReactNode;
@@ -15,9 +12,12 @@ export interface AppraisalContainerChildren {
 }
 
 export const newAppraisalContainerChildren = (
-  appraisal: Appraisal
+  appraisal: Appraisal,
+  character?: ICharacter
 ): AppraisalContainerChildren => ({
-  primaryInfo: <AppraisalPrimaryInfo appraisal={appraisal} />,
+  primaryInfo: (
+    <AppraisalPrimaryInfo appraisal={appraisal} character={character} />
+  ),
   contractInfo: <AppraisalContractInfo appraisal={appraisal} />,
   table: <AppraisalTable appraisal={appraisal} />,
 });
