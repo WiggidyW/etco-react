@@ -1,9 +1,16 @@
 import { ReactElement } from "react";
 import { AppraisalProps } from "./ContractInfo";
 import { InfoRow, InfoTable, PortraitRow } from "./Shared";
+import { ICharacter } from "@/browser/character";
+import { CancelButton } from "./Cancel";
+
+export interface AppraisalPrimaryInfoProps extends AppraisalProps {
+  character?: ICharacter;
+}
 
 export const AppraisalPrimaryInfo = ({
   className,
+  character: loginCharacter,
   appraisal: {
     locationId,
     systemId,
@@ -13,7 +20,7 @@ export const AppraisalPrimaryInfo = ({
     status,
     locationNamingMaps: { locationNames, systemNames, regionNames },
   },
-}: AppraisalProps): ReactElement => {
+}: AppraisalPrimaryInfoProps): ReactElement => {
   let statusString: string;
   if (character === undefined) {
     statusString = "Anonymous";
@@ -35,6 +42,9 @@ export const AppraisalPrimaryInfo = ({
       <InfoRow label="Region">{regionNames[regionId]}</InfoRow>
       <InfoRow label="Status">{statusString}</InfoRow>
       <InfoRow label="Code">{code}</InfoRow>
+      {status === "inPurchaseQueue" && loginCharacter && (
+        <CancelButton character={loginCharacter} code={code} />
+      )}
     </InfoTable>
   );
 };
