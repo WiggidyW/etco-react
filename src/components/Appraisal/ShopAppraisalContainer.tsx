@@ -91,13 +91,6 @@ export const ShopAppraisalContainer = ({
       </>
     );
   } else {
-    return (
-      <AppraisalContainer containerChildren={containerChildren}>
-        <PasteLink
-          {...pasteLinkProps}
-          className={classNames("w-96", "justify-self-start")}
-        />
-      </AppraisalContainer>
-    );
+    return <AppraisalContainer containerChildren={containerChildren} />;
   }
 };
