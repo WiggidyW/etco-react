@@ -3,11 +3,10 @@
 import { ThrowKind } from "../throw";
 import * as pb from "@/proto/etco";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
-import { dispatch, dispatchAuthenticated, throwInvalid } from "./grpc";
+import { asIs, dispatch } from "./grpc";
 import { ICharacter } from "@/browser/character";
 import { ICorporation } from "@/browser/corporation";
 import { IAlliance } from "@/browser/alliance";
-import { TypeNamesAll } from "./util";
 import { withCatchResult } from "../withResult";
 
 export const characterInfo = async (
@@ -18,12 +17,12 @@ export const characterInfo = async (
 ): Promise<ICharacter> =>
   dispatch(
     pbClient.prototype.characterInfo,
-    { characterId },
+    { entityId: characterId },
     ({ characterId, name, corporationId, allianceId }) => ({
       id: characterId,
       name,
       corporationId,
-      allianceId: allianceId?.inner,
+      allianceId: allianceId !== 0 ? allianceId : undefined,
       admin,
       refreshToken,
     }),
@@ -37,12 +36,12 @@ export const corporationInfo = async (
 ): Promise<ICorporation> =>
   dispatch(
     pbClient.prototype.corporationInfo,
-    { corporationId },
+    { entityId: corporationId },
     ({ corporationId, name, ticker, allianceId }) => ({
       id: corporationId,
       name,
       ticker,
-      allianceId: allianceId?.inner,
+      allianceId: allianceId !== 0 ? allianceId : undefined,
       isCorp: true,
     }),
     throwKind
@@ -55,7 +54,7 @@ export const allianceInfo = async (
 ): Promise<IAlliance> =>
   dispatch(
     pbClient.prototype.allianceInfo,
-    { allianceId },
+    { entityId: allianceId },
     ({ allianceId, name, ticker }) => ({
       id: allianceId,
       name,
@@ -65,41 +64,15 @@ export const allianceInfo = async (
   );
 export const resultAllianceInfo = withCatchResult(allianceInfo);
 
-export interface ValidShopItem extends Omit<pb.ShopItem, "typeNamingIndexes"> {
-  typeNamingIndexes: pb.TypeNamingIndexes;
-}
-export interface ShopInventory {
-  items: ValidShopItem[];
-  typeNamingLists: pb.TypeNamingLists;
-}
 export const shopInventory = async (
   locationId: number,
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
-): Promise<ShopInventory> =>
-  dispatchAuthenticated(
+): Promise<pb.ShopInventoryResponse> =>
+  dispatch(
     pbClient.prototype.shopInventory,
-    { locationId, includeTypeNaming: TypeNamesAll, auth: { token } },
-    ({ items, typeNamingLists }) => {
-      for (const item of items) {
-        if (item.typeNamingIndexes === undefined) {
-          throwInvalid(
-            `typeId ${item.typeId}: typeNamingIndexes is undefined`,
-            throwKind
-          );
-        } else if (item.typeNamingIndexes.categoryIndex === -1) {
-          throwInvalid(`typeId ${item.typeId}: categoryIndex is -1`, throwKind);
-        } else if (item.typeNamingIndexes.groupIndex === -1) {
-          throwInvalid(`typeId ${item.typeId}: groupIndex is -1`, throwKind);
-        }
-      }
-      return {
-        items: items as ValidShopItem[],
-        typeNamingLists:
-          typeNamingLists ??
-          throwInvalid("typeNamingLists is undefined", throwKind),
-      };
-    },
+    { locationId, refreshToken },
+    asIs,
     throwKind
   );
 export const resultShopInventory = withCatchResult(shopInventory);
@@ -115,32 +88,24 @@ export const parse = async (
   dispatch(
     pbClient.prototype.parse,
     { text },
-    ({ knownItems, unknownItems }) => ({ knownItems, unknownItems }),
+    ({ knownItems, unknownItems, strs }) => ({
+      knownItems,
+      unknownItems,
+      strs,
+    }),
     throwKind
   );
 export const resultParse = withCatchResult(parse);
 
-export const isAdmin = async (
-  token: string,
-  throwKind?: ThrowKind
-): Promise<boolean> =>
-  dispatch(
-    pbClient.prototype.isAdmin,
-    { auth: { token } },
-    (rep) => rep.isAdmin,
-    throwKind
-  );
-export const resultIsAdmin = withCatchResult(isAdmin);
-
 // admin-only endpoint
 export const delPurchases = async (
-  codes: string[],
-  token: string,
+  entries: { code: string; locationId: number }[],
+  refreshToken: string,
   throwKind?: ThrowKind
 ): Promise<{}> =>
-  dispatchAuthenticated(
-    pbClient.prototype.shopDeletePurchases,
-    { codes, auth: { token } },
+  dispatch(
+    pbClient.prototype.deletePurchases,
+    { entries, refreshToken },
     () => ({}),
     throwKind
   );
@@ -149,13 +114,27 @@ export const resultDelPurchases = withCatchResult(delPurchases);
 // user endpoint
 export const cancelPurchase = async (
   code: string,
-  token: string,
+  refreshToken: string,
+  locationId: number,
   throwKind?: ThrowKind
 ): Promise<{}> =>
-  dispatchAuthenticated(
-    pbClient.prototype.shopCancelPurchase,
-    { code, auth: { token } },
+  dispatch(
+    pbClient.prototype.cancelPurchase,
+    { code, refreshToken, locationId },
     () => ({}),
     throwKind
   );
 export const resultCancelPurchase = withCatchResult(cancelPurchase);
+
+export const login = async (
+  accessCode: string,
+  app: pb.EsiApp,
+  throwKind?: ThrowKind
+): Promise<ICharacter> =>
+  dispatch(
+    pbClient.prototype.login,
+    { accessCode, app },
+    ({ characterId, refreshToken, admin }) =>
+      characterInfo(characterId, admin, refreshToken, ThrowKind.Parsed),
+    throwKind
+  );

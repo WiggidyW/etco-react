@@ -11,12 +11,7 @@ import { Appraisal } from "@/server-actions/grpc/appraisal";
 
 export type AppraisalTablePartialAppraisal = Omit<
   Appraisal,
-  | "code"
-  | "locationId"
-  | "systemId"
-  | "regionId"
-  | "locationNamingMaps"
-  | "character"
+  "code" | "locationInfo" | "character"
 >;
 
 export interface BaseAppraisalTableProps {

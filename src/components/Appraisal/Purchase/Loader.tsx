@@ -29,7 +29,7 @@ export const PurchaseContainerLoader = async ({
       <PurchaseContainer
         {...appraisalProps}
         items={inventoryResult.value.items}
-        typeNamingLists={inventoryResult.value.typeNamingLists}
+        strs={inventoryResult.value.strs}
         character={character}
         locationId={locationId}
         defaultOption={defaultOption}

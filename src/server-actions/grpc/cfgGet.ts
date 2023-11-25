@@ -3,12 +3,11 @@
 import * as pb from "@/proto/etco";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
 import { ThrowKind } from "../throw";
-import { dispatchAuthenticated, throwInvalid } from "./grpc";
+import { asIs, dispatch, throwInvalid } from "./grpc";
 import {
   RPCResponseWithTypeMapsBuilder,
   TypeMapsBuilder,
 } from "@/proto/interfaces";
-import { LocationNamesAll } from "./util";
 import { ICharacter } from "@/browser/character";
 import { ICorporation } from "@/browser/corporation";
 import { IAlliance } from "@/browser/alliance";
@@ -16,12 +15,12 @@ import { allianceInfo, characterInfo, corporationInfo } from "./other";
 import { withCatchResult } from "../withResult";
 
 export const cfgGetConstDataLoad = async (
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
-): Promise<pb.ConstData> =>
-  dispatchAuthenticated(
+): Promise<pb.CfgConstData> =>
+  dispatch(
     pbClient.prototype.cfgGetConstData,
-    { auth: { token } },
+    { refreshToken },
     ({ constData }) =>
       constData === undefined
         ? throwInvalid("ConstData is undefined", throwKind)
@@ -37,14 +36,41 @@ export interface CfgGetAuthListLoadRep {
   permitCorporations: Map<number, ICorporation>;
   permitAlliances: Map<number, IAlliance>;
 }
-export const cfgGetAuthListLoad = async (
-  token: string,
-  domainKey: string,
+export const cfgGetUserAuthListLoad = async (
+  refreshToken: string,
   throwKind?: ThrowKind
 ): Promise<CfgGetAuthListLoadRep> =>
-  dispatchAuthenticated(
-    pbClient.prototype.cfgGetAuthList,
-    { auth: { token }, domainKey },
+  cfgGetAuthListLoad(
+    pbClient.prototype.cfgGetUserAuthList,
+    refreshToken,
+    throwKind
+  );
+export const cfgGetAdminAuthListLoad = async (
+  refreshToken: string,
+  throwKind?: ThrowKind
+): Promise<CfgGetAuthListLoadRep> =>
+  cfgGetAuthListLoad(
+    pbClient.prototype.cfgGetAdminAuthList,
+    refreshToken,
+    throwKind
+  );
+export const resultCfgGetUserAuthListLoad = withCatchResult(
+  cfgGetUserAuthListLoad
+);
+export const resultCfgGetAdminAuthListLoad = withCatchResult(
+  cfgGetAdminAuthListLoad
+);
+
+const cfgGetAuthListLoad = async (
+  method:
+    | typeof pbClient.prototype.cfgGetUserAuthList
+    | typeof pbClient.prototype.cfgGetAdminAuthList,
+  refreshToken: string,
+  throwKind?: ThrowKind
+): Promise<CfgGetAuthListLoadRep> =>
+  dispatch(
+    method,
+    { refreshToken },
     ({ authList }) => {
       if (authList === undefined) {
         return throwInvalid("AuthList is undefined", throwKind);
@@ -80,7 +106,6 @@ export const cfgGetAuthListLoad = async (
     },
     throwKind
   );
-export const resultCfgGetAuthListLoad = withCatchResult(cfgGetAuthListLoad);
 
 const authListCharacterInfo = (
   ids: number[],
@@ -132,31 +157,51 @@ const authListAllianceInfo = (
     alliances.reduce((map, a) => map.set(a.id, a), new Map())
   );
 
+interface LocationInfoMap {
+  locationInfoMap: { [locationId: string]: pb.LocationInfo };
+  strs: string[];
+}
+const getLocationInfoMap = async (ids: number[]): Promise<LocationInfoMap> => {
+  if (ids.length === 0) {
+    return { locationInfoMap: {}, strs: [] };
+  }
+
+  const { locations, strs } = await dispatch(
+    pbClient.prototype.locations,
+    { locations: ids },
+    asIs,
+    ThrowKind.Parsed
+  );
+
+  const locationInfoMap: { [locationId: string]: pb.LocationInfo } = {};
+  for (const location of locations) {
+    locationInfoMap[location.locationId.toString()] = location;
+  }
+
+  return { locationInfoMap, strs };
+};
+
 export interface CfgGetMarketsLoadRep {
   markets: { [marketName: string]: pb.CfgMarket };
   locationInfoMap: { [locationId: string]: pb.LocationInfo };
-  locationNames: { [locationId: string]: string };
-  systemNames: { [systemId: number]: string };
-  regionNames: { [regionId: number]: string };
+  strs: string[];
 }
 export const cfgGetMarketsLoad = async (
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
 ): Promise<CfgGetMarketsLoadRep> =>
-  dispatchAuthenticated(
+  dispatch(
     pbClient.prototype.cfgGetMarkets,
-    {
-      auth: { token },
-      includeLocationInfo: true,
-      includeLocationNaming: LocationNamesAll,
+    { refreshToken },
+    async ({ markets }) => {
+      const locationIdsSet = new Set<number>();
+      for (const market of Object.values(markets)) {
+        locationIdsSet.add(market.locationId);
+      }
+      const locationIds = [...locationIdsSet];
+      const { locationInfoMap, strs } = await getLocationInfoMap(locationIds);
+      return { markets, locationInfoMap, strs };
     },
-    ({ markets, locationInfoMap, locationNamingMaps }) => ({
-      markets,
-      locationInfoMap,
-      locationNames: locationNamingMaps?.locationNames || {},
-      systemNames: locationNamingMaps?.systemNames || {},
-      regionNames: locationNamingMaps?.regionNames || {},
-    }),
     throwKind
   );
 export const resultCfgGetMarketsLoad = withCatchResult(cfgGetMarketsLoad);
@@ -164,35 +209,28 @@ export const resultCfgGetMarketsLoad = withCatchResult(cfgGetMarketsLoad);
 export interface CfgGetShopLocationsLoadRep {
   locations: { [locationId: number]: pb.CfgShopLocation };
   locationInfoMap: { [locationId: string]: pb.LocationInfo };
-  locationNames: { [locationId: string]: string };
-  systemNames: { [systemId: number]: string };
-  regionNames: { [regionId: number]: string };
+  strs: string[];
   bundleKeys: string[];
 }
 export const cfgGetShopLocationsLoad = async (
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
 ): Promise<CfgGetShopLocationsLoadRep> => {
   const [locationData, bundleKeys] = await Promise.all([
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetShopLocations,
-      {
-        includeLocationInfo: true,
-        includeLocationNaming: LocationNamesAll,
-        auth: { token },
+      { refreshToken },
+      async ({ locations }) => {
+        const { locationInfoMap, strs } = await getLocationInfoMap(
+          Object.keys(locations).map((id) => parseInt(id))
+        );
+        return { locations, locationInfoMap, strs };
       },
-      ({ locations, locationInfoMap, locationNamingMaps }) => ({
-        locations,
-        locationInfoMap,
-        locationNames: locationNamingMaps?.locationNames || {},
-        systemNames: locationNamingMaps?.systemNames || {},
-        regionNames: locationNamingMaps?.regionNames || {},
-      }),
       throwKind
     ),
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetShopBundleKeys,
-      { auth: { token } },
+      { refreshToken },
       ({ bundleKeys }) => bundleKeys,
       throwKind
     ),
@@ -208,19 +246,19 @@ export interface CfgGetBuybackSystemsLoadRep {
   bundleKeys: string[];
 }
 export const cfgGetBuybackSystemsLoad = async (
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
 ): Promise<CfgGetBuybackSystemsLoadRep> => {
   const [systems, bundleKeys] = await Promise.all([
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetBuybackSystems,
-      { includeLocationInfo: false, auth: { token } },
+      { refreshToken },
       ({ systems }) => systems,
       throwKind
     ),
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetBuybackBundleKeys,
-      { auth: { token } },
+      { refreshToken },
       ({ bundleKeys }) => bundleKeys,
       throwKind
     ),
@@ -237,22 +275,22 @@ export interface CfgGetBuybackSystemTypeMapsBuilderLoadRep {
   marketNames: string[];
 }
 export const cfgGetBuybackSystemTypeMapsBuilderLoad = async (
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
 ): Promise<CfgGetBuybackSystemTypeMapsBuilderLoadRep> => {
   const [{ builder, bundleKeys }, marketNames] = await Promise.all([
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetBuybackSystemTypeMapsBuilder,
-      { auth: { token } },
+      { refreshToken },
       builderWithBundleKeys<
         pb.CfgBuybackTypePricing,
         pb.CfgGetBuybackSystemTypeMapsBuilderResponse
       >,
       throwKind
     ),
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetMarketNames,
-      { auth: { token } },
+      { refreshToken },
       ({ marketNames }) => marketNames,
       throwKind
     ),
@@ -269,22 +307,22 @@ export interface CfgGetShopLocationTypeMapsBuilderLoadRep {
   marketNames: string[];
 }
 export const cfgGetShopLocationTypeMapsBuilderLoad = async (
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
 ): Promise<CfgGetShopLocationTypeMapsBuilderLoadRep> => {
   const [{ builder, bundleKeys }, marketNames] = await Promise.all([
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetShopLocationTypeMapsBuilder,
-      { auth: { token } },
+      { refreshToken },
       builderWithBundleKeys<
         pb.CfgShopTypePricing,
         pb.CfgGetShopLocationTypeMapsBuilderResponse
       >,
       throwKind
     ),
-    dispatchAuthenticated(
+    dispatch(
       pbClient.prototype.cfgGetMarketNames,
-      { auth: { token } },
+      { refreshToken },
       ({ marketNames }) => marketNames,
       throwKind
     ),

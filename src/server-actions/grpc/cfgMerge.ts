@@ -3,44 +3,56 @@
 import * as pb from "@/proto/etco";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
 import { ThrowKind } from "../throw";
-import { asIs, dispatchAuthenticated } from "./grpc";
+import { asIs, dispatch } from "./grpc";
 import { withCatchResult } from "../withResult";
 
 export const cfgSetConstData = async (
-  token: string,
-  constData: pb.ConstData,
+  refreshToken: string,
+  constData: pb.CfgConstData,
   throwKind?: ThrowKind
-): Promise<pb.CfgSetConstDataResponse & { modified: boolean }> =>
-  dispatchAuthenticated(
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
     pbClient.prototype.cfgSetConstData,
-    { constData, auth: { token } },
-    (rep) => ({ ...rep, modified: true }),
+    { constData, refreshToken },
+    asIs,
     throwKind
   );
 export const resultCfgSetConstData = withCatchResult(cfgSetConstData);
 
-export const cfgSetAuthList = async (
-  token: string,
-  domainKey: string,
-  authList: pb.AuthList,
+export const cfgSetUserAuthList = async (
+  refreshToken: string,
+  authList: pb.CfgAuthList,
   throwKind?: ThrowKind
-): Promise<pb.CfgSetAuthListResponse & { modified: boolean }> =>
-  dispatchAuthenticated(
-    pbClient.prototype.cfgSetAuthList,
-    { authList, auth: { token }, domainKey },
-    (rep) => ({ ...rep, modified: true }),
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
+    pbClient.prototype.cfgSetUserAuthList,
+    { authList, refreshToken },
+    asIs,
     throwKind
   );
-export const resultCfgSetAuthList = withCatchResult(cfgSetAuthList);
+export const resultCfgSetUserAuthList = withCatchResult(cfgSetUserAuthList);
+
+export const cfgSetAdminAuthList = async (
+  refreshToken: string,
+  authList: pb.CfgAuthList,
+  throwKind?: ThrowKind
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
+    pbClient.prototype.cfgSetAdminAuthList,
+    { authList, refreshToken },
+    asIs,
+    throwKind
+  );
+export const resultCfgSetAdminAuthList = withCatchResult(cfgSetAdminAuthList);
 
 export const cfgMergeBuybackSystemTypeMapsBuilder = async (
-  token: string,
+  refreshToken: string,
   builder: { [key: number]: pb.CfgBuybackSystemTypeBundle },
   throwKind?: ThrowKind
-): Promise<pb.CfgMergeBuybackSystemTypeMapsBuilderResponse> =>
-  dispatchAuthenticated(
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
     pbClient.prototype.cfgMergeBuybackSystemTypeMapsBuilder,
-    { builder, auth: { token } },
+    { builder, refreshToken },
     asIs,
     throwKind
   );
@@ -49,13 +61,13 @@ export const resultCfgMergeBuybackSystemTypeMapsBuilder = withCatchResult(
 );
 
 export const cfgMergeShopLocationTypeMapsBuilder = async (
-  token: string,
+  refreshToken: string,
   builder: { [key: number]: pb.CfgShopLocationTypeBundle },
   throwKind?: ThrowKind
-): Promise<pb.CfgMergeShopLocationTypeMapsBuilderResponse> =>
-  dispatchAuthenticated(
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
     pbClient.prototype.cfgMergeShopLocationTypeMapsBuilder,
-    { builder, auth: { token } },
+    { builder, refreshToken },
     asIs,
     throwKind
   );
@@ -64,13 +76,13 @@ export const resultCfgMergeShopLocationTypeMapsBuilder = withCatchResult(
 );
 
 export const cfgMergeBuybackSystems = async (
-  token: string,
+  refreshToken: string,
   systems: { [systemId: number]: pb.CfgBuybackSystem },
   throwKind?: ThrowKind
-): Promise<pb.CfgMergeBuybackSystemsResponse> =>
-  dispatchAuthenticated(
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
     pbClient.prototype.cfgMergeBuybackSystems,
-    { systems, auth: { token } },
+    { systems, refreshToken },
     asIs,
     throwKind
   );
@@ -79,13 +91,13 @@ export const resultCfgMergeBuybackSystems = withCatchResult(
 );
 
 export const cfgMergeShopLocations = async (
-  token: string,
+  refreshToken: string,
   locations: { [locationId: number]: pb.CfgShopLocation },
   throwKind?: ThrowKind
-): Promise<pb.CfgMergeShopLocationsResponse> =>
-  dispatchAuthenticated(
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
     pbClient.prototype.cfgMergeShopLocations,
-    { locations, auth: { token } },
+    { locations, refreshToken },
     asIs,
     throwKind
   );
@@ -94,13 +106,13 @@ export const resultCfgMergeShopLocations = withCatchResult(
 );
 
 export const cfgMergeMarkets = async (
-  token: string,
+  refreshToken: string,
   markets: { [marketName: string]: pb.CfgMarket },
   throwKind?: ThrowKind
-): Promise<pb.CfgMergeMarketsResponse> =>
-  dispatchAuthenticated(
+): Promise<pb.CfgUpdateResponse> =>
+  dispatch(
     pbClient.prototype.cfgMergeMarkets,
-    { markets, auth: { token } },
+    { markets, refreshToken },
     asIs,
     throwKind
   );

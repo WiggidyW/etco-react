@@ -3,133 +3,62 @@
 import * as pb from "@/proto/etco";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
 import { ThrowKind } from "../throw";
+import { dispatch, throwInvalid } from "./grpc";
 import {
-  StoreKind,
-  dispatch,
-  dispatchAuthenticated,
-  throwInvalid,
-} from "./grpc";
-import {
-  FullBuybackAppraisalStatus,
-  FullShopAppraisalStatus,
-  statusBuybackAppraisal,
-  statusShopAppraisal,
+  FullAppraisalStatus,
+  fullStatusBuybackAppraisal,
+  fullStatusShopAppraisal,
 } from "./appraisalStatus";
 import { ICharacter } from "@/browser/character";
-import { BuybackAppraisal, ShopAppraisal, toNewAppraisal } from "./appraisal";
-import {
-  NULL_OBFUSCATED,
-  newPBObfuscateCharacterID,
-} from "@/shared/obfuscatedCharacterId";
+import { Appraisal, toNewAppraisal } from "./appraisal";
 import { characterInfo } from "./other";
-import { ItemNamesOnly } from "./util";
 import { withCatchResult } from "../withResult";
 
 export const getBuybackAppraisal = async (
   code: string,
   character?: ICharacter,
   throwKind?: ThrowKind
-): Promise<BuybackAppraisal | null> => {
-  const dispatchEither = character?.admin ? dispatchAuthenticated : dispatch;
-  return dispatchEither(
+): Promise<Appraisal | null> =>
+  dispatch(
     pbClient.prototype.getBuybackAppraisal,
-    getAppraisalRequest("buyback", code, character),
+    getAppraisalRequest(code, character),
     (rep) =>
       newAppraisal({ kind: "buyback", rep }, character, ThrowKind.Parsed),
     throwKind
   );
-};
 export const resultGetBuybackAppraisal = withCatchResult(getBuybackAppraisal);
 
 export const getShopAppraisal = async (
   code: string,
   character?: ICharacter,
   throwKind?: ThrowKind
-): Promise<ShopAppraisal | null> => {
-  const dispatchEither = character?.admin ? dispatchAuthenticated : dispatch;
-  return dispatchEither(
+): Promise<Appraisal | null> =>
+  dispatch(
     pbClient.prototype.getShopAppraisal,
-    getAppraisalRequest("shop", code, character),
+    getAppraisalRequest(code, character),
     (rep) => newAppraisal({ kind: "shop", rep }, character, ThrowKind.Parsed),
     throwKind
   );
-};
 export const resultGetShopAppraisal = withCatchResult(getShopAppraisal);
 
 function getAppraisalRequest(
-  kind: "buyback",
   code: string,
   character?: ICharacter
-): pb.GetBuybackAppraisalRequest;
-function getAppraisalRequest(
-  kind: "shop",
-  code: string,
-  character?: ICharacter
-): pb.GetShopAppraisalRequest;
-function getAppraisalRequest(
-  _: StoreKind,
-  code: string,
-  character?: ICharacter
-): pb.GetBuybackAppraisalRequest | pb.GetShopAppraisalRequest {
+): pb.GetAppraisalRequest {
   return {
     code,
-    admin: character?.admin ?? false,
-    includeTypeNaming: ItemNamesOnly,
-    ...(character ? { auth: { token: character.refreshToken } } : {}),
+    includeItems: true,
+    refreshToken: character ? character.refreshToken : "",
   };
 }
 
 function newAppraisalRequest(
-  param: {
-    kind: "buyback";
-    systemId: number;
-  },
+  territoryId: number,
   items: pb.BasicItem[]
-): pb.NewBuybackAppraisalRequest;
-function newAppraisalRequest(
-  param: {
-    kind: "shop";
-    locationId: number;
-  },
-  items: pb.BasicItem[]
-): pb.NewShopAppraisalRequest;
-function newAppraisalRequest(
-  param:
-    | {
-        kind: "buyback";
-        systemId: number;
-      }
-    | {
-        kind: "shop";
-        locationId: number;
-      },
-  items: pb.BasicItem[]
-): pb.NewBuybackAppraisalRequest | pb.NewShopAppraisalRequest {
-  const { kind, ...reqParam } = param;
-  return {
-    ...reqParam,
-    items,
-    save: false,
-    includeTypeNaming: ItemNamesOnly,
-  };
+): pb.NewAppraisalRequest {
+  return { territoryId, items };
 }
 
-function newAppraisal(
-  param: {
-    kind: "buyback";
-    rep: pb.GetBuybackAppraisalResponse;
-  },
-  character?: ICharacter,
-  throwKind?: ThrowKind
-): Promise<BuybackAppraisal | null>;
-function newAppraisal(
-  param: {
-    kind: "shop";
-    rep: pb.GetShopAppraisalResponse;
-  },
-  character?: ICharacter,
-  throwKind?: ThrowKind
-): Promise<ShopAppraisal | null>;
 function newAppraisal(
   param:
     | {
@@ -142,110 +71,116 @@ function newAppraisal(
       },
   character?: ICharacter,
   throwKind?: ThrowKind
-): Promise<BuybackAppraisal | ShopAppraisal | null> {
+): Promise<Appraisal | null> {
   if (param.rep.appraisal === undefined) {
     return Promise.resolve(null);
   }
 
-  const { admin, refreshToken } = character ?? { admin: false };
-  const { characterId: adminOnlyCharacterId, hashCharacterId } = param.rep;
-
-  const isAnonymous = hashCharacterId === NULL_OBFUSCATED;
   const isSameCharacter =
     character !== undefined &&
-    !isAnonymous &&
-    (admin
-      ? character.id === adminOnlyCharacterId // if admin, don't check obfuscated
-      : hashCharacterId === newPBObfuscateCharacterID(character.id));
+    !param.rep.anonymous &&
+    param.rep.appraisal.characterId === character.id;
 
-  let fullStatusPromise:
-    | Promise<FullBuybackAppraisalStatus>
-    | Promise<FullShopAppraisalStatus>;
-  let appraisalCharacterPromise: Promise<ICharacter | null>;
-  // let newAppraisalPromise: Promise<pb.BuybackAppraisal> | Promise<pb.ShopAppraisal>;
-
-  if (
-    !isAnonymous &&
-    (isSameCharacter || admin) &&
-    refreshToken !== undefined
-  ) {
-    // fullStatusPromise
+  let fullStatusPromise: Promise<FullAppraisalStatus>;
+  if (character !== undefined && (character?.admin || isSameCharacter)) {
     if (param.kind === "buyback") {
-      fullStatusPromise = statusBuybackAppraisal(
+      fullStatusPromise = fullStatusBuybackAppraisal(
         param.rep.appraisal.code,
-        admin,
-        refreshToken,
+        character.refreshToken,
         throwKind
       );
     } /* if (param.kind === "shop") */ else {
-      fullStatusPromise = statusShopAppraisal(
+      fullStatusPromise = fullStatusShopAppraisal(
         param.rep.appraisal.code,
-        admin,
-        refreshToken,
+        character.refreshToken,
         throwKind
       );
     }
-    // newAppraisalPromise
-    if (isSameCharacter) {
-      appraisalCharacterPromise = Promise.resolve(character);
-    } else if (adminOnlyCharacterId !== 0) {
-      appraisalCharacterPromise = characterInfo(
-        adminOnlyCharacterId,
-        undefined,
-        undefined,
-        throwKind
-      );
-    } else {
-      appraisalCharacterPromise = Promise.resolve(null);
-    }
-  } /* if (isAnonymous || not admin and not same character) */ else {
-    appraisalCharacterPromise = Promise.resolve(null);
+  } else {
     fullStatusPromise = Promise.resolve(null);
   }
 
+  let appraisalCharacterPromise: Promise<ICharacter | null>;
+  if (isSameCharacter) {
+    appraisalCharacterPromise = Promise.resolve(character);
+  } else if (!param.rep.anonymous && param.rep.appraisal.characterId !== 0) {
+    appraisalCharacterPromise = characterInfo(
+      param.rep.appraisal.characterId,
+      undefined,
+      undefined,
+      throwKind
+    );
+  } else {
+    appraisalCharacterPromise = Promise.resolve(null);
+  }
+
   if (param.kind === "buyback") {
-    const { systemId, items } = param.rep.appraisal;
+    const { systemInfo, items } = param.rep.appraisal;
     return Promise.all([
       appraisalCharacterPromise,
       fullStatusPromise,
       dispatch(
         pbClient.prototype.newBuybackAppraisal,
-        newAppraisalRequest({ kind: "buyback", systemId }, items),
-        ({ appraisal }) =>
-          appraisal ?? throwInvalid("appraisal is undefined", throwKind),
+        newAppraisalRequest(
+          systemInfo!.systemId,
+          items.map((item) => ({
+            typeId: item.typeId!.typeId,
+            quantity: item.quantity,
+          }))
+        ),
+        ({ appraisal, strs }) => ({
+          strs,
+          appraisal:
+            appraisal ?? throwInvalid("appraisal is undefined", throwKind),
+        }),
         throwKind
       ),
-    ]).then(([appraisalCharacter, fullStatus, newAppraisal]) =>
+    ]).then(([appraisalCharacter, fullStatus, newAppraisalRep]) =>
       toNewAppraisal(
         {
           kind: "buyback",
           appraisal: param.rep.appraisal!,
-          newAppraisal,
-          fullStatus: fullStatus as FullBuybackAppraisalStatus,
+          newAppraisal: newAppraisalRep.appraisal,
         },
+        param.rep.strs,
+        newAppraisalRep.strs,
+        [],
+        fullStatus,
         appraisalCharacter
       )
     );
   } /* if (param.kind === "shop") */ else {
-    const { locationId, items } = param.rep.appraisal;
+    const { locationInfo, items } = param.rep.appraisal;
     return Promise.all([
       appraisalCharacterPromise,
       fullStatusPromise,
       dispatch(
         pbClient.prototype.newShopAppraisal,
-        newAppraisalRequest({ kind: "shop", locationId }, items),
-        ({ appraisal }) =>
-          appraisal ?? throwInvalid("appraisal is undefined", throwKind),
+        newAppraisalRequest(
+          locationInfo!.locationId,
+          items.map((item) => ({
+            typeId: item.typeId?.typeId || 0,
+            quantity: item.quantity,
+          }))
+        ),
+        ({ appraisal, strs }) => ({
+          strs,
+          appraisal:
+            appraisal ?? throwInvalid("appraisal is undefined", throwKind),
+        }),
         throwKind
       ),
-    ]).then(([appraisalCharacter, fullStatus, newAppraisal]) =>
+    ]).then(([appraisalCharacter, fullStatus, newAppraisalRep]) =>
       toNewAppraisal(
         {
           kind: "shop",
           appraisal: param.rep.appraisal!,
-          newAppraisal,
-          fullStatus: fullStatus as FullShopAppraisalStatus,
+          newAppraisal: newAppraisalRep.appraisal,
         },
+        param.rep.strs,
+        newAppraisalRep.strs,
+        [],
+        fullStatus,
         appraisalCharacter
       )
     );

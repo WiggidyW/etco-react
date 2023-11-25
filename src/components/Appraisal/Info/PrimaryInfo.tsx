@@ -12,13 +12,10 @@ export const AppraisalPrimaryInfo = ({
   className,
   character: loginCharacter,
   appraisal: {
-    locationId,
-    systemId,
-    regionId,
+    locationInfo: { locationId, locationStr, systemStr, regionStr },
     code,
     character,
     status,
-    locationNamingMaps: { locationNames, systemNames, regionNames },
   },
 }: AppraisalPrimaryInfoProps): ReactElement => {
   let statusString: string;
@@ -35,15 +32,17 @@ export const AppraisalPrimaryInfo = ({
   return (
     <InfoTable className={className}>
       {character && <PortraitRow entity={character} />}
-      {locationId && (
-        <InfoRow label="Location">{locationNames[locationId]}</InfoRow>
-      )}
-      <InfoRow label="System">{systemNames[systemId]}</InfoRow>
-      <InfoRow label="Region">{regionNames[regionId]}</InfoRow>
+      {locationId > 0 && <InfoRow label="Location">{locationStr}</InfoRow>}
+      <InfoRow label="System">{systemStr}</InfoRow>
+      <InfoRow label="Region">{regionStr}</InfoRow>
       <InfoRow label="Status">{statusString}</InfoRow>
       <InfoRow label="Code">{code}</InfoRow>
       {status === "inPurchaseQueue" && loginCharacter && (
-        <CancelButton character={loginCharacter} code={code} />
+        <CancelButton
+          character={loginCharacter}
+          code={code}
+          locationId={locationId}
+        />
       )}
     </InfoTable>
   );

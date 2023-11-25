@@ -2,6 +2,7 @@ const PUBLIC_ENV = {
   DEV_MODE: process.env.NEXT_PUBLIC_ETCO_DEV_MODE === "true",
   BASE_DOMAIN: process.env.NEXT_PUBLIC_ETCO_BASE_DOMAIN,
   CORP_NAME: process.env.NEXT_PUBLIC_ETCO_CORP_NAME,
+  CORP_ID: process.env.NEXT_PUBLIC_ETCO_CORP_ID,
   BASE_URL: process.env.NEXT_PUBLIC_ETCO_BASE_URL,
 };
 

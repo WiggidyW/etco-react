@@ -1,23 +1,18 @@
-import {
-  serverCookiesGetCheckIsAdmin,
-  serverCookiesGetLoginCallbackRedirect,
-} from "@/cookies/server";
-import { fetchCharacter } from "@/server-actions/fetchCharacter";
+import { serverCookiesGetLoginCallbackRedirect } from "@/cookies/server";
 import { EveAuthCallbackClientSide } from "./EveAuthCallbackClientSide";
 import { Loading } from "@/components/Loading";
 import { ReactElement, Suspense } from "react";
 import { ParsedJSONError, unknownToParsedJSONError } from "@/error/error";
 import { ICharacter } from "@/browser/character";
 import { ErrorBoundaryGoBack } from "@/components/ErrorBoundary";
-import { isAdmin } from "@/server-actions/grpc/other";
+import { login } from "@/server-actions/grpc/other";
 import { Result } from "@/components/todo";
 import { ErrorThrower } from "@/components/ErrorThrower";
+import { EsiApp } from "@/proto/etco";
 
 export interface EveAuthCallbackProps {
-  clientId: string;
-  clientSecret: string;
+  app: EsiApp;
   charactersKey: string;
-  canBeAdmin: boolean;
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
@@ -37,16 +32,12 @@ export interface EveAuthCallbackServerSideProps extends EveAuthCallbackProps {
 }
 
 const EveAuthCallbackServerSide = async ({
-  clientId,
-  clientSecret,
+  app,
   charactersKey,
-  canBeAdmin,
   searchParams,
   redirectHref,
 }: EveAuthCallbackServerSideProps): Promise<ReactElement> => {
   const code = searchParams["code"];
-  const checkIsAdmin = canBeAdmin && serverCookiesGetCheckIsAdmin();
-
   const fetch = async (): Promise<Result<ICharacter, ParsedJSONError>> => {
     try {
       // validate code
@@ -58,17 +49,7 @@ const EveAuthCallbackServerSide = async ({
       }
 
       // fetch character
-      const character = await fetchCharacter(
-        code,
-        clientId,
-        clientSecret,
-        checkIsAdmin
-      );
-
-      // check if admin and set admin if so
-      if (checkIsAdmin) {
-        character.admin = await isAdmin(character.refreshToken);
-      }
+      const character = await login(code, app);
 
       return { ok: true, value: character };
     } catch (e) {

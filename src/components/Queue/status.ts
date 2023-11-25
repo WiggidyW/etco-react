@@ -81,7 +81,7 @@ export const newFlattenedUserQueue = (
     status: getAppraisalStatusTab(kind, entry),
     code: entry.code,
     ...(entry.status !== null && entry.status !== "inPurchaseQueue"
-      ? { expires: entry.status.expires }
+      ? { expires: entry.status.contract.expires }
       : {}),
   }));
 
@@ -94,7 +94,7 @@ const getAppraisalStatusTab = (
   } else if (entry.status === "inPurchaseQueue") {
     return "In Purchase Queue";
   } else {
-    return getStatusTab(kind, entry.status.status);
+    return getStatusTab(kind, entry.status.contract.status);
   }
 };
 
@@ -103,16 +103,16 @@ const getStatusTab = (
   pbStatus: PBContractStatus
 ): ContractStatusTab => {
   switch (pbStatus) {
-    case PBContractStatus.outstanding:
+    case PBContractStatus.CS_OUTSTANDING:
       return "Outstanding";
-    case PBContractStatus.finished:
+    case PBContractStatus.CS_FINISHED:
       return "Completed";
-    case PBContractStatus.deleted:
-    case PBContractStatus.cancelled:
+    case PBContractStatus.CS_DELETED:
+    case PBContractStatus.CS_CANCELLED:
       return kind === "buyback" ? "Cancelled by User" : "Cancelled by Corp";
-    case PBContractStatus.rejected:
+    case PBContractStatus.CS_REJECTED:
       return kind === "shop" ? "Cancelled by User" : "Cancelled by Corp";
-    case PBContractStatus.failed:
+    case PBContractStatus.CS_FAILED:
       return "Timed Out";
     // case PBContractStatus.unknown_status:
     // case PBContractStatus.in_progress:

@@ -5,6 +5,7 @@ import { CharacterPortrait } from "./Character/Portrait";
 import Link from "next/link";
 import { Character, ICharacter } from "@/browser/character";
 import LoginImagePNG from "@/../public/eve-sso-login-black-large.png";
+import { getLocations } from "./Appraisal/Options";
 
 export interface NavBarProps {
   path: string;
@@ -18,9 +19,20 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
     <div className={classNames("ml-2", "pt-1", "pb-1")}>
       <NavLink href="/">Home</NavLink>
       <NavLink href="/buyback">Buyback</NavLink>
-      <NavLink href="/shop" disabled={!character}>
-        Shop
-      </NavLink>
+      <NavDropdown
+        items={getLocations().map(({ label, value }) => (
+          <NavLink
+            href={`/shop/inventory/${value}`}
+            key={value}
+            nested
+            disabled={!character}
+          >
+            {label}
+          </NavLink>
+        ))}
+      >
+        <NavLink disabled={!character}>Shop</NavLink>
+      </NavDropdown>
       <NavLink href="/history" disabled={!character}>
         History
       </NavLink>
@@ -69,7 +81,7 @@ export const NavBar = ({ path, character }: NavBarProps): ReactElement => (
             </NavLink>,
           ]}
         >
-          <NavLink href="/admin">Admin</NavLink>
+          <NavLink>Admin</NavLink>
         </NavDropdown>
       )}
     </div>
@@ -99,38 +111,43 @@ const LoginImage = ({ path, character }: NavBarProps): ReactElement => (
 
 interface NavLinkProps extends PropsWithChildren {
   className?: string;
-  href: string;
+  href?: string;
   nested?: boolean;
   disabled?: boolean;
 }
 const NavLink = ({
-  className,
+  className: argClassName,
   href,
   nested,
   disabled,
   children,
-}: NavLinkProps): ReactElement => (
-  <Link
-    href={href}
-    className={classNames(
-      "inline-block",
-      "whitespace-nowrap",
-      "font-bold",
-      "hover:text-light-blue-base",
-      { [classNames("text-xl", "mr-3")]: !nested },
-      {
-        [classNames(
-          "brightness-50",
-          "pointer-events-none"
-          // "cursor-not-allowed"
-        )]: disabled,
-      },
-      className
-    )}
-  >
-    {children}
-  </Link>
-);
+}: NavLinkProps): ReactElement => {
+  const className = classNames(
+    "inline-block",
+    "whitespace-nowrap",
+    "font-bold",
+    "hover:text-light-blue-base",
+    { [classNames("text-xl", "mr-3")]: !nested },
+    {
+      [classNames(
+        "brightness-50",
+        "pointer-events-none"
+        // "cursor-not-allowed"
+      )]: disabled,
+    },
+    { "cursor-pointer": !disabled && href === undefined },
+    argClassName
+  );
+  if (href === undefined) {
+    return <span className={className}>{children}</span>;
+  } else {
+    return (
+      <Link href={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
+};
 
 interface NavDropdownProps extends PropsWithChildren {
   className?: string;

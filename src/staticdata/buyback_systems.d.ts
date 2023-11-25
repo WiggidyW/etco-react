@@ -1,8 +1,8 @@
-import { Systems, RegionNames } from "./types";
+import { Systems, Strs } from "./types";
 
 export interface ContentBuybackSystems {
   BUYBACK_SYSTEMS: Systems;
-  BUYBACK_REGION_NAMES: RegionNames;
+  STRS: Strs;
 }
 
 declare module "buyback_systems.json" {

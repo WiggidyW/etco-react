@@ -39,9 +39,10 @@ export const AppraisalContainerLoader = async ({
   if (appraisal === null) {
     return notFound();
   } else if (kind === "shop") {
-    if (appraisal.locationId) {
+    if (appraisal.locationInfo.locationId) {
       defaultOption = options.find(
-        (option) => option.value === appraisal.locationId!.toString()
+        (option) =>
+          option.value === appraisal.locationInfo.locationId.toString()
       );
     }
     return (
@@ -58,7 +59,7 @@ export const AppraisalContainerLoader = async ({
     );
   } /* else if (kind === "buyback") */ else {
     defaultOption = options.find(
-      (option) => option.value === appraisal.systemId.toString()
+      (option) => option.value === appraisal.locationInfo.systemId.toString()
     );
     return (
       <ErrorBoundaryTryAgain>

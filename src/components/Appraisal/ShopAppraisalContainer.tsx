@@ -1,6 +1,5 @@
 "use client";
 
-import { LocationSelect, LocationSelectProps } from "./LocationSelect";
 import { AppraisalContainer } from "./Container";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import classNames from "classnames";

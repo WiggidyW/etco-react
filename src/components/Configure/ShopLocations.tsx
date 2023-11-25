@@ -54,23 +54,14 @@ export const ConfigureShopLocations = ({
     {({
       update,
       updated,
-      rep: {
-        locations,
-        locationInfoMap,
-        locationNames,
-        systemNames,
-        regionNames,
-        bundleKeys,
-      },
+      rep: { locations, locationInfoMap, strs, bundleKeys },
     }) => (
       <Configure
         update={update}
         oldLocations={locations}
         newLocations={updated}
         locationInfoMap={locationInfoMap}
-        locationNames={locationNames}
-        systemNames={systemNames}
-        regionNames={regionNames}
+        strs={strs}
         bundleKeys={bundleKeys}
       />
     )}
@@ -107,9 +98,7 @@ class RecordData {
   constructor(
     readonly oldLocations: Locations,
     readonly locationInfoMap: { [locationId: string]: LocationInfo },
-    readonly locationNames: { [locationId: string]: string },
-    readonly systemNames: { [systemId: number]: string },
-    readonly regionNames: { [regionId: number]: string }
+    readonly strs: string[]
   ) {}
 
   newRecords(): Record[] {
@@ -149,19 +138,25 @@ class Record {
     return this.locationInfo?.isStructure;
   }
   get locationName(): string | undefined {
-    return this.recordData.locationNames[this.locationId.toString()];
+    return this.recordData.strs[this.locationInfo?.locationStrIndex ?? 0];
   }
   get systemId(): number | undefined {
-    return this.locationInfo?.systemId;
+    return this.locationInfo?.systemInfo?.systemId;
   }
   get systemName(): string | undefined {
-    if (this.systemId) return this.recordData.systemNames[this.systemId];
+    if (this.systemId)
+      return this.recordData.strs[
+        this.locationInfo?.systemInfo?.systemStrIndex ?? 0
+      ];
   }
   get regionId(): number | undefined {
-    return this.locationInfo?.regionId;
+    return this.locationInfo?.systemInfo?.regionId;
   }
   get regionName(): string | undefined {
-    if (this.regionId) return this.recordData.regionNames[this.regionId];
+    if (this.regionId)
+      return this.recordData.strs[
+        this.locationInfo?.systemInfo?.regionStrIndex ?? 0
+      ];
   }
   get bundleKey(): string | undefined {
     return this.location?.bundleKey;
@@ -194,9 +189,7 @@ interface ConfigureProps {
   oldLocations: Locations;
   newLocations: Locations;
   locationInfoMap: { [locationId: string]: LocationInfo };
-  locationNames: { [locationId: string]: string };
-  systemNames: { [systemId: number]: string };
-  regionNames: { [regionId: number]: string };
+  strs: string[];
   bundleKeys: string[];
 }
 const Configure = ({
@@ -204,9 +197,7 @@ const Configure = ({
   oldLocations,
   newLocations,
   locationInfoMap,
-  locationNames,
-  systemNames,
-  regionNames,
+  strs,
   bundleKeys,
 }: ConfigureProps): ReactElement => {
   const [selected, setSelected] = useState<{
@@ -218,15 +209,8 @@ const Configure = ({
   });
   const updates = useMemo<Locations>(() => ({}), [newLocations]);
   const recordData = useMemo(
-    () =>
-      new RecordData(
-        oldLocations,
-        locationInfoMap,
-        locationNames,
-        systemNames,
-        regionNames
-      ),
-    [oldLocations, locationInfoMap, locationNames, systemNames, regionNames]
+    () => new RecordData(oldLocations, locationInfoMap, strs),
+    [oldLocations, locationInfoMap, strs]
   );
   recordData.newLocations = newLocations;
   const records = useMemo(

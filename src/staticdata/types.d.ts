@@ -1,34 +1,31 @@
+export type Strs = string[];
+
 // SDE Types
 export interface SDEType {
   typeId: number;
-  name: string;
-  groupIndex: number;
-  categoryIndex: number;
-  marketGroupIndexes: number[];
+  typeStrIndex: number;
+  categoryStrIndex: number;
+  groupStrIndex: number;
+  marketGroupStrIndexes: number[];
 }
 export type SDETypes = SDEType[];
-export type GroupNames = string[];
-export type CategoryNames = string[];
-export type MarketGroupNames = string[];
+
+// SDE Location Flags
 export type LocationFlags = string[];
 
 // BuybackSystems + SDESystems
 export interface System {
-  systemName: string;
+  systemStrIndex: number;
   regionId: number;
+  regionStrIndex: number;
 }
 export type Systems = { [systemId: number]: System };
 
 // ShopLocations
 export interface ShopLocation {
+  locationName: string;
   isStructure: boolean;
   forbiddenStructure: boolean;
-  locationName: string; // "" if forbiddenStructure
-  systemId: number;
-  regionId: number;
+  taxRate: number;
 }
 export type ShopLocations = { [locationId: number]: ShopLocation };
-export type SystemNames = { [systemId: number]: string };
-
-// BuybackSystems + SDESystems + ShopLocations
-export type RegionNames = { [regionId: number]: string };

@@ -21,7 +21,6 @@ export const UserLogin = ({ path }: LoginProps): ReactElement => {
         redirectAfterLoginCallbackPath={loginPath}
         loginUrl={newWebLoginUrl(EveApps["Auth"])}
         canSelect={CurrentCharacterEveAppKind === "Auth"}
-        checkIsAdmin={false}
       />
     </ErrorBoundaryTryAgain>
   );
@@ -42,7 +41,6 @@ export const AdminLogin = ({ path }: LoginProps): ReactElement => {
               redirectAfterLoginCallbackPath={loginPath}
               loginUrl={newWebLoginUrl(EveApps[title])}
               canSelect={CurrentCharacterEveAppKind === title}
-              checkIsAdmin={EveApps[title].canBeAdmin}
             />
           )) as [ReactNode, ...[ReactNode]] // invalid cast if EveAppKinds is ever empty
         }

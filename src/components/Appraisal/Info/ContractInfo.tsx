@@ -28,14 +28,30 @@ export const AppraisalContractInfo = ({
   }
 
   const {
-    contract: { status: pbContractStatus, issued, expires, locationId, price },
-    locationInfo: { systemId, regionId },
+    contract: {
+      status: pbContractStatus,
+      issued,
+      expires,
+      /* Start Extra-Disgusting Code */
+      locationInfo: {
+        locationStrIndex,
+        systemInfo: { systemStrIndex, regionStrIndex } = {
+          systemStrIndex: 0,
+          regionStrIndex: 0,
+        },
+      } = {
+        locationStrIndex: 0,
+      },
+      /* End Extra-Disgusting Code */
+      price,
+    },
+    strs,
     entity: { entity },
   } = appraisal.status;
 
-  const locationName = appraisal.locationNamingMaps.locationNames[locationId];
-  const systemName = appraisal.locationNamingMaps.systemNames[systemId];
-  const regionName = appraisal.locationNamingMaps.regionNames[regionId];
+  const locationName = strs[locationStrIndex];
+  const systemName = strs[systemStrIndex];
+  const regionName = strs[regionStrIndex];
 
   return (
     <InfoTable className={className}>

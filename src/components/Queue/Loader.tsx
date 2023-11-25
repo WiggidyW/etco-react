@@ -18,6 +18,7 @@ import {
   UserQueueViewer,
 } from "./Viewer";
 import { ErrorThrower } from "../ErrorThrower";
+import { ICharacter } from "@/browser/character";
 
 export interface ContractQueueLoaderProps {
   kind: StoreKind;
@@ -33,14 +34,14 @@ export const ContractQueueLoader = async ({
       : await resultShopContractQueue(token);
 
   if (queueResult.ok) {
-    const { queue, locationNamingMaps } = queueResult.value;
+    const { queue, strs } = queueResult.value;
 
     queue.sort((a, b) => b.contract.issued - a.contract.issued);
 
     return (
       <ContractQueueViewer
         kind={kind}
-        locationNamingMaps={locationNamingMaps}
+        strs={strs}
         queue={newGroupedContractQueue(kind, queue)}
       />
     );
@@ -64,12 +65,15 @@ export const PurchaseQueueLoader = async ({
 };
 
 export interface UserQueueLoaderProps {
-  token: string;
+  character: ICharacter;
 }
 export const UserQueueLoader = async ({
-  token,
+  character,
 }: UserQueueLoaderProps): Promise<ReactElement> => {
-  const userDataResult = await resultUserData(token);
+  const userDataResult = await resultUserData(
+    character.id,
+    character.refreshToken
+  );
   if (userDataResult.ok) {
     const {
       buybackHistory: unfltBuybackHistory,

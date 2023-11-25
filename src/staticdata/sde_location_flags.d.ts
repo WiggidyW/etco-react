@@ -1,5 +1,7 @@
+import { LocationFlags } from "./types";
+
 export interface ContentSdeLocationFlags {
-  LOCATION_FLAGS: string[];
+  LOCATION_FLAGS: LocationFlags;
 }
 
 declare module "sde_location_flags.json" {

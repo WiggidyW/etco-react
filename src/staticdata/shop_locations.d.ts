@@ -1,9 +1,7 @@
-import { ShopLocations, RegionNames, SystemNames } from "./types";
+import { ShopLocations } from "./types";
 
 export interface ContentShopLocations {
   SHOP_LOCATIONS: ShopLocations;
-  SHOP_REGION_NAMES: RegionNames;
-  SHOP_SYSTEM_NAMES: SystemNames;
 }
 
 declare module "shop_locations.json" {

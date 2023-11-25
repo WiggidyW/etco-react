@@ -1,19 +1,18 @@
 import { ModificationState } from "@/components/Configure/modificationState";
-import { TypeNamingLists } from "@/proto/etco";
-import { ValidShopItem } from "@/server-actions/grpc/other";
+import { ShopItem } from "@/proto/etco";
 
 export class Record {
   private _marketGroupNames: string[] | null = null;
   private _cartQuantity: number | null = null;
 
   constructor(
-    readonly item: ValidShopItem,
+    readonly item: ShopItem,
     readonly index: number,
-    readonly typeNamingLists: TypeNamingLists
+    readonly strs: string[]
   ) {}
 
   get typeId(): number {
-    return this.item.typeId;
+    return this.item.typeId!.typeId;
   }
   get quantity(): number {
     return this.item.quantity;
@@ -22,25 +21,22 @@ export class Record {
     return this.item.pricePerUnit;
   }
   get description(): string {
-    return this.item.description;
+    return this.strs[this.item.descriptionStrIndex];
   }
   get typeName(): string {
-    return this.item.typeNamingIndexes.name;
+    return this.strs[this.item.typeId!.typeStrIndex];
   }
   get groupName(): string {
-    return this.typeNamingLists.groups[this.item.typeNamingIndexes.groupIndex];
+    return this.strs[this.item.typeId!.groupStrIndex];
   }
   get categoryName(): string {
-    return this.typeNamingLists.categories[
-      this.item.typeNamingIndexes.categoryIndex
-    ];
+    return this.strs[this.item.typeId!.categoryStrIndex];
   }
   get marketGroupNames(): string[] {
     if (this._marketGroupNames === null) {
-      this._marketGroupNames =
-        this.item.typeNamingIndexes.marketGroupIndexes.map(
-          (index) => this.typeNamingLists.marketGroups[index]
-        );
+      this._marketGroupNames = this.item.typeId!.marketGroupStrIndexes.map(
+        (index) => this.strs[index]
+      );
     }
     return this._marketGroupNames;
   }

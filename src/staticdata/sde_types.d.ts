@@ -1,10 +1,8 @@
-import { SDETypes, GroupNames, CategoryNames, MarketGroupNames } from "./types";
+import { SDETypes, Strs } from "./types";
 
 export interface ContentSdeTypes {
   SDE_TYPE_DATA: SDETypes;
-  GROUP_NAMES: GroupNames;
-  CATEGORY_NAMES: CategoryNames;
-  MARKET_GROUP_NAMES: MarketGroupNames;
+  STRS: Strs;
 }
 
 declare module "sde_types.json" {

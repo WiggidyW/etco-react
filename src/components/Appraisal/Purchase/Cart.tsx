@@ -66,6 +66,7 @@ const newCartAppraisal = (
   records: Record[],
   price: number
 ): AppraisalTablePartialAppraisal => ({
+  kind: "shop",
   price,
   newPrice: true,
   time: Date.now() / 1000,

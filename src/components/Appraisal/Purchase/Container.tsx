@@ -1,7 +1,7 @@
 "use client";
 
 import { ICharacter } from "@/browser/character";
-import { BasicItem, MakePurchaseStatus, TypeNamingLists } from "@/proto/etco";
+import { BasicItem, MakePurchaseStatus, ShopItem } from "@/proto/etco";
 import { ReactElement, ReactNode, Suspense, useState } from "react";
 import {
   ShopAppraisalContainer,
@@ -19,7 +19,6 @@ import { ParsedJSONError } from "@/error/error";
 import { newAppraisalContainerChildren } from "../ContainerChildren";
 import { Appraisal } from "@/server-actions/grpc/appraisal";
 import { ShopInventory } from "./Inventory";
-import { ValidShopItem } from "@/server-actions/grpc/other";
 import {
   MakePurchaseAppraisal,
   resultShopMakePurchase,
@@ -28,8 +27,8 @@ import {
 import { Result } from "../../todo";
 
 export interface BasePurchaseContainerProps {
-  typeNamingLists: TypeNamingLists;
-  items: ValidShopItem[];
+  strs: string[];
+  items: ShopItem[];
   character: ICharacter;
   locationId: number;
 }
@@ -37,7 +36,7 @@ export interface BasePurchaseContainerProps {
 export type PurchaseContainerProps = BasePurchaseContainerProps &
   Omit<ShopAppraisalContainerProps, "containerChildren">;
 export const PurchaseContainer = ({
-  typeNamingLists,
+  strs,
   items,
   character,
   locationId,
@@ -86,7 +85,7 @@ export const PurchaseContainer = ({
   } else {
     return (
       <ShopInventory
-        typeNamingLists={typeNamingLists}
+        strs={strs}
         items={items}
         locationId={locationId}
         onCheckout={(items) => setCheckout({ checkingOut: true, items })}
@@ -125,13 +124,16 @@ const PurchaseResult = ({
   ...appraisalProps
 }: PurchaseResultProps): ReactElement => {
   const appraisalOk =
-    appraisal !== undefined && status === MakePurchaseStatus.MPS_SUCCESS;
+    appraisal !== undefined &&
+    (status === MakePurchaseStatus.MPS_SUCCESS ||
+      status === MakePurchaseStatus.MPS_NONE);
   useAppraisalCodeURIEffect("/shop", appraisalOk ? appraisal.code : null);
 
   if (!appraisalOk) {
     let message: string;
     switch (status) {
       case MakePurchaseStatus.MPS_SUCCESS:
+      case MakePurchaseStatus.MPS_NONE:
         message = "SERVER ERROR: Purchase successful, appraisal undefined.";
         break;
       case MakePurchaseStatus.MPS_COOLDOWN_LIMIT:

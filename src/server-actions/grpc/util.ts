@@ -1,31 +1,23 @@
 import * as pb from "@/proto/etco";
 
-export const TypeNamesAll: pb.IncludeTypeNaming = {
-  includeName: true,
-  includeMarketGroups: true,
-  includeCategory: true,
-  includeGroup: true,
-};
-export const ItemNamesOnly: pb.IncludeTypeNaming = {
-  includeName: true,
-  includeMarketGroups: false,
-  includeCategory: false,
-  includeGroup: false,
-};
-export const LocationNamesAll: pb.IncludeLocationNaming = {
-  includeLocationName: true,
-  includeSystemName: true,
-  includeRegionName: true,
-};
-export const EmptyPbBuybackAppraisal: pb.BuybackAppraisal = {
-  items: [],
+export const NewEmptyPbBuybackAppraisal = (): pb.BuybackAppraisal => ({
+  rejected: false,
   code: "",
-  price: 0,
   time: 0,
+  items: [],
   version: "",
-  systemId: -1,
-  feePerM3: 0,
-  fee: 0,
-  taxRate: 0,
+  characterId: 0,
+  systemInfo: {
+    systemId: 0,
+    systemStrIndex: 0,
+    regionId: 0,
+    regionStrIndex: 0,
+  },
+  price: 0,
   tax: 0,
-};
+  taxRate: 0,
+  fee: 0,
+  feePerM3: 0,
+});
+
+export const NewEmptyPbStrs = (): string[] => ["undefined"];

@@ -73,12 +73,3 @@ export const serverCookiesGetTheme = (): "light" | "dark" | null => {
     return null;
   }
 };
-
-export const serverCookiesGetCheckIsAdmin = (): boolean => {
-  const val = cookies().get("checkIsAdmin")?.value;
-  if (val === "true") {
-    return true;
-  } else {
-    return false;
-  }
-};

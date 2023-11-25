@@ -3,12 +3,11 @@
 import * as pb from "@/proto/etco";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
 import { ThrowKind } from "../throw";
-import { StoreKind, dispatchAuthenticated, throwInvalid } from "./grpc";
+import { StoreKind, dispatch, throwInvalid } from "./grpc";
 import { ICharacter } from "@/browser/character";
 import { allianceInfo, characterInfo, corporationInfo } from "./other";
 import { ICorporation } from "@/browser/corporation";
 import { IAlliance } from "@/browser/alliance";
-import { ItemNamesOnly, LocationNamesAll } from "./util";
 import { withCatchResult } from "../withResult";
 
 export type AppraisalEntity =
@@ -26,45 +25,30 @@ export type AppraisalEntity =
     };
 
 export interface ContractStatus {
-  locationInfo: pb.LocationInfo;
   contract: pb.Contract;
   entity: AppraisalEntity;
 }
 
-export interface FullContractStatus extends ContractStatus {
-  locationNamingMaps: pb.LocationNamingMaps;
-  contractItems: pb.ContractItem[];
+export interface ContractStatusWithStrs extends ContractStatus {
+  strs: string[];
 }
 
-export type UserBuybackAppraisalStatus = pb.Contract | null;
-export type UserShopAppraisalStatus = pb.Contract | "inPurchaseQueue" | null;
-export type UserAppraisalStatus =
-  | UserBuybackAppraisalStatus
-  | UserShopAppraisalStatus;
+export interface FullContractStatus extends ContractStatusWithStrs {
+  contractItems: pb.NamedBasicItem[];
+}
 
-export type BuybackAppraisalStatus = ContractStatus | null;
-export type ShopAppraisalStatus = ContractStatus | "inPurchaseQueue" | null;
-export type AppraisalStatus = BuybackAppraisalStatus | ShopAppraisalStatus;
-
-export type FullBuybackAppraisalStatus = FullContractStatus | null;
-export type FullShopAppraisalStatus =
-  | FullContractStatus
-  | "inPurchaseQueue"
-  | null;
-export type FullAppraisalStatus =
-  | FullBuybackAppraisalStatus
-  | FullShopAppraisalStatus;
+export type AppraisalStatus = ContractStatusWithStrs | "inPurchaseQueue" | null;
+export type FullAppraisalStatus = FullContractStatus | "inPurchaseQueue" | null;
 
 export const statusBuybackAppraisal = async (
   code: string,
-  admin: boolean,
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
-): Promise<FullBuybackAppraisalStatus> =>
-  dispatchAuthenticated(
+): Promise<AppraisalStatus> =>
+  dispatch(
     pbClient.prototype.statusBuybackAppraisal,
-    newStatusAppraisalRequest("buyback", code, admin, token),
-    (rep) => newFullAppraisalStatus({ kind: "buyback", rep }, ThrowKind.Parsed),
+    { code, includeItems: false, refreshToken },
+    (rep) => newAppraisalStatus("buyback", rep, ThrowKind.Parsed),
     throwKind
   );
 export const resultStatusBuybackAppraisal = withCatchResult(
@@ -73,125 +57,67 @@ export const resultStatusBuybackAppraisal = withCatchResult(
 
 export const statusShopAppraisal = async (
   code: string,
-  admin: boolean,
-  token: string,
+  refreshToken: string,
   throwKind?: ThrowKind
-): Promise<FullShopAppraisalStatus> =>
-  dispatchAuthenticated(
+): Promise<AppraisalStatus> =>
+  dispatch(
     pbClient.prototype.statusShopAppraisal,
-    newStatusAppraisalRequest("shop", code, admin, token),
-    (rep) => newFullAppraisalStatus({ kind: "shop", rep }, ThrowKind.Parsed),
+    { code, includeItems: false, refreshToken },
+    (rep) => newAppraisalStatus("shop", rep, ThrowKind.Parsed),
     throwKind
   );
 export const resultStatusShopAppraisal = withCatchResult(statusShopAppraisal);
 
-function newStatusAppraisalRequest(
-  kind: "buyback",
+export const fullStatusBuybackAppraisal = async (
   code: string,
-  admin: boolean,
-  token: string
-): pb.StatusBuybackAppraisalRequest;
-function newStatusAppraisalRequest(
-  kind: "shop",
+  refreshToken: string,
+  throwKind?: ThrowKind
+): Promise<FullAppraisalStatus> =>
+  dispatch(
+    pbClient.prototype.statusBuybackAppraisal,
+    { code, includeItems: true, refreshToken },
+    (rep) => newFullAppraisalStatus("buyback", rep, ThrowKind.Parsed),
+    throwKind
+  );
+export const resultFullStatusBuybackAppraisal = withCatchResult(
+  fullStatusBuybackAppraisal
+);
+
+export const fullStatusShopAppraisal = async (
   code: string,
-  admin: boolean,
-  token: string
-): pb.StatusShopAppraisalRequest;
-function newStatusAppraisalRequest(
-  _: StoreKind,
-  code: string,
-  admin: boolean,
-  token: string
-): pb.StatusBuybackAppraisalRequest | pb.StatusShopAppraisalRequest {
-  return {
-    code,
-    includeItems: true,
-    includeLocationInfo: true,
-    includeTypeNaming: ItemNamesOnly,
-    includeLocationNaming: LocationNamesAll,
-    admin,
-    auth: { token },
-  };
-}
+  refreshToken: string,
+  throwKind?: ThrowKind
+): Promise<FullAppraisalStatus> =>
+  dispatch(
+    pbClient.prototype.statusShopAppraisal,
+    { code, includeItems: true, refreshToken },
+    (rep) => newFullAppraisalStatus("shop", rep, ThrowKind.Parsed),
+    throwKind
+  );
+export const resultFullStatusShopAppraisal = withCatchResult(
+  fullStatusShopAppraisal
+);
 
 const throwAppraisalStatusInvalid = (
-  rep: pb.StatusBuybackAppraisalResponse | pb.StatusShopAppraisalResponse,
+  rep: pb.StatusAppraisalResponse,
   message: string,
   throwKind?: ThrowKind
 ): never =>
   throwInvalid(message, throwKind, {
     itemCount: rep.contractItems.length,
     contractPresent: rep.contract !== undefined,
-    forbiddenStructure: rep.locationInfo?.forbiddenStructure,
-    locationNamingMapsPresent: rep.locationNamingMaps !== undefined,
+    forbiddenStructure: rep.contract?.locationInfo?.forbiddenStructure,
   });
-
-function newFullAppraisalStatus(
-  param: { kind: "buyback"; rep: pb.StatusBuybackAppraisalResponse },
-  throwKind?: ThrowKind
-): Promise<FullBuybackAppraisalStatus>;
-function newFullAppraisalStatus(
-  param: { kind: "shop"; rep: pb.StatusShopAppraisalResponse },
-  throwKind?: ThrowKind
-): Promise<FullShopAppraisalStatus>;
-function newFullAppraisalStatus(
-  param:
-    | { kind: "buyback"; rep: pb.StatusBuybackAppraisalResponse }
-    | { kind: "shop"; rep: pb.StatusShopAppraisalResponse },
-  throwKind?: ThrowKind
-): Promise<FullBuybackAppraisalStatus | FullShopAppraisalStatus> {
-  const { contract, contractItems, locationInfo, locationNamingMaps } =
-    param.rep;
-
-  // return early if there is no contract
-  if (param.kind === "shop" && param.rep.inPurchaseQueue) {
-    return Promise.resolve("inPurchaseQueue");
-  } else if (contract === undefined) {
-    return Promise.resolve(null);
-  }
-
-  // validate contract data
-  else if (locationInfo === undefined) {
-    return throwAppraisalStatusInvalid(
-      param.rep,
-      "locationInfo is undefined",
-      throwKind
-    );
-  } else if (locationNamingMaps === undefined) {
-    return throwAppraisalStatusInvalid(
-      param.rep,
-      "locationNamingMaps is undefined",
-      throwKind
-    );
-  }
-
-  // return contract status
-  else {
-    return newContractStatus(
-      param.kind,
-      contract,
-      locationInfo,
-      locationNamingMaps,
-      throwKind
-    ).then((contractStatus) => ({
-      ...contractStatus,
-      contractItems,
-      locationNamingMaps,
-    }));
-  }
-}
 
 export const newContractStatus = (
   kind: StoreKind,
   contract: pb.Contract,
-  locationInfo: pb.LocationInfo,
-  locationNamingMaps: pb.LocationNamingMaps,
   throwKind?: ThrowKind,
   entity?: AppraisalEntity
 ): Promise<ContractStatus> => {
   // fetch the correct entity according to kind and return status
   if (entity !== undefined) {
-    return Promise.resolve({ contract, locationInfo, entity });
+    return Promise.resolve({ contract, entity });
   } else if (kind === "shop") {
     return newAssignee(
       contract.assigneeId,
@@ -199,18 +125,53 @@ export const newContractStatus = (
       throwKind
     ).then((entity) => ({
       contract,
-      locationInfo,
-      locationNamingMaps,
       entity,
     }));
   } /* if (param.kind === "buyback") */ else {
     return newIssuer(contract.issuerCharId, throwKind).then((entity) => ({
       contract,
-      locationInfo,
-      locationNamingMaps,
       entity,
     }));
   }
+};
+
+export const newAppraisalStatus = (
+  kind: StoreKind,
+  rep: pb.StatusAppraisalResponse,
+  throwKind?: ThrowKind
+): Promise<AppraisalStatus> => {
+  const { status, contract, strs } = rep;
+
+  // return early if there is no contract
+  if (status === pb.AppraisalStatus.AS_PURCHASE_QUEUE) {
+    return Promise.resolve("inPurchaseQueue");
+  } else if (status === pb.AppraisalStatus.AS_UNDEFINED) {
+    return Promise.resolve(null);
+  } else if (contract === undefined) {
+    return throwAppraisalStatusInvalid(rep, "contract is undefined", throwKind);
+  }
+
+  // return contract status
+  else {
+    return newContractStatus(kind, contract, throwKind).then((status) => ({
+      ...status,
+      strs,
+    }));
+  }
+};
+
+export const newFullAppraisalStatus = (
+  kind: StoreKind,
+  rep: pb.StatusAppraisalResponse,
+  throwKind?: ThrowKind
+): Promise<FullAppraisalStatus> => {
+  return newAppraisalStatus(kind, rep, throwKind).then((status) => {
+    if (status === null || status === "inPurchaseQueue") {
+      return status;
+    } else {
+      return { ...status, contractItems: rep.contractItems, strs: rep.strs };
+    }
+  });
 };
 
 const newIssuer = (
@@ -230,21 +191,21 @@ const newAssignee = (
   throwKind?: ThrowKind
 ): Promise<AppraisalEntity> => {
   switch (assigneeType) {
-    case pb.ContractAssigneeType.character:
+    case pb.ContractAssigneeType.CAT_CHARACTER:
       return characterInfo(assigneeId, undefined, undefined, throwKind).then(
         (character) => ({ kind: "character", entity: character })
       );
-    case pb.ContractAssigneeType.corporation:
+    case pb.ContractAssigneeType.CAT_CORPORATION:
       return corporationInfo(assigneeId, throwKind).then((corporation) => ({
         kind: "corporation",
         entity: corporation,
       }));
-    case pb.ContractAssigneeType.alliance:
+    case pb.ContractAssigneeType.CAT_ALLIANCE:
       return allianceInfo(assigneeId, throwKind).then((alliance) => ({
         kind: "alliance",
         entity: alliance,
       }));
-    case pb.ContractAssigneeType.unknown_assignee_type:
+    case pb.ContractAssigneeType.CAT_UNKNOWN:
       return Promise.resolve({
         kind: "character",
         entity: {

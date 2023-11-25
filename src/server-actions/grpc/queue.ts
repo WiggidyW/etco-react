@@ -1,13 +1,13 @@
 "use server";
 
-import { StoreKind, dispatchAuthenticated, throwInvalid } from "./grpc";
+import { StoreKind, dispatch, throwInvalid } from "./grpc";
 import {
+  AppraisalStatus,
   ContractStatus,
-  UserAppraisalStatus,
   newContractStatus,
+  statusBuybackAppraisal,
 } from "./appraisalStatus";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
-import { LocationNamesAll } from "./util";
 import { ThrowKind } from "../throw";
 import * as pb from "@/proto/etco";
 import { withCatchResult } from "../withResult";
@@ -17,12 +17,12 @@ export interface ContractQueueEntry extends ContractStatus {
 }
 
 export interface ContractQueue {
-  locationNamingMaps: pb.LocationNamingMaps;
+  strs: string[];
   queue: ContractQueueEntry[];
 }
 
 export interface UserQueueEntry {
-  status: UserAppraisalStatus;
+  status: AppraisalStatus;
   code: string;
 }
 
@@ -37,9 +37,9 @@ export const buybackContractQueue = async (
   token: string,
   throwKind?: ThrowKind
 ): Promise<ContractQueue> =>
-  dispatchAuthenticated(
+  dispatch(
     pbClient.prototype.buybackContractQueue,
-    newContractQueueRequest("buyback", token),
+    { refreshToken: token },
     (rep) => newContractQueue("buyback", rep, ThrowKind.Parsed),
     throwKind
   );
@@ -49,126 +49,123 @@ export const shopContractQueue = async (
   token: string,
   throwKind?: ThrowKind
 ): Promise<ContractQueue> =>
-  dispatchAuthenticated(
+  dispatch(
     pbClient.prototype.shopContractQueue,
-    newContractQueueRequest("shop", token),
+    { refreshToken: token },
     (rep) => newContractQueue("shop", rep, ThrowKind.Parsed),
     throwKind
   );
 export const resultShopContractQueue = withCatchResult(shopContractQueue);
 
-export type PurchaseQueue = string[];
 export const purchaseQueue = async (
   token: string,
   throwKind?: ThrowKind
-): Promise<PurchaseQueue> =>
-  dispatchAuthenticated(
-    pbClient.prototype.shopPurchaseQueue,
-    { auth: { token } },
-    (rep) => rep.queue.map((entry) => entry.code),
+): Promise<string[]> =>
+  dispatch(
+    pbClient.prototype.purchaseQueue,
+    { refreshToken: token },
+    (rep) =>
+      Object.values(rep.queue).reduce((acc, { codes }) => {
+        codes.forEach((code) => acc.push(code));
+        return acc;
+      }, [] as string[]),
     throwKind
   );
 export const resultPurchaseQueue = withCatchResult(purchaseQueue);
 
 export const userData = async (
-  token: string,
+  characterId: number,
+  refreshToken: string,
   throwKind?: ThrowKind
-): Promise<UserData> =>
-  dispatchAuthenticated(
-    pbClient.prototype.userData,
-    { auth: { token } },
-    ({
-      madePurchase,
-      cancelledPurchase,
-      buybackAppraisals,
-      shopAppraisals,
-    }) => ({
-      buybackHistory: buybackAppraisals.map((status) =>
-        newBuybackUserQueueEntry(status)
+): Promise<UserData> => {
+  const request: pb.UserDataRequest = { characterId, refreshToken };
+  const [buybackHistory, shopHistory, madePurchase, cancelledPurchase] =
+    await Promise.all([
+      dispatch(
+        pbClient.prototype.userBuybackAppraisalCodes,
+        request,
+        (rep) =>
+          userQueueEntries(
+            rep.codes,
+            refreshToken,
+            statusBuybackAppraisal,
+            throwKind
+          ),
+        throwKind
       ),
-      shopHistory: shopAppraisals.map((status) =>
-        newShopUserQueueEntry(status)
+      dispatch(
+        pbClient.prototype.userShopAppraisalCodes,
+        request,
+        (rep) =>
+          userQueueEntries(
+            rep.codes,
+            refreshToken,
+            statusBuybackAppraisal,
+            throwKind
+          ),
+        throwKind
       ),
-      cancelledPurchase,
-      madePurchase,
-    }),
-    throwKind
-  );
+      dispatch(
+        pbClient.prototype.userMadePurchase,
+        request,
+        (rep) => rep.time,
+        throwKind
+      ),
+      dispatch(
+        pbClient.prototype.userCancelledPurchase,
+        request,
+        (rep) => rep.time,
+        throwKind
+      ),
+    ]);
+  return { buybackHistory, shopHistory, madePurchase, cancelledPurchase };
+};
 export const resultUserData = withCatchResult(userData);
 
-const newBuybackUserQueueEntry = ({
-  contract,
-  code,
-}: pb.BuybackAppraisalStatus): UserQueueEntry => ({
-  status: contract ?? null,
-  code,
-});
-const newShopUserQueueEntry = ({
-  contract,
-  code,
-  inPurchaseQueue,
-}: pb.ShopAppraisalStatus): UserQueueEntry => ({
-  status: contract ?? inPurchaseQueue ? "inPurchaseQueue" : null,
-  code,
-});
-
-function newContractQueueRequest(
-  kind: "buyback",
-  token: string
-): pb.BuybackContractQueueRequest;
-function newContractQueueRequest(
-  kind: "shop",
-  token: string
-): pb.ShopContractQueueRequest;
-function newContractQueueRequest(
-  _: StoreKind,
-  token: string
-): pb.BuybackContractQueueRequest | pb.ShopContractQueueRequest {
-  return {
-    includeLocationInfo: true,
-    includeLocationNaming: LocationNamesAll,
-    auth: { token },
-  };
-}
+const userQueueEntries = async (
+  codes: string[],
+  token: string,
+  statusFunc: (
+    code: string,
+    refreshToken: string,
+    throwKind?: ThrowKind
+  ) => Promise<AppraisalStatus>,
+  throwKind?: ThrowKind
+): Promise<UserQueueEntry[]> => {
+  return Promise.all(
+    codes.map((code) =>
+      statusFunc(code, token, throwKind).then((status) => ({ status, code }))
+    )
+  );
+};
 
 const newContractQueueEntry = (
   kind: StoreKind,
-  entry: pb.ContractQueueEntry,
-  locationNamingMaps: pb.LocationNamingMaps,
+  entry: pb.BuybackContractQueueEntry | pb.ShopContractQueueEntry,
   throwKind?: ThrowKind
 ): Promise<ContractQueueEntry> => {
-  const { contract, contractLocationInfo: locationInfo, code } = entry;
+  const { contract, code } = entry;
   if (contract === undefined) {
     return throwInvalid(`${code}: contract is undefined`, throwKind);
-  } else if (locationInfo === undefined) {
-    return throwInvalid(`${code}: locationInfo is undefined`, throwKind);
   }
-  return newContractStatus(
-    kind,
-    contract,
-    locationInfo,
-    locationNamingMaps,
-    throwKind
-  ).then((status) => ({ ...status, code }));
+  return newContractStatus(kind, contract, throwKind).then((status) => ({
+    ...status,
+    code,
+  }));
 };
 
 const newContractQueue = (
   kind: StoreKind,
   {
-    locationNamingMaps,
+    strs,
     queue,
   }: pb.BuybackContractQueueResponse | pb.ShopContractQueueResponse,
   throwKind?: ThrowKind
 ): Promise<ContractQueue> => {
-  if (locationNamingMaps === undefined) {
-    return throwInvalid("locationNamingMaps is undefined", throwKind);
-  }
   return Promise.all(
-    queue.map((entry) =>
-      newContractQueueEntry(kind, entry, locationNamingMaps, throwKind)
-    )
+    queue.map((entry) => newContractQueueEntry(kind, entry, throwKind))
   ).then((queue) => ({
-    locationNamingMaps,
     queue,
+    strs,
   }));
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { ContentBookend } from "../../Bookend";
-import { ShopAppraisal } from "@/server-actions/grpc/appraisal";
+import { Appraisal } from "@/server-actions/grpc/appraisal";
 import { BasicItem } from "@/proto/etco";
 import { ErrorBoundaryTryAgain } from "../../ErrorBoundary";
 import {
@@ -53,7 +53,7 @@ export interface ShopInventoryProps
   onCheckout: (items: BasicItem[]) => void;
 }
 export const ShopInventory = ({
-  typeNamingLists,
+  strs,
   items,
   locationId,
   onCheckout,
@@ -64,11 +64,11 @@ export const ShopInventory = ({
     defaultOption ?? null
   );
   const [text, setText] = useState<string | null>(null);
-  const [parsed, setParsed] = useState<ShopAppraisal | null>(null);
+  const [parsed, setParsed] = useState<Appraisal | null>(null);
   const [viewingCart, setViewingCart] = useState(false);
   const [cartInfo, setCartInfo] = useState<CartInfo>({ price: 0, quantity: 0 });
   const [records, setRecords] = useState<Record[]>(() =>
-    items.map((item, i) => new Record(item, i, typeNamingLists))
+    items.map((item, i) => new Record(item, i, strs))
   );
   const ctx = useBrowserContext();
 
@@ -117,7 +117,7 @@ export const ShopInventory = ({
   );
 
   const parseSetCartQuantity = useCallback(
-    (parsed: ShopAppraisal): void => {
+    (parsed: Appraisal): void => {
       for (const item of parsed?.items ?? []) {
         if (item.unknown) continue;
         const record = recordsMap.get(item.typeId);
@@ -198,7 +198,7 @@ const BasisDiv = ({ children }: PropsWithChildren): ReactElement => (
 );
 
 const mutateParsedWithInventory = (
-  parsed: ShopAppraisal,
+  parsed: Appraisal,
   inventory: Map<number, Record>,
   currentPrice: number
 ): void => {

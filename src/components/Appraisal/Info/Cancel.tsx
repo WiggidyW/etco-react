@@ -15,23 +15,32 @@ import { ReactNode, useCallback, useState } from "react";
 export interface CancelButtonProps {
   character: ICharacter;
   code: string;
+  locationId: number;
 }
 export const CancelButton = ({
   character,
   code,
+  locationId,
 }: CancelButtonProps): ReactNode => {
   const ctx = useBrowserContext();
   const [clicked, setClicked] = useState<boolean>(false);
   const action = useCallback(async () => {
-    let method: (code: string, token: string) => Promise<Result<{}, unknown>>;
+    let method: (
+      code: string,
+      token: string,
+      locationId: number
+    ) => Promise<Result<{}, unknown>>;
     if (character.admin) {
-      method = (code, token) => resultDelPurchases([code], token);
+      method = (code, token, locationId) =>
+        resultDelPurchases([{ code, locationId }], token);
     } else {
       method = resultCancelPurchase;
     }
-    await method(code, character.refreshToken).then((res) => ResultThrow(res));
+    await method(code, character.refreshToken, locationId).then((res) =>
+      ResultThrow(res)
+    );
     if (ctx !== null) window.location.reload();
-  }, [character, code, ctx]);
+  }, [character, code, locationId, ctx]);
   if (ctx === null) return null;
   return (
     <tr>

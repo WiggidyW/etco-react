@@ -1,8 +1,8 @@
-import { Systems, RegionNames } from "./types";
+import { Systems, Strs } from "./types";
 
 export interface ContentSdeSystems {
   SDE_SYSTEMS: Systems;
-  SDE_REGION_NAMES: RegionNames;
+  STRS: Strs;
 }
 
 declare module "sde_systems.json" {

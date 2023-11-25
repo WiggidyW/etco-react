@@ -1,7 +1,5 @@
 "use client";
 
-import { LocationNamingMaps } from "@/proto/etco";
-import { ContractQueueEntry } from "@/server-actions/grpc/queue";
 import { ReactElement, useState } from "react";
 import classNames from "classnames";
 import { Tab } from "../Tab";
@@ -31,12 +29,12 @@ export const PurchaseQueueViewer = ({
 
 export interface ContractQueueViewerProps {
   kind: StoreKind;
-  locationNamingMaps: LocationNamingMaps;
+  strs: string[];
   queue: GroupedContractQueue;
 }
 export const ContractQueueViewer = ({
   kind,
-  locationNamingMaps,
+  strs,
   queue,
 }: ContractQueueViewerProps): ReactElement => {
   const [tab, setTab] = useState(0);
@@ -62,7 +60,7 @@ export const ContractQueueViewer = ({
       <ContractCodeEntries
         kind={kind}
         entries={getGroupEntries(queue, ContractStatusTabs[tab])}
-        locationNamingMaps={locationNamingMaps}
+        strs={strs}
         className={classNames("mt-2")}
       />
     </div>

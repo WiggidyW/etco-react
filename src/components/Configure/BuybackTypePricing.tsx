@@ -28,12 +28,7 @@ import { resultCfgMergeBuybackSystemTypeMapsBuilder } from "@/server-actions/grp
 
 import sde_types_json from "@/staticdata/sde_types.json";
 import { ContentSdeTypes } from "@/staticdata/sde_types";
-const {
-  SDE_TYPE_DATA,
-  GROUP_NAMES,
-  CATEGORY_NAMES,
-  MARKET_GROUP_NAMES,
-}: ContentSdeTypes = sde_types_json;
+const { SDE_TYPE_DATA, STRS: SDE_STRS }: ContentSdeTypes = sde_types_json;
 
 export interface ConfigureBuybackTypePricingProps {
   refreshToken: string;
@@ -126,9 +121,7 @@ class RecordData {
 
   constructor(
     readonly sdeTypes: SDEType[],
-    readonly sdeGroupNames: string[],
-    readonly sdeCategoryNames: string[],
-    readonly sdeMarketGroupNames: string[],
+    readonly sdeStrs: string[],
     readonly oldBundles: { [key: number]: CfgBuybackSystemTypeBundle }
   ) {}
 
@@ -161,18 +154,18 @@ class Record {
     return this.sdeType.typeId;
   }
   get typeName(): string {
-    return this.sdeType.name;
+    return this.recordData.sdeStrs[this.sdeType.typeStrIndex];
   }
   get groupName(): string {
-    return this.recordData.sdeGroupNames[this.sdeType.groupIndex];
+    return this.recordData.sdeStrs[this.sdeType.groupStrIndex];
   }
   get categoryName(): string {
-    return this.recordData.sdeCategoryNames[this.sdeType.categoryIndex];
+    return this.recordData.sdeStrs[this.sdeType.categoryStrIndex];
   }
   get marketGroupNames(): string[] {
     if (this._marketGroupNames === null) {
-      this._marketGroupNames = this.sdeType.marketGroupIndexes.map(
-        (index) => this.recordData.sdeMarketGroupNames[index]
+      this._marketGroupNames = this.sdeType.marketGroupStrIndexes.map(
+        (index) => this.recordData.sdeStrs[index]
       );
     }
     return this._marketGroupNames;
@@ -244,14 +237,7 @@ const Configure = ({
     [newBuilder]
   );
   const recordData = useMemo(
-    () =>
-      new RecordData(
-        SDE_TYPE_DATA,
-        GROUP_NAMES,
-        CATEGORY_NAMES,
-        MARKET_GROUP_NAMES,
-        oldBuilder
-      ),
+    () => new RecordData(SDE_TYPE_DATA, SDE_STRS, oldBuilder),
     [oldBuilder]
   );
   recordData.bundleKey = selectedBundleKey;

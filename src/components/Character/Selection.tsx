@@ -18,11 +18,7 @@ import {
   storageGetReadonlyCharacters,
   storageSetCharacters,
 } from "@/browser/storage";
-import {
-  clientCookiesDelCheckIsAdmin,
-  clientCookiesSetCheckIsAdmin,
-  clientCookiesSetLoginCallbackRedirect,
-} from "@/cookies/client";
+import { clientCookiesSetLoginCallbackRedirect } from "@/cookies/client";
 import { iterIndexed } from "../todo";
 import { Tab } from "../Tab";
 import {
@@ -93,7 +89,6 @@ export interface LoginCharacterSelectionProps {
   redirectOnSelectPath: string;
   charactersKey: string;
   canSelect?: boolean;
-  checkIsAdmin?: boolean;
 }
 
 export const LoginCharacterSelection = ({
@@ -102,7 +97,6 @@ export const LoginCharacterSelection = ({
   redirectOnSelectPath,
   charactersKey,
   canSelect = false,
-  checkIsAdmin = false,
 }: LoginCharacterSelectionProps): ReactElement => {
   const browserCtx = useBrowserContext();
   const forbidSelect = useRef<boolean>(false);
@@ -114,9 +108,6 @@ export const LoginCharacterSelection = ({
     if (browserCtx !== null) {
       serverCookiesDelCurrentCharacter(); // logout current character
       clientCookiesSetLoginCallbackRedirect(redirectAfterLoginCallbackPath); // set redirect
-      checkIsAdmin // set check admin or delete check admin
-        ? clientCookiesSetCheckIsAdmin(true)
-        : clientCookiesDelCheckIsAdmin();
       if (mutCharacters.characters.length === 0) {
         setMutCharacters(loadMutCharactersOrDefault(browserCtx, charactersKey));
       }

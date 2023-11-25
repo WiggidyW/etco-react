@@ -1,6 +1,5 @@
 "use client";
 
-import { LocationNamingMaps } from "@/proto/etco";
 import { ContractQueueEntry } from "@/server-actions/grpc/queue";
 import { FlexWrapMax, FlexWrapMaxChildArgs } from "../FlexWrapMax";
 import classNames from "classnames";
@@ -71,13 +70,13 @@ export const PurchaseCodeEntries = ({
 export interface ContractCodeEntriesProps {
   className?: string;
   kind: StoreKind;
-  locationNamingMaps: LocationNamingMaps;
+  strs: string[];
   entries: ContractQueueEntry[];
 }
 export const ContractCodeEntries = ({
   className,
   kind,
-  locationNamingMaps,
+  strs,
   entries,
 }: ContractCodeEntriesProps): ReactElement => (
   <FlexWrapMax
@@ -90,7 +89,7 @@ export const ContractCodeEntries = ({
               className={classNames("mt-1", "ml-0.5", "mr-0.5")}
               kind={kind}
               entry={entry}
-              locationNamingMaps={locationNamingMaps}
+              strs={strs}
               {...args}
             />
           );

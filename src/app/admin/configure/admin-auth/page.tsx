@@ -12,7 +12,7 @@ export default function Page(): ReactElement {
     <AdminMain path={PATH} character={character}>
       {character && (
         <ConfigureAuthList
-          domainKey={DOMAIN_KEY}
+          domain={DOMAIN_KEY}
           refreshToken={character.refreshToken}
         />
       )}

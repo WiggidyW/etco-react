@@ -28,38 +28,30 @@ const getTransformWriteNamedSDETypeData = async (
   filePath: string
 ): Promise<void> => {
   const rep = await getNamedSDETypeData();
-  const { types, groupNames, categoryNames, marketGroupNames } =
-    transformNamedSDETypeData(rep);
-  return writeNamedSDETypeData(
-    filePath,
-    types,
-    groupNames,
-    categoryNames,
-    marketGroupNames
-  );
+  const { types, strs } = transformNamedSDETypeData(rep);
+  return writeNamedSDETypeData(filePath, types, strs);
 };
 
 const getTransformWriteBuybackSystems = async (
   filePath: string
 ): Promise<void> => {
   const rep = await getBuybackSystems();
-  const { systems, regionNames } = transformSystems(rep);
-  return writeBuybackSystems(filePath, systems, regionNames);
+  const { systems, strs } = transformSystems(rep);
+  return writeBuybackSystems(filePath, systems, strs);
 };
 
 const getTransformWriteSDESystems = async (filePath: string): Promise<void> => {
   const rep = await getSDESystems();
-  const { systems, regionNames } = transformSystems(rep);
-  return writeSDESystems(filePath, systems, regionNames);
+  const { systems, strs } = transformSystems(rep);
+  return writeSDESystems(filePath, systems, strs);
 };
 
 const getTransformWriteShopLocations = async (
   filePath: string
 ): Promise<void> => {
   const rep = await getShopLocations();
-  const { shopLocations, systemNames, regionNames } =
-    transformShopLocations(rep);
-  return writeShopLocations(filePath, shopLocations, systemNames, regionNames);
+  const { shopLocations } = transformShopLocations(rep);
+  return writeShopLocations(filePath, shopLocations);
 };
 
 const getRPCResponse = async <RQ extends RPCRequest, RP extends RPCResponse>(
@@ -67,162 +59,55 @@ const getRPCResponse = async <RQ extends RPCRequest, RP extends RPCResponse>(
   request: RQ
 ): Promise<RP> => dispatch(method, request, asIs, ThrowKind.Pretty);
 
-const getNamedSDETypeData = async (): Promise<pb.NamedSDETypeDataResponse> =>
-  getRPCResponse(pbClient.EveTradingCoClient.prototype.namedSDETypeData, {});
+const getNamedSDETypeData = async (): Promise<pb.NamedTypesResponse> =>
+  getRPCResponse(pbClient.EveTradingCoClient.prototype.allNamedTypes, {});
+const getBuybackSystems = async (): Promise<pb.SystemsResponse> =>
+  getRPCResponse(pbClient.EveTradingCoClient.prototype.allBuybackSystems, {});
+const getSDESystems = async (): Promise<pb.SystemsResponse> =>
+  getRPCResponse(pbClient.EveTradingCoClient.prototype.allSystems, {});
+const getShopLocations = async (): Promise<pb.AllShopLocationsResponse> =>
+  getRPCResponse(pbClient.EveTradingCoClient.prototype.allShopLocations, {});
 
-const getBuybackSystems = async (): Promise<pb.BuybackSystemsResponse> =>
-  getRPCResponse(pbClient.EveTradingCoClient.prototype.buybackSystems, {
-    includeLocationNaming: {
-      includeLocationName: false,
-      includeSystemName: true,
-      includeRegionName: true,
-    },
-  });
-
-const getSDESystems = async (): Promise<pb.SDESystemsResponse> =>
-  getRPCResponse(pbClient.EveTradingCoClient.prototype.sDESystems, {
-    includeLocationNaming: {
-      includeLocationName: true,
-      includeSystemName: true,
-      includeRegionName: true,
-    },
-  });
-
-const getShopLocations = async (): Promise<pb.ShopLocationsResponse> =>
-  getRPCResponse(pbClient.EveTradingCoClient.prototype.shopLocations, {
-    includeLocationInfo: true,
-    includeLocationNaming: {
-      includeLocationName: true,
-      includeSystemName: true,
-      includeRegionName: true,
-    },
-  });
-
-const transformNamedSDETypeData = (
-  rep: pb.NamedSDETypeDataResponse
-): {
+const transformNamedSDETypeData = ({
+  types,
+  strs,
+}: pb.NamedTypesResponse): {
   types: sdt.SDETypes;
-  groupNames: sdt.GroupNames;
-  categoryNames: sdt.CategoryNames;
-  marketGroupNames: sdt.MarketGroupNames;
-} => {
-  if (rep.typeNamingLists === undefined) {
-    throw new Error("typeNamingLists is undefined");
-  }
-
-  const types = new Array<sdt.SDEType>(rep.types.length);
-
-  for (let i = 0; i < rep.types.length; i++) {
-    const type = rep.types[i];
-    if (type.typeNamingIndexes === undefined) {
-      throw new Error(`typeNamingIndexes for type ${type.typeId} is undefined`);
-    } else if (type.typeNamingIndexes.groupIndex < 0) {
-      throw new Error(`groupIndex for type ${type.typeId} is negative`);
-    } else if (type.typeNamingIndexes.categoryIndex < 0) {
-      throw new Error(`categoryIndex for type ${type.typeId} is negative`);
-    } else if (type.typeNamingIndexes.marketGroupIndexes.length <= 0) {
-      throw new Error(`marketGroupIndexes for type ${type.typeId} is empty`);
-    }
-    types[i] = { typeId: type.typeId, ...type.typeNamingIndexes };
-  }
-
-  return {
-    types: types,
-    groupNames: rep.typeNamingLists.groups,
-    categoryNames: rep.typeNamingLists.categories,
-    marketGroupNames: rep.typeNamingLists.marketGroups,
-  };
-};
+  strs: sdt.Strs;
+} => ({ types, strs });
 
 const transformSystems = (
-  rep: pb.BuybackSystemsResponse | pb.SDESystemsResponse
+  rep: pb.SystemsResponse
 ): {
   systems: sdt.Systems;
-  regionNames: sdt.RegionNames;
+  strs: sdt.Strs;
 } => {
-  if (rep.locationNamingMaps === undefined) {
-    throw new Error("locationNamingMaps is undefined");
-  }
-
   const systems: sdt.Systems = {};
-
   for (const system of rep.systems) {
-    try {
-      const systemName = rep.locationNamingMaps.systemNames[system.systemId];
-      if (systemName === "") {
-        throw new Error(`systemId ${system.systemId} has empty systemName`);
-      }
-      systems[system.systemId] = {
-        systemName: systemName,
-        regionId: system.regionId,
-      };
-    } catch (err) {
-      throw new Error(`systemId ${system.systemId} not found in systemNames`);
-    }
-    try {
-      rep.locationNamingMaps.regionNames[system.regionId];
-    } catch (err) {
-      throw new Error(`regionId ${system.regionId} not found in regionNames`);
-    }
+    systems[system.systemId] = {
+      systemStrIndex: system.systemStrIndex,
+      regionId: system.regionId,
+      regionStrIndex: system.regionStrIndex,
+    };
   }
-
-  return { systems, regionNames: rep.locationNamingMaps.regionNames };
+  return { systems, strs: rep.strs };
 };
 
 const transformShopLocations = (
-  rep: pb.ShopLocationsResponse
+  rep: pb.AllShopLocationsResponse
 ): {
   shopLocations: sdt.ShopLocations;
-  systemNames: sdt.SystemNames;
-  regionNames: sdt.RegionNames;
 } => {
-  if (rep.locationNamingMaps === undefined) {
-    throw new Error("locationNamingMaps is undefined");
-  }
-
   const shopLocations: sdt.ShopLocations = {};
-
   for (const location of rep.locations) {
-    if (location.locationId > Number.MAX_SAFE_INTEGER) {
-      throw new Error(`locationId ${location.locationId} is too large`);
-    }
-    if (location.locationInfo === undefined) {
-      throw new Error(
-        `locationId ${location.locationId} LocationInfo is undefined`
-      );
-    }
-    let locationName: string;
-    try {
-      locationName =
-        rep.locationNamingMaps.locationNames[location.locationId.toString()];
-    } catch (err) {
-      throw new Error(`locationId ${location.locationId} not found in names`);
-    }
-    shopLocations[Number(location.locationId)] = {
-      locationName: locationName,
-      ...location.locationInfo,
+    shopLocations[location.locationInfo!.locationId] = {
+      locationName: rep.strs[location.locationInfo!.locationStrIndex],
+      isStructure: location.locationInfo!.isStructure,
+      forbiddenStructure: location.locationInfo!.forbiddenStructure,
+      taxRate: location.taxRate,
     };
-    try {
-      rep.locationNamingMaps.systemNames[location.locationInfo.systemId];
-    } catch (err) {
-      throw new Error(
-        `systemId ${location.locationInfo.systemId} not found in systemNames`
-      );
-    }
-    try {
-      rep.locationNamingMaps.regionNames[location.locationInfo.regionId];
-    } catch (err) {
-      throw new Error(
-        `regionId ${location.locationInfo.regionId} not found in regionNames`
-      );
-    }
   }
-
-  return {
-    shopLocations: shopLocations,
-    systemNames: rep.locationNamingMaps.systemNames,
-    regionNames: rep.locationNamingMaps.regionNames,
-  };
+  return { shopLocations };
 };
 
 const writeFile = async (
@@ -242,11 +127,11 @@ const writeFile = async (
 const writeBuybackSystems = async (
   filePath: string,
   systems: sdt.Systems,
-  regionNames: sdt.RegionNames
+  strs: sdt.Strs
 ): Promise<void> => {
   let content: ContentBuybackSystems = {
     BUYBACK_SYSTEMS: systems,
-    BUYBACK_REGION_NAMES: regionNames,
+    STRS: strs,
   };
   return writeFile(filePath, JSON.stringify(content));
 };
@@ -254,25 +139,21 @@ const writeBuybackSystems = async (
 const writeSDESystems = async (
   filePath: string,
   systems: sdt.Systems,
-  regionNames: sdt.RegionNames
+  strs: sdt.Strs
 ): Promise<void> => {
   let content: ContentSdeSystems = {
     SDE_SYSTEMS: systems,
-    SDE_REGION_NAMES: regionNames,
+    STRS: strs,
   };
   return writeFile(filePath, JSON.stringify(content));
 };
 
 const writeShopLocations = async (
   filePath: string,
-  shopLocations: sdt.ShopLocations,
-  systemNames: sdt.SystemNames,
-  regionNames: sdt.RegionNames
+  shopLocations: sdt.ShopLocations
 ): Promise<void> => {
   let content: ContentShopLocations = {
     SHOP_LOCATIONS: shopLocations,
-    SHOP_SYSTEM_NAMES: systemNames,
-    SHOP_REGION_NAMES: regionNames,
   };
   return writeFile(filePath, JSON.stringify(content));
 };
@@ -280,15 +161,11 @@ const writeShopLocations = async (
 const writeNamedSDETypeData = async (
   filePath: string,
   types: sdt.SDETypes,
-  groupNames: sdt.GroupNames,
-  categoryNames: sdt.CategoryNames,
-  marketGroupNames: sdt.MarketGroupNames
+  strs: sdt.Strs
 ): Promise<void> => {
   let content: ContentSdeTypes = {
     SDE_TYPE_DATA: types,
-    GROUP_NAMES: groupNames,
-    CATEGORY_NAMES: categoryNames,
-    MARKET_GROUP_NAMES: marketGroupNames,
+    STRS: strs,
   };
   return writeFile(filePath, JSON.stringify(content));
 };

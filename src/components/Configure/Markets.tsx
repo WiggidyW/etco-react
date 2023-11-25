@@ -51,25 +51,13 @@ export const ConfigureMarkets = ({
     undoCap={undoCap}
     redoCap={redoCap}
   >
-    {({
-      update,
-      updated,
-      rep: {
-        markets,
-        locationInfoMap,
-        locationNames,
-        systemNames,
-        regionNames,
-      },
-    }) => (
+    {({ update, updated, rep: { markets, locationInfoMap, strs } }) => (
       <Configure
         update={update}
         oldMarkets={markets}
         newMarkets={updated}
         locationInfoMap={locationInfoMap}
-        locationNames={locationNames}
-        systemNames={systemNames}
-        regionNames={regionNames}
+        strs={strs}
         marketCharactersKey={marketCharactersKey}
       />
     )}
@@ -108,9 +96,7 @@ class RecordData {
   constructor(
     readonly oldMarkets: { [marketName: string]: CfgMarket },
     readonly locationInfoMap: { [locationId: string]: LocationInfo },
-    readonly locationNames: { [locationId: string]: string },
-    readonly systemNames: { [systemId: number]: string },
-    readonly regionNames: { [regionId: number]: string }
+    readonly strs: string[]
   ) {}
 
   newRecords(): Record[] {
@@ -154,19 +140,23 @@ class Record {
   }
   get systemId(): number | undefined {
     if (this.forbiddenStructure) return undefined;
-    return this.locationInfo?.systemId;
+    return this.locationInfo?.systemInfo?.systemId;
   }
   get systemName(): string | undefined {
     if (this.systemId === undefined) return undefined;
-    return this.recordData.systemNames[this.systemId];
+    return this.recordData.strs[
+      this.locationInfo?.systemInfo?.systemStrIndex ?? 0
+    ];
   }
   get regionId(): number | undefined {
     if (this.forbiddenStructure) return undefined;
-    return this.locationInfo?.regionId;
+    return this.locationInfo?.systemInfo?.regionId;
   }
   get regionName(): string | undefined {
     if (this.regionId === undefined) return undefined;
-    return this.recordData.regionNames[this.regionId];
+    return this.recordData.strs[
+      this.locationInfo?.systemInfo?.regionStrIndex ?? 0
+    ];
   }
   get refreshToken(): string | undefined {
     return this.market?.refreshToken;
@@ -176,7 +166,7 @@ class Record {
   }
   get locationName(): string | undefined {
     if (this.locationId === undefined) return undefined;
-    return this.recordData.locationNames[this.locationId.toString()];
+    return this.recordData.strs[this.locationInfo?.locationStrIndex ?? 0];
   }
 
   get rowKey(): string {
@@ -201,9 +191,7 @@ interface ConfigureProps {
   oldMarkets: { [marketName: string]: CfgMarket };
   newMarkets: { [marketName: string]: CfgMarket };
   locationInfoMap: { [locationId: string]: LocationInfo };
-  locationNames: { [locationId: string]: string };
-  systemNames: { [systemId: number]: string };
-  regionNames: { [regionId: number]: string };
+  strs: string[];
   marketCharactersKey: string;
 }
 const Configure = ({
@@ -211,9 +199,7 @@ const Configure = ({
   oldMarkets,
   newMarkets,
   locationInfoMap,
-  locationNames,
-  systemNames,
-  regionNames,
+  strs,
   marketCharactersKey,
 }: ConfigureProps): ReactElement => {
   const [selected, setSelected] = useState<{
@@ -225,15 +211,8 @@ const Configure = ({
     [newMarkets]
   );
   const recordData = useMemo(
-    () =>
-      new RecordData(
-        oldMarkets,
-        locationInfoMap,
-        locationNames,
-        systemNames,
-        regionNames
-      ),
-    [oldMarkets, locationInfoMap, locationNames, systemNames, regionNames]
+    () => new RecordData(oldMarkets, locationInfoMap, strs),
+    [oldMarkets, locationInfoMap, strs]
   );
   recordData.newMarkets = newMarkets;
   const records = useMemo(

@@ -1,6 +1,3 @@
-const RE_APPRAISAL_CODE = /[us]{1}[0-9a-f]{15}/;
-const RE_SHOP_APPRAISAL_CODE = /s[0-9a-f]{15}/;
-const RE_BUYBACK_APPRAISAL_CODE = /u[0-9a-f]{15}/;
 const RE_SHOP_APPRAISAL_CODE_QUERY = /^s[0-9a-f]{15}$/;
 const RE_BUYBACK_APPRAISAL_CODE_QUERY = /^u[0-9a-f]{15}$/;
 

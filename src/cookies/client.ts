@@ -49,22 +49,6 @@ export const clientCookiesSetTheme = (theme: "light" | "dark"): void =>
 export const clientCookiesDelTheme = (): void =>
   new Cookies().set("theme", "", newCookieSetOpts({ expires: new Date(0) }));
 
-// // Check Is Admin
-
-export const clientCookiesSetCheckIsAdmin = (isAdmin: boolean): void =>
-  new Cookies().set(
-    "checkIsAdmin",
-    isAdmin.toString(),
-    newCookieSetOpts({ maxAge: 60 * 30 }) // 30 minutes
-  );
-
-export const clientCookiesDelCheckIsAdmin = (): void =>
-  new Cookies().set(
-    "checkIsAdmin",
-    "",
-    newCookieSetOpts({ expires: new Date(0) })
-  );
-
 // // Shop Parse Key
 
 export const clientCookiesGetShopParseKey = (): string | null =>

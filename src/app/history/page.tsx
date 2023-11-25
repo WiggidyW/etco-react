@@ -8,13 +8,13 @@ import { ReactElement, Suspense } from "react";
 const PATH = "/history";
 
 export default function Page(): ReactElement {
-  const character = serverCookiesGetCurrentCharacter();
+  const character = serverCookiesGetCurrentCharacter()?.toObject();
   return (
     <LoggedInMain path={PATH} character={character}>
       {character && (
         <Suspense fallback={<Loading scale="25%" />}>
           <ErrorBoundaryRefresh>
-            <UserQueueLoader token={character.refreshToken} />
+            <UserQueueLoader character={character} />
           </ErrorBoundaryRefresh>
         </Suspense>
       )}

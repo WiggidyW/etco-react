@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactElement, useEffect, useMemo, useState } from "react";
-import { ConstData } from "@/proto/etco";
+import { CfgConstData } from "@/proto/etco";
 import { Popup } from "@/components/Popup";
 import classNames from "classnames";
 import { Button, NumberInput, TextInput } from "../Input/Manipulator";
@@ -31,6 +31,10 @@ export const ConfigureConstData = ({
       cancelPurchaseCooldown: 0,
       corporationWebRefreshToken: "",
       structureInfoWebRefreshToken: "",
+      discordChannel: "",
+      buybackContractNotifications: false,
+      shopContractNotifications: false,
+      purchaseNotifications: false,
     }}
     refreshToken={refreshToken}
     actionLoad={(token) => resultCfgGetConstDataLoad(token)}
@@ -51,18 +55,21 @@ export const ConfigureConstData = ({
   </ConfigureBase>
 );
 
-const deepCloneConstData = (constData: ConstData): ConstData => ({
+const deepCloneConstData = (constData: CfgConstData): CfgConstData => ({
   ...constData,
 });
 
-const mergeConstData = (constData: ConstData, updates: ConstData): void => {
+const mergeConstData = (
+  constData: CfgConstData,
+  updates: CfgConstData
+): void => {
   Object.assign(constData, updates);
 };
 
 interface ConfigureProps {
-  update: (update: ConstData) => void;
-  oldConstData: ConstData;
-  newConstData: ConstData;
+  update: (update: CfgConstData) => void;
+  oldConstData: CfgConstData;
+  newConstData: CfgConstData;
   corporationCharactersKey: string;
   structureInfoCharactersKey: string;
 }
@@ -104,8 +111,8 @@ const fmtSeconds = (seconds: number): string => {
 };
 
 interface ManipulatorProps {
-  previous: ConstData;
-  onSave: (update: ConstData) => void;
+  previous: CfgConstData;
+  onSave: (update: CfgConstData) => void;
   corporationCharactersKey: string;
   structureInfoCharactersKey: string;
 }
@@ -116,6 +123,10 @@ const Manipulator = ({
     cancelPurchaseCooldown: prevCancelPurchaseCooldown,
     corporationWebRefreshToken: prevCorporationWebRefreshToken,
     structureInfoWebRefreshToken: prevStructureInfoWebRefreshToken,
+    discordChannel: prevDiscordChannel,
+    buybackContractNotifications: prevBuybackContractNotifications,
+    shopContractNotifications: prevShopContractNotifications,
+    purchaseNotifications: prevPurchaseNotifications,
   },
   corporationCharactersKey,
   structureInfoCharactersKey,
@@ -138,6 +149,15 @@ const Manipulator = ({
   >(null);
   const [_structureInfoWebRefreshToken, setStructureInfoWebRefreshToken] =
     useState<string | null>(null);
+  const [_discordChannel, setDiscordChannel] = useState<string | null>(null);
+  const [_buybackContractNotifications, setBuybackContractNotifications] =
+    useState<boolean | null>(null);
+  const [_shopContractNotifications, setShopContractNotifications] = useState<
+    boolean | null
+  >(null);
+  const [_purchaseNotifications, setPurchaseNotifications] = useState<
+    boolean | null
+  >(null);
 
   let selectingChar: null | { key: string; setToken: (token: string) => void };
   switch (selectingCharacter) {
@@ -167,13 +187,24 @@ const Manipulator = ({
     _corporationWebRefreshToken ?? prevCorporationWebRefreshToken;
   const structureInfoWebRefreshToken =
     _structureInfoWebRefreshToken ?? prevStructureInfoWebRefreshToken;
+  const discordChannel = _discordChannel ?? prevDiscordChannel;
+  const buybackContractNotifications =
+    _buybackContractNotifications ?? prevBuybackContractNotifications;
+  const shopContractNotifications =
+    _shopContractNotifications ?? prevShopContractNotifications;
+  const purchaseNotifications =
+    _purchaseNotifications ?? prevPurchaseNotifications;
 
   const savePossible =
     purchaseMaxActive !== prevPurchaseMaxActive ||
     makePurchaseCooldown !== prevMakePurchaseCooldown ||
     cancelPurchaseCooldown !== prevCancelPurchaseCooldown ||
     corporationWebRefreshToken !== prevCorporationWebRefreshToken ||
-    structureInfoWebRefreshToken !== prevStructureInfoWebRefreshToken;
+    structureInfoWebRefreshToken !== prevStructureInfoWebRefreshToken ||
+    discordChannel !== prevDiscordChannel ||
+    buybackContractNotifications !== prevBuybackContractNotifications ||
+    shopContractNotifications !== prevShopContractNotifications ||
+    purchaseNotifications !== prevPurchaseNotifications;
 
   const fmtPrevMakePurchaseCooldown = fmtSeconds(prevMakePurchaseCooldown);
   const fmtPrevCancelPurchaseCooldown = fmtSeconds(prevCancelPurchaseCooldown);
@@ -223,6 +254,43 @@ const Manipulator = ({
             setValue={setCancelPurchaseCooldown}
           />
 
+          {/* Discord Channel (for notifications) input */}
+          <TextInput
+            title="Discord Channel"
+            value={discordChannel}
+            setValue={setDiscordChannel}
+          />
+
+          {/* Buyback Contract Notifications input */}
+          <Button
+            variant={buybackContractNotifications ? "success" : "failure"}
+            onClick={() => setBuybackContractNotifications((prev) => !prev)}
+          >
+            {`Buyback Contract Notifications (${
+              buybackContractNotifications ? "Enabled" : "Disabled"
+            })`}
+          </Button>
+
+          {/* Shop Contract Notifications input */}
+          <Button
+            variant={shopContractNotifications ? "success" : "failure"}
+            onClick={() => setShopContractNotifications((prev) => !prev)}
+          >
+            {`Shop Contract Notifications (${
+              shopContractNotifications ? "Enabled" : "Disabled"
+            })`}
+          </Button>
+
+          {/* Purchase Notifications input */}
+          <Button
+            variant={purchaseNotifications ? "success" : "failure"}
+            onClick={() => setPurchaseNotifications((prev) => !prev)}
+          >
+            {`Purchase Notifications (${
+              purchaseNotifications ? "Enabled" : "Disabled"
+            })`}
+          </Button>
+
           {/* Corporation Web Refresh Token input */}
           <Button
             variant="lightblue"
@@ -253,6 +321,10 @@ const Manipulator = ({
                 cancelPurchaseCooldown,
                 corporationWebRefreshToken,
                 structureInfoWebRefreshToken,
+                discordChannel,
+                buybackContractNotifications,
+                shopContractNotifications,
+                purchaseNotifications,
               })
             }
           >

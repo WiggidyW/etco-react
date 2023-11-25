@@ -3,9 +3,9 @@
 import { ReactElement, useMemo, useState } from "react";
 import { ColumnType } from "antd/es/table";
 import {
-  Systems as SDESystems,
   System as SDESystem,
-  RegionNames as SDERegionNames,
+  Systems as SDESystems,
+  Strs as SDESystemStrs,
 } from "@/staticdata/types";
 import { ModificationState } from "./modificationState";
 import { CfgBuybackSystem } from "@/proto/etco";
@@ -25,7 +25,8 @@ import { resultCfgMergeBuybackSystems } from "@/server-actions/grpc/cfgMerge";
 
 import sde_systems_json from "@/staticdata/sde_systems.json";
 import { ContentSdeSystems } from "@/staticdata/sde_systems";
-const { SDE_SYSTEMS, SDE_REGION_NAMES }: ContentSdeSystems = sde_systems_json;
+const { SDE_SYSTEMS, STRS: SDE_SYSTEM_STRS }: ContentSdeSystems =
+  sde_systems_json;
 
 export interface ConfigureBuybackSystemsProps {
   refreshToken: string;
@@ -92,7 +93,7 @@ class RecordData {
   constructor(
     readonly oldSystems: { [systemId: number]: CfgBuybackSystem },
     readonly sdeSystems: SDESystems,
-    readonly regionNames: SDERegionNames
+    readonly sdeStrs: SDESystemStrs
   ) {}
 
   newRecords(): Record[] {
@@ -119,10 +120,10 @@ class Record {
   }
 
   get systemName(): string {
-    return this.sdeSystem.systemName;
+    return this.recordData.sdeStrs[this.sdeSystem.systemStrIndex];
   }
   get regionName(): string {
-    return this.recordData.regionNames[this.sdeSystem.regionId];
+    return this.recordData.sdeStrs[this.sdeSystem.regionStrIndex];
   }
   get m3Fee(): number | undefined {
     return this.system?.m3Fee;
@@ -176,7 +177,7 @@ const Configure = ({
     [newSystems]
   );
   const recordData = useMemo(
-    () => new RecordData(oldSystems, SDE_SYSTEMS, SDE_REGION_NAMES),
+    () => new RecordData(oldSystems, SDE_SYSTEMS, SDE_SYSTEM_STRS),
     [oldSystems]
   );
   recordData.newSystems = newSystems;

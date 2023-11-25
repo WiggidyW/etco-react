@@ -12,16 +12,7 @@ export interface TypeMapsBuilder<P> {
 export interface RPCRequest {}
 
 export interface RPCRequestWithAuth extends RPCRequest {
-  auth?: pb.AuthRequest;
-}
-
-export interface RPCRequestWithLocationNaming extends Request {
-  includeLocationNaming?: pb.IncludeLocationNaming;
-}
-
-export interface RPCRequestWithLocationInfo
-  extends RPCRequestWithLocationNaming {
-  includeLocationInfo: boolean;
+  refreshToken: string;
 }
 
 export interface RPCResponse {
@@ -30,11 +21,7 @@ export interface RPCResponse {
 }
 
 export interface RPCResponseWithAuth extends RPCResponse {
-  auth?: pb.AuthResponse;
-}
-
-export interface RPCResponseWithLocationNaming extends RPCResponse {
-  locationNamingMaps?: pb.LocationNamingMaps;
+  authorized: boolean;
 }
 
 export interface RPCResponseWithTypeMapsBuilder<P> extends RPCResponse {

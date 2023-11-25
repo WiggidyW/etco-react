@@ -3,7 +3,7 @@ import { LoginCharacterPortrait } from "../Character/Portrait";
 import { StoreKind } from "@/server-actions/grpc/grpc";
 import { FlexWrapMaxChildStyle } from "../FlexWrapMax";
 import { FlattenedUserQueueEntry } from "./status";
-import { ContractStatus, LocationNamingMaps } from "@/proto/etco";
+import { ContractStatus } from "@/proto/etco";
 import { Remaining } from "./Remaining";
 import classNames from "classnames";
 import Link from "next/link";
@@ -74,18 +74,17 @@ export interface ContractCodeEntryProps extends FlexWrapMaxChildStyle {
   className?: string;
   kind: StoreKind;
   entry: ContractQueueEntry;
-  locationNamingMaps: LocationNamingMaps;
+  strs: string[];
 }
 export const ContractCodeEntry = forwardRef(
   (
     {
       entry: {
-        contract: { issued, expires, locationId, status },
-        locationInfo: { systemId, regionId },
+        contract: { issued, expires, locationInfo, status },
         code,
         entity: { entity },
       },
-      locationNamingMaps: { locationNames, systemNames, regionNames },
+      strs,
       className,
       ...linkProps
     }: ContractCodeEntryProps,
@@ -115,15 +114,19 @@ export const ContractCodeEntry = forwardRef(
           className={classNames("inline-flex", "flex-col", "justify-evenly")}
         >
           <EntryInfo>
-            {status === ContractStatus.outstanding ? (
+            {status === ContractStatus.CS_OUTSTANDING ? (
               <Remaining expiresUnix={expires} />
             ) : (
               <LocaleText fmt={formatTime} v={issued} />
             )}
           </EntryInfo>
-          <EntryInfo>{locationNames[locationId]}</EntryInfo>
-          <EntryInfo>{systemNames[systemId]}</EntryInfo>
-          <EntryInfo>{regionNames[regionId]}</EntryInfo>
+          <EntryInfo>{strs[locationInfo!.locationStrIndex]}</EntryInfo>
+          <EntryInfo>
+            {strs[locationInfo!.systemInfo!.systemStrIndex]}
+          </EntryInfo>
+          <EntryInfo>
+            {strs[locationInfo!.systemInfo!.regionStrIndex]}
+          </EntryInfo>
         </div>
       </LoginCharacterPortrait>
     </EntryLinkWrapper>

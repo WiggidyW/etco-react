@@ -3,7 +3,7 @@
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import AntTable, { ColumnType } from "antd/es/table";
 import { ModificationState } from "./modificationState";
-import { AuthList } from "@/proto/etco";
+import { CfgAuthList } from "@/proto/etco";
 import {
   IdColumn,
   BannedFmtColumn,
@@ -16,19 +16,25 @@ import { Button, ManipulatorSelector, NumberInput } from "../Input/Manipulator";
 import { ConfigureBase } from "./Base";
 import {
   CfgGetAuthListLoadRep,
-  resultCfgGetAuthListLoad,
+  resultCfgGetUserAuthListLoad,
+  resultCfgGetAdminAuthListLoad,
 } from "@/server-actions/grpc/cfgGet";
-import { resultCfgSetAuthList } from "@/server-actions/grpc/cfgMerge";
+import {
+  resultCfgSetUserAuthList,
+  resultCfgSetAdminAuthList,
+} from "@/server-actions/grpc/cfgMerge";
 import { Entity, EntityKind } from "@/browser/entity";
 
+export type Domain = "user" | "admin";
+
 export interface ConfigureAuthListProps {
-  domainKey: string;
+  domain: Domain;
   refreshToken: string;
   undoCap?: number;
   redoCap?: number;
 }
 export const ConfigureAuthList = ({
-  domainKey,
+  domain,
   refreshToken,
   undoCap,
   redoCap,
@@ -42,9 +48,15 @@ export const ConfigureAuthList = ({
       permitAllianceIds: [],
     }}
     refreshToken={refreshToken}
-    actionLoad={(token) => resultCfgGetAuthListLoad(token, domainKey)}
+    actionLoad={(token) =>
+      domain === "user"
+        ? resultCfgGetUserAuthListLoad(token)
+        : resultCfgGetAdminAuthListLoad(token)
+    }
     actionMerge={(token, updated) =>
-      resultCfgSetAuthList(token, domainKey, updated)
+      domain === "user"
+        ? resultCfgSetUserAuthList(token, updated)
+        : resultCfgSetAdminAuthList(token, updated)
     }
     deepClone={deepCloneAuthList}
     mergeUpdates={mergeAuthLists}
@@ -63,7 +75,7 @@ const deepCloneAuthList = ({
   bannedCorporationIds,
   permitCorporationIds,
   permitAllianceIds,
-}: AuthList): AuthList => ({
+}: CfgAuthList): CfgAuthList => ({
   bannedCharacterIds: [...bannedCharacterIds],
   permitCharacterIds: [...permitCharacterIds],
   bannedCorporationIds: [...bannedCorporationIds],
@@ -71,11 +83,11 @@ const deepCloneAuthList = ({
   permitAllianceIds: [...permitAllianceIds],
 });
 
-const mergeAuthLists = (authList: AuthList, updates: AuthList): void => {
+const mergeAuthLists = (authList: CfgAuthList, updates: CfgAuthList): void => {
   Object.assign(authList, updates);
 };
 
-const newAuthList = (): AuthList => ({
+const newAuthList = (): CfgAuthList => ({
   bannedCharacterIds: [],
   permitCharacterIds: [],
   bannedCorporationIds: [],
@@ -97,7 +109,7 @@ const newAuthListSet = ({
   bannedCorporationIds,
   permitCorporationIds,
   permitAllianceIds,
-}: AuthList): AuthListSet => ({
+}: CfgAuthList): AuthListSet => ({
   bannedCharacterIds: new Set(bannedCharacterIds),
   permitCharacterIds: new Set(permitCharacterIds),
   bannedCorporationIds: new Set(bannedCorporationIds),
@@ -137,12 +149,12 @@ function getKindEntries(
 ): Set<number>;
 function getKindEntries(
   stockKind: "list",
-  stock: AuthList,
+  stock: CfgAuthList,
   recordKind: RecordKind
 ): number[];
 function getKindEntries(
   stockKind: "rep" | "list",
-  stock: CfgGetAuthListLoadRep | AuthListSet | AuthList,
+  stock: CfgGetAuthListLoadRep | AuthListSet | CfgAuthList,
   { kind, banned }: RecordKind
 ): Map<number, Entity> | Set<number> | number[] {
   // Calculate the index based on the kind and banned status
@@ -157,7 +169,7 @@ function getKindEntries(
 }
 
 class RecordData {
-  private _newAuthList: AuthList;
+  private _newAuthList: CfgAuthList;
   private _newAuthListSet: AuthListSet;
 
   constructor(readonly oldAuthList: CfgGetAuthListLoadRep) {
@@ -165,13 +177,13 @@ class RecordData {
     this._newAuthListSet = newAuthListSet(this._newAuthList);
   }
 
-  get newAuthList(): AuthList {
+  get newAuthList(): CfgAuthList {
     return this._newAuthList;
   }
   get newAuthListSet(): AuthListSet {
     return this._newAuthListSet;
   }
-  set newAuthList(newAuthList: AuthList) {
+  set newAuthList(newAuthList: CfgAuthList) {
     this._newAuthList = newAuthList;
     this._newAuthListSet = newAuthListSet(newAuthList);
   }
@@ -268,9 +280,9 @@ class Record {
 }
 
 interface ConfigureProps {
-  update: (update: AuthList) => void;
+  update: (update: CfgAuthList) => void;
   oldAuthList: CfgGetAuthListLoadRep;
-  newAuthList: AuthList;
+  newAuthList: CfgAuthList;
 }
 const Configure = ({
   update,
@@ -281,7 +293,7 @@ const Configure = ({
     record: Record;
     rowKey: number;
   } | null>(null);
-  const updates = useMemo<AuthList>(
+  const updates = useMemo<CfgAuthList>(
     () => deepCloneAuthList(newAuthList),
     [newAuthList]
   );

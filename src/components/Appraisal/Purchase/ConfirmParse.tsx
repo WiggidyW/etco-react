@@ -1,14 +1,14 @@
 import { ContentPortal } from "@/components/Content";
 import { Popup } from "@/components/Popup";
-import { ShopAppraisal } from "@/server-actions/grpc/appraisal";
+import { Appraisal } from "@/server-actions/grpc/appraisal";
 import { ReactElement } from "react";
 import { AppraisalTable } from "../Table/Table";
 import { Button } from "@/components/Input/Manipulator";
 import classNames from "classnames";
 
 export interface ConfirmParseProps {
-  parsed: ShopAppraisal;
-  onConfirm: (parsed: ShopAppraisal) => void;
+  parsed: Appraisal;
+  onConfirm: (parsed: Appraisal) => void;
   onCancel: () => void;
 }
 export const ConfirmParse = ({

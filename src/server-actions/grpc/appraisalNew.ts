@@ -3,97 +3,112 @@
 import * as pb from "@/proto/etco";
 import { EveTradingCoClient as pbClient } from "@/proto/etco.client";
 import { ThrowKind } from "../throw";
-import { asIs, dispatch, dispatchAuthenticated, throwInvalid } from "./grpc";
+import { asIs, dispatch, throwInvalid } from "./grpc";
 import { ICharacter } from "@/browser/character";
-import { BuybackAppraisal, ShopAppraisal, toNewAppraisal } from "./appraisal";
+import { Appraisal, toNewAppraisal } from "./appraisal";
 import { parse } from "./other";
-import { EmptyPbBuybackAppraisal, ItemNamesOnly } from "./util";
+import { NewEmptyPbBuybackAppraisal, NewEmptyPbStrs } from "./util";
 import { withCatchResult } from "../withResult";
 
 export const parseAsAppraisal = async (
   text: string,
   throwKind?: ThrowKind
-): Promise<ShopAppraisal> => {
-  const { knownItems, unknownItems } = await parse(text, throwKind);
+): Promise<Appraisal> => {
+  const { knownItems, unknownItems, strs } = await parse(text, throwKind);
   return toNewAppraisal(
     {
       kind: "shop",
       appraisal: {
-        items: knownItems.map(({ typeId, quantity, name }) => ({
+        rejected: false,
+        code: "",
+        time: Math.floor(Date.now() / 1000),
+        items: knownItems.map(({ typeId, quantity }) => ({
           typeId,
           quantity,
           pricePerUnit: 0,
-          description: "",
-          typeNamingIndexes: {
-            name,
-            groupIndex: -1,
-            categoryIndex: -1,
-            marketGroupIndexes: [],
-          },
+          descriptionStrIndex: 0,
         })),
-        code: "",
-        price: 0,
-        time: Math.floor(Date.now() / 1000),
         version: "parse",
-        locationId: 0,
+        characterId: 0,
+        locationInfo: {
+          locationId: 0,
+          locationStrIndex: 0,
+          isStructure: false,
+          forbiddenStructure: false,
+          systemInfo: {
+            systemId: 0,
+            systemStrIndex: 0,
+            regionId: 0,
+            regionStrIndex: 0,
+          },
+        },
+        price: 0,
         taxRate: 0,
         tax: 0,
       },
     },
+    NewEmptyPbStrs(),
+    [],
+    strs,
+    undefined,
     undefined,
     unknownItems
   );
 };
 export const resultParseAsAppraisal = withCatchResult(parseAsAppraisal);
 
-export interface ParsedBuybackAppraisal {
-  unknownItems: pb.NamedBasicItem[];
-  appraisal: pb.BuybackAppraisal | null;
-}
 export const parseNewBuybackAppraisal = async (
   systemId: number,
   text: string,
   character?: ICharacter,
   throwKind?: ThrowKind
-): Promise<BuybackAppraisal> => {
-  const { knownItems, unknownItems } = await parse(text, throwKind);
+): Promise<Appraisal> => {
+  const {
+    knownItems,
+    unknownItems,
+    strs: parseStrs,
+  } = await parse(text, throwKind);
   if (knownItems.length === 0) {
     return toNewAppraisal(
-      { kind: "buyback", appraisal: EmptyPbBuybackAppraisal },
+      {
+        kind: "buyback",
+        appraisal: NewEmptyPbBuybackAppraisal(),
+      },
+      NewEmptyPbStrs(),
+      [],
+      parseStrs,
+      undefined,
       character,
       unknownItems
     );
   }
 
-  if (Math.random() > 0.999) {
-    return throwInvalid(
-      "👻👻 you have been haunted by the appraisal ghost 👻👻",
-      throwKind,
-      {
-        Ghost: true,
-        Spooky: true,
-        "Oh No": "Indeed",
-      }
-    );
-  }
-
-  const dispatchEither = character ? dispatchAuthenticated : dispatch;
-  const appraisal = await dispatchEither(
-    pbClient.prototype.newBuybackAppraisal,
+  const { appraisal, strs: appraisalStrs } = await dispatch(
+    pbClient.prototype.saveBuybackAppraisal,
     {
-      systemId,
-      save: true,
-      items: knownItems,
-      auth: character ? { token: character.refreshToken } : undefined,
-      includeTypeNaming: ItemNamesOnly,
+      territoryId: systemId,
+      items: knownItems.map(({ typeId, quantity }) => ({
+        typeId: typeId!.typeId,
+        quantity,
+      })),
+      refreshToken: character ? character.refreshToken : "",
     },
-    ({ appraisal }) =>
-      appraisal ?? throwInvalid("appraisal is undefined", throwKind),
+    ({ strs, appraisal }) => ({
+      strs,
+      appraisal: appraisal ?? throwInvalid("appraisal is undefined", throwKind),
+    }),
     throwKind
   );
 
   return toNewAppraisal(
-    { kind: "buyback", appraisal },
+    {
+      kind: "buyback",
+      appraisal,
+    },
+    appraisalStrs,
+    [],
+    parseStrs,
+    undefined,
     character,
     unknownItems
   );
@@ -104,7 +119,7 @@ export const resultParseNewBuybackAppraisal = withCatchResult(
 
 export interface MakePurchaseAppraisal {
   makePurchaseStatus: pb.MakePurchaseStatus;
-  appraisal?: ShopAppraisal;
+  appraisal?: Appraisal;
 }
 export const shopMakePurchase = async (
   locationId: number,
@@ -112,13 +127,16 @@ export const shopMakePurchase = async (
   character: ICharacter,
   throwKind?: ThrowKind
 ): Promise<MakePurchaseAppraisal> => {
-  const { appraisal, status: makePurchaseStatus } = await dispatchAuthenticated(
-    pbClient.prototype.shopMakePurchase,
+  const {
+    appraisal,
+    status: makePurchaseStatus,
+    strs,
+  } = await dispatch(
+    pbClient.prototype.saveShopAppraisal,
     {
-      locationId,
+      territoryId: locationId,
       items,
-      includeTypeNaming: ItemNamesOnly,
-      auth: { token: character.refreshToken },
+      refreshToken: character.refreshToken,
     },
     asIs,
     throwKind
@@ -129,7 +147,14 @@ export const shopMakePurchase = async (
     return {
       makePurchaseStatus,
       appraisal: toNewAppraisal(
-        { kind: "shop", appraisal, fullStatus: "inPurchaseQueue" },
+        {
+          kind: "shop",
+          appraisal,
+        },
+        strs,
+        [],
+        [],
+        "inPurchaseQueue",
         character
       ),
     };

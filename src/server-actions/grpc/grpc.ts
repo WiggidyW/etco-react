@@ -93,7 +93,7 @@ const handleRPCError = (error: unknown): never => {
 };
 
 const checkProtoError = <RP extends RPCResponse>(rep: RP): RP => {
-  if (rep.error !== undefined && rep.error.code !== pb.ErrorCode.OK) {
+  if (rep.error !== undefined && rep.error.code !== pb.ErrorCode.EC_OK) {
     throw new ParsedJSONError(
       {
         kind: ["ProtoErrorResponse"],
@@ -106,14 +106,14 @@ const checkProtoError = <RP extends RPCResponse>(rep: RP): RP => {
   return rep;
 };
 
-const checkAuthorized = <RP extends RPCResponseWithAuth>(rep: RP): RP => {
-  if (rep.auth === undefined || rep.auth.authorized === false) {
+const checkAuthorized = <RP extends RPCResponse>(rep: RP): RP => {
+  if ("authorized" in rep && rep.authorized === false) {
     throw new ParsedJSONError(
       {
         kind: ["NotAuthorized"],
         message: "Not Authorized",
       },
-      rep.auth ?? "undefined auth response"
+      rep.authorized ?? "undefined auth response"
     );
   }
   return rep;
@@ -134,6 +134,7 @@ export const dispatch = async <
       .call(GrpcClient.instance(), input)
       .response.catch((e) => handleRPCError(e))
       .then(checkProtoError)
+      .then(checkAuthorized)
       .then(transform);
   } catch (e) {
     const error = unknownToParsedJSONError(e);
@@ -148,18 +149,6 @@ export const dispatch = async <
     return throwErr(error, throwKind);
   }
 };
-
-export const dispatchAuthenticated = <
-  RQ extends RPCRequest,
-  RP extends RPCResponseWithAuth,
-  V
->(
-  method: RPCMethod<RQ, RP>,
-  input: RQ,
-  transform: (rep: RP) => V | Promise<V>,
-  throwKind?: ThrowKind
-): Promise<V> =>
-  dispatch(method, input, (rep) => transform(checkAuthorized(rep)), throwKind);
 
 export const throwInvalid = (
   message: string,

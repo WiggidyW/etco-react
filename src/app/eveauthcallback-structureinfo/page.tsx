@@ -11,10 +11,8 @@ export default function Page({
   return (
     <AuthMain>
       <EveAuthCallback
-        clientId={EveApps.StructureInfo.clientId}
-        clientSecret={EveApps.StructureInfo.clientSecret}
+        app={EveApps.StructureInfo.pbApp}
         charactersKey={EveApps.StructureInfo.charactersKey}
-        canBeAdmin={EveApps.StructureInfo.canBeAdmin}
         searchParams={searchParams}
       />
     </AuthMain>
