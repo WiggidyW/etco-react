@@ -19,9 +19,7 @@ export const AppraisalContractInfo = ({
     } else {
       return (
         <InfoTable>
-          <tr>
-            <td>No Contract</td>
-          </tr>
+          <TitleRow>No Contract</TitleRow>
         </InfoTable>
       );
     }
