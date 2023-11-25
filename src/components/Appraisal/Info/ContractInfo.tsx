@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { ContractStatus } from "@/proto/etco";
 import { LocaleText, formatPrice, formatTime } from "../Util";
 import { Appraisal } from "@/server-actions/grpc/appraisal";
-import { InfoRow, InfoTable, PortraitRow } from "./Shared";
+import { InfoRow, InfoTable, PortraitRow, TitleRow } from "./Shared";
 
 export interface AppraisalProps {
   className?: string;
@@ -55,6 +55,7 @@ export const AppraisalContractInfo = ({
 
   return (
     <InfoTable className={className}>
+      <TitleRow>Contract</TitleRow>
       <PortraitRow entity={entity} />
       <InfoRow label="Price">
         <LocaleText fmt={formatPrice} v={price} />

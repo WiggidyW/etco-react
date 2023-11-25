@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import { AppraisalProps } from "./ContractInfo";
-import { InfoRow, InfoTable, PortraitRow } from "./Shared";
+import { InfoRow, InfoTable, PortraitRow, TitleRow } from "./Shared";
 import { ICharacter } from "@/browser/character";
 import { CancelButton } from "./Cancel";
 
@@ -31,6 +31,7 @@ export const AppraisalPrimaryInfo = ({
 
   return (
     <InfoTable className={className}>
+      <TitleRow>Appraisal</TitleRow>
       {character && <PortraitRow entity={character} />}
       {locationId > 0 && <InfoRow label="Location">{locationStr}</InfoRow>}
       <InfoRow label="System">{systemStr}</InfoRow>

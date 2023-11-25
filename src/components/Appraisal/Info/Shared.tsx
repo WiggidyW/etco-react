@@ -46,3 +46,12 @@ export const PortraitRow = ({ entity }: PortraitRowProps): ReactElement => (
     </td>
   </tr>
 );
+
+export interface TitleRowProps extends PropsWithChildren {}
+export const TitleRow = ({ children }: TitleRowProps): ReactElement => (
+  <tr>
+    <td colSpan={2} className={classNames("text-center", "text-lg")}>
+      {children}
+    </td>
+  </tr>
+);
