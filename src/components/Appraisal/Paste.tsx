@@ -66,6 +66,7 @@ interface PasteContentProps {
   pasteTitle?: string;
   linkProps?: NextLinkProps;
   intrinsicTextAreaProps?: IntrinsicTextAreaProps;
+  readonlyTerritory?: boolean;
 }
 const PasteContent = ({
   text,
@@ -79,14 +80,15 @@ const PasteContent = ({
   pasteTitle = "Paste Items",
   linkProps,
   intrinsicTextAreaProps,
+  readonlyTerritory,
 }: PasteContentProps): ReactElement => {
   const { pending } = useFormStatus();
   const submitDisabled = pending || !territory || (textRequired && !text);
 
   const resetState = useCallback(() => {
-    setTerritory(null);
+    if (!readonlyTerritory) setTerritory(null);
     setText(null);
-  }, [setTerritory, setText]);
+  }, [setTerritory, setText, readonlyTerritory]);
 
   return (
     <>
@@ -114,7 +116,7 @@ const PasteContent = ({
             value={territory}
             setValue={setTerritory}
             title={territoryTitle}
-            disabled={pending}
+            disabled={pending || readonlyTerritory}
             name="territoryId"
             options={options}
             required

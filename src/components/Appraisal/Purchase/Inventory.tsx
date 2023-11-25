@@ -171,6 +171,7 @@ export const ShopInventory = ({
           submitTitle={territory?.value === locationIdStr ? "Add" : "Shop"}
           pasteTitle={"(OPTIONAL) Paste Items"}
           action={actionParseAdd}
+          readonlyTerritory
         />
         <div className={classNames("w-full", "p-2")}>
           <InventoryTable
