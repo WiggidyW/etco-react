@@ -35,7 +35,7 @@ const BasisDiv = ({ children }: PropsWithChildren): ReactElement => (
       "flex-grow",
       "empty:hidden",
       "flex",
-      "items-center",
+      "items-start",
       "justify-center"
     )}
   >
