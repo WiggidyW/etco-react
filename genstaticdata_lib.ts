@@ -57,7 +57,7 @@ const getTransformWriteShopLocations = async (
 const getRPCResponse = async <RQ extends RPCRequest, RP extends RPCResponse>(
   method: RPCMethod<RQ, RP>,
   request: RQ
-): Promise<RP> => dispatch(method, request, asIs, ThrowKind.Pretty);
+): Promise<RP> => dispatch(method, request, asIs, ThrowKind.Pretty, true);
 
 const getNamedSDETypeData = async (): Promise<pb.NamedTypesResponse> =>
   getRPCResponse(pbClient.EveTradingCoClient.prototype.allNamedTypes, {});

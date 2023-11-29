@@ -48,12 +48,22 @@ Object.getOwnPropertySymbols = function (o: any): symbol[] {
 
 class GrpcClient {
   private static _instance: pbClient | null = null;
-  static instance(): pbClient {
+  static instance(buildMode: boolean = false): pbClient {
     if (GrpcClient._instance === null) {
+      let host: string;
+      if (
+        buildMode &&
+        process.env.BUILD_GRPC_URL !== undefined &&
+        process.env.BUILD_GRPC_URL !== ""
+      ) {
+        host = process.env.BUILD_GRPC_URL;
+      } else {
+        host = PRIVATE_ENV.GRPC_URL;
+      }
       try {
         GrpcClient._instance = new pbClient(
           new GrpcTransport({
-            host: PRIVATE_ENV.GRPC_URL,
+            host,
             channelCredentials: ChannelCredentials.createSsl(),
           })
         );
@@ -127,11 +137,12 @@ export const dispatch = async <
   method: RPCMethod<RQ, RP>,
   input: RQ,
   transform: (rep: RP) => V | Promise<V>,
-  throwKind?: ThrowKind
+  throwKind?: ThrowKind,
+  buildMode?: boolean
 ): Promise<V> => {
   try {
     return await method
-      .call(GrpcClient.instance(), input)
+      .call(GrpcClient.instance(buildMode), input)
       .response.catch((e) => handleRPCError(e))
       .then(checkProtoError)
       .then(checkAuthorized)
