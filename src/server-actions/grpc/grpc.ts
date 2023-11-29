@@ -53,10 +53,10 @@ class GrpcClient {
       let host: string;
       if (
         buildMode &&
-        process.env.BUILD_GRPC_URL !== undefined &&
-        process.env.BUILD_GRPC_URL !== ""
+        process.env.BUILD_ETCO_GRPC_URL !== undefined &&
+        process.env.BUILD_ETCO_GRPC_URL !== ""
       ) {
-        host = process.env.BUILD_GRPC_URL;
+        host = process.env.BUILD_ETCO_GRPC_URL;
       } else {
         host = PRIVATE_ENV.GRPC_URL;
       }
