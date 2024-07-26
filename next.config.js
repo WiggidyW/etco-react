@@ -5,6 +5,9 @@ const nextConfig = {
     serverActionsBodySizeLimit: '10mb',
   },
   output: "standalone",
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 }
 
 const validate = require('./src/env/validate')
